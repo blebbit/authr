@@ -1,0 +1,47 @@
+{
+  "name": "authr",
+  "version": "1.0.0",
+  "description": "standalone atproto authnz server",
+  "keywords": [],
+  "author": "blebbit.app",
+  "license": "Apache-2.0",
+  "main": "dist/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "genkey": "tsx ./scripts/create-jwks.ts ",
+    "dev": "nodemon --watch 'src/**/*.ts' --exec 'tsx' src/server.ts",
+    "build": "tsc",
+    "start": "node dist/server.js",
+    "lint": "eslint 'src/**/*.ts'"
+  },
+  "devDependencies": {
+    "@types/cookie-parser": "^1.4.8",
+    "@types/express": "^5.0.1",
+    "@types/node": "^22.13.14",
+    "@types/pg": "^8.11.11",
+    "dotenv": "^16.4.7",
+    "eslint": "^9.23.0",
+    "express": "^5.1.0",
+    "install": "^0.13.0",
+    "nodemon": "^3.1.9",
+    "npm": "^11.2.0",
+    "prettier": "^3.5.3",
+    "ts-jose": "^6.0.10",
+    "ts-node": "^10.9.2",
+    "tsc-alias": "^1.8.13",
+    "tsc-watch": "^6.2.1",
+    "tsx": "^4.19.3",
+    "typescript": "^5.8.2"
+  },
+  "dependencies": {
+    "@atproto/jwk-jose": "^0.1.5",
+    "@atproto/oauth-client-node": "^0.2.13",
+    "@authzed/authzed-node": "^1.2.3",
+    "@blebbit/flexicon": "^0.0.5",
+    "@whatwg-node/cookie-store": "^0.2.3",
+    "cookie-parser": "^1.4.7",
+    "cors": "^2.8.5",
+    "kysely": "^0.27.6",
+    "pg": "^8.14.1"
+  }
+}
