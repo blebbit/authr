@@ -1,14 +1,18 @@
-import Layout from '@/components/layout'
 import { Outlet, createRootRoute } from '@tanstack/react-router'
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools'
+import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
+
+import Providers from '@/components/providers';
+import Layout from '@/components/layout'
 
 export const Route = createRootRoute({
   component: () => (
-    <>
-    <Layout>
-      <Outlet />
-    </Layout>
+    <Providers>
+      <Layout>
+        <Outlet />
+        <ReactQueryDevtools buttonPosition="bottom-right" />
+      </Layout>
       <TanStackRouterDevtools />
-    </>
+    </Providers>
   ),
 })
