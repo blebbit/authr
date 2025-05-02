@@ -22,7 +22,7 @@ pnpm genkey keyname-1
 pnpm genkey keyname-2
 
 # run dev db & api
-make authr.dev
+make up
 ```
 
 
