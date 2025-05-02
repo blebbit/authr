@@ -38,6 +38,7 @@
     "@atproto/oauth-client-node": "^0.2.13",
     "@authzed/authzed-node": "^1.2.3",
     "@blebbit/flexicon": "^0.0.5",
+    "@tanstack/react-query": "^5.74.11",
     "@whatwg-node/cookie-store": "^0.2.3",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
