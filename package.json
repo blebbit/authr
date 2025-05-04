@@ -34,6 +34,7 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "@atproto/api": "^0.15.5",
     "@atproto/jwk-jose": "^0.1.5",
     "@atproto/oauth-client-node": "^0.2.13",
     "@authzed/authzed-node": "^1.2.3",
@@ -43,6 +44,7 @@
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "kysely": "^0.27.6",
-    "pg": "^8.14.1"
+    "pg": "^8.14.1",
+    "pg-boss": "^10.2.0"
   }
 }
