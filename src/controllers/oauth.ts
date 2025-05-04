@@ -193,3 +193,7 @@ export const callback = async (req: Request, res: Response, next: NextFunction) 
   }
 
 };
+
+export const refresh = async (req: Request, res: Response, next: NextFunction) => {
+  // ...
+}

@@ -60,9 +60,12 @@ export class SessionStore implements NodeSavedSessionStore {
     if (existing) {
       await this.del(key)
     }
+    // TODO
+    // destructure the session object to get the values
+    // add something for atproto vs google vs ...
     await this.db
       .insertInto("oauth_session")
-      .values({ key, session })
+      .values({ key, session, ...val.tokenSet })
       .returningAll()
       .executeTakeFirstOrThrow()
   }

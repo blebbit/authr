@@ -11,6 +11,7 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('state', 'varchar', (col) => col.notNull())
     .execute()
 
+  
   // OAuth Sessions (should support multiple accounts and multiple devices)
   await db.schema
     .createTable('oauth_session')
@@ -18,6 +19,14 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('created_at', 'timestamp', (col) => col.defaultTo(sql`now()`).notNull())
     .addColumn('updated_at', 'timestamp', (col) => col.defaultTo(sql`now()`).notNull())
     .addColumn('session', 'varchar', (col) => col.notNull())
+    .addColumn('aud', 'varchar')
+    .addColumn('sub', 'varchar')
+    .addColumn('iss', 'varchar')
+    .addColumn('scope', 'varchar')
+    .addColumn('refresh_token', 'varchar')
+    .addColumn('access_token', 'varchar')
+    .addColumn('token_type', 'varchar')
+    .addColumn('expires_at', 'timestamp')
     .execute()
 
   // extra user info, per DID, typically used to persist information during the oauth login flow

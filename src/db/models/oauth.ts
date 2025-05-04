@@ -24,7 +24,14 @@ export interface OauthSessionTable {
   key: string
   created_at: ColumnType<Date, string | undefined, never>
   updated_at: ColumnType<Date, string | undefined, never>
-  session: string
+  iss: string
+  sub: string
+  aud: string
+  token_type: string
+  access_token: string
+  refresh_token: string
+  expires_at: ColumnType<Date, string | undefined, never>
+  scope: string
 }
 
 // used during oauth login
