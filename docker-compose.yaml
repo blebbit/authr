@@ -3,6 +3,7 @@ version: "3"
 volumes:
   spice_pgdata:
   authr_pgdata:
+  boss_pgdata:
 
 services:
   spicedb:
@@ -16,18 +17,28 @@ services:
     environment:
       - "SPICEDB_GRPC_PRESHARED_KEY=blebbit-spicedb"
       - "SPICEDB_DATASTORE_ENGINE=postgres"
-      - "SPICEDB_DATASTORE_CONN_URI=postgres://postgres:secret@spicedb-pg:5432/spicedb?sslmode=disable"
+      - "SPICEDB_DATASTORE_CONN_URI=postgres://spicedb:pg-secret@spicedb-pg:5432/spicedb?sslmode=disable"
     depends_on:
-      - "spicedb-mig"
       - "spicedb-pg"
+      - "spicedb-pg-mig"
 
-  spicedb-mig:
+  spicedb-pg-mig:
     image: "authzed/spicedb"
     command: "migrate head"
     restart: "on-failure"
     environment:
       - "SPICEDB_DATASTORE_ENGINE=postgres"
-      - "SPICEDB_DATASTORE_CONN_URI=postgres://postgres:secret@spicepg:5432/spicedb?sslmode=disable"
+      - "SPICEDB_DATASTORE_CONN_URI=postgres://spicedb:pg-secret@spicedb-pg:5432/spicedb?sslmode=disable"
+    depends_on:
+      - "spicedb-pg"
+      - "spicedb-pg-init"
+
+  # track_commit_timestamp is required to support SpiceDB's Watch API
+  # see https://authzed.com/docs/spicedb/concepts/datastores#usage-notes-2
+  spicedb-pg-init:
+    image: "postgres:16"
+    restart: "on-failure:3"
+    command: "psql postgres://spicedb:pg-secret@spicedb-pg:5432/spicedb?sslmode=disable -c \"ALTER SYSTEM SET track_commit_timestamp = on;\""
     depends_on:
       - "spicedb-pg"
 
@@ -36,21 +47,11 @@ services:
     ports:
       - "5433:5432"
     environment:
-      - "POSTGRES_PASSWORD=pg-secret"
       - "POSTGRES_DB=spicedb"
+      - "POSTGRES_USER=spicedb"
+      - "POSTGRES_PASSWORD=pg-secret"
     volumes:
       - spice_pgdata:/var/lib/postgresql/data 
-
-  # track_commit_timestamp is required to support SpiceDB's Watch API
-  # see https://authzed.com/docs/spicedb/concepts/datastores#usage-notes-2
-  spicedb-pg-init:
-    image: "postgres:16"
-    restart: "on-failure:3"
-    command: "psql -h spicedb-pg -U postgres -c \"ALTER SYSTEM SET track_commit_timestamp = on;\""
-    environment:
-      - "PGPASSWORD=pg-secret"
-    depends_on:
-      - "spicedb-pg"
 
   authr-pg:
     image: "postgres:16"
@@ -62,4 +63,16 @@ services:
       - authr_pgdata:/var/lib/postgresql/data 
     ports:
     - "5432:5432"
+ 
+
+  boss-pg:
+    image: "postgres:16"
+    restart: always
+    environment:
+      POSTGRES_DB: boss
+      POSTGRES_PASSWORD: boss
+    volumes:
+      - boss_pgdata:/var/lib/postgresql/data 
+    ports:
+    - "5434:5432"
  
