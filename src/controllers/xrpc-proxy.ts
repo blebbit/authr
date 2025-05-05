@@ -14,14 +14,24 @@ export const handleXrpc = async (req: Request, res: Response, next: NextFunction
     return res.status(401).json({ error: "Unauthorized" });
   }
 
-  const url = `${req.session.pds}/xrpc/com.atproto.repo.getRecord?repo=${req.params.account}&collection=${req.params.collection}&rkey=${req.params.rkey}`
+  console.log("xrpc.url:", req.url)
+  // console.log("xrpc.reqPath:", req.path);
+  // console.log("xrpc.reqQuery:", req.query);
+
+  // const url1 = `${req.session.pds}/xrpc/com.atproto.repo.getRecord?repo=${req.query.repo}&collection=${req.query.collection}&rkey=${req.query.rkey}`
+  const url2 = `${req.session.pds}${req.url}`
+  // console.log("xrpc.url1:", url1)
+  console.log("xrpc.url2:", url2)
 
   const authz = `dpop ${req.session.access_token}`
 
-  const resp = await fetch(url, {
+  const resp = await fetch(url2, {
+    method: req.method,
     headers: {
       Authorization: authz,
-    }
+      "at-proxy": req.headers['at-proxy'] as string,
+    },
+    body: req.method === 'POST' ? req.body : undefined,
   })
   const rdata = await resp.json()
 

@@ -2,14 +2,17 @@ import { Database } from './models' // this is the Database interface we defined
 import { Pool } from 'pg'
 import { Kysely, PostgresDialect } from 'kysely'
 
+import config from '@/config'
+
 const dialect = new PostgresDialect({
   pool: new Pool({
-    database: 'authr',
-    password: 'authr',
-    host: 'localhost',
-    user: 'postgres',
-    port: 5432,
-    max: 10,
+    database: config.db.database,
+    ssl: config.db.ssl,
+    password: config.db.password,
+    host: config.db.host,
+    user: config.db.user,
+    port: config.db.port,
+    max: config.db.maxConnections,
   })
 })
 

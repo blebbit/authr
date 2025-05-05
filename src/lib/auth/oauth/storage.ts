@@ -7,6 +7,9 @@ import type {
 
 import { Kysely } from 'kysely'
 import { Database } from '../../../db/models'
+import { sendEvent } from '@/lib/events'
+import { access } from 'fs'
+import e from 'express'
 
 export class StateStore implements NodeSavedStateStore {
   constructor(private db: Kysely<Database>) {}
@@ -55,19 +58,37 @@ export class SessionStore implements NodeSavedSessionStore {
   }
 
   async set(key: string, val: NodeSavedSession) {
+    console.log("SessionStore.set", key)
     const session = JSON.stringify(val)
+
+    // do we want to delete this or just overwrite it?
     const existing = await this.get(key)
     if (existing) {
       await this.del(key)
     }
-    // TODO
-    // destructure the session object to get the values
-    // add something for atproto vs google vs ...
+    // TODO // add something for atproto vs google vs ... (to the table schema, write an atproto default here)
     await this.db
       .insertInto("oauth_session")
       .values({ key, session, ...val.tokenSet })
       .returningAll()
       .executeTakeFirstOrThrow()
+
+    console.log("SessionStore.event", key)
+
+    try {
+      // send webhook event
+      await sendEvent("oauth_session.set", {
+        key,
+        iss: val.tokenSet.iss,
+        sub: val.tokenSet.sub,
+        aud: val.tokenSet.aud,
+        scope: val.tokenSet.scope,
+        access_token: val.tokenSet.access_token,
+        expires_at: val.tokenSet.expires_at,
+      })
+    } catch (error) {
+      console.error("Error sending event:", error)
+    }
   }
 
   async del(key: string) {

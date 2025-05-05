@@ -1,11 +1,12 @@
 import { Request, Response, NextFunction } from 'express';
 import { isValidHandle } from '@atproto/syntax'
 
-import config from '../config';
+import config from '@/config';
 
-import { getClient } from "../lib/auth/oauth/client";
-import { addSession } from "../lib/auth/session";
-import { lookupInfo } from '../lib/atproto/lookup';
+import { getClient } from "@/lib/auth/oauth/client";
+import { addSession } from "@/lib/auth/session";
+import { lookupInfo } from '@/lib/atproto/lookup';
+import { sendEvent } from '@/lib/events';
 
 // for saving some extra data
 import { Database } from '../db/models';

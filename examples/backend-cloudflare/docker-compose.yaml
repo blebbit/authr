@@ -1,0 +1,18 @@
+version: "3"
+
+volumes:
+  authr_example_backend_pgdata:
+
+services:
+
+  example-db:
+    image: "postgres:16"
+    restart: always
+    environment:
+      POSTGRES_DB: example
+      POSTGRES_USER: example
+      POSTGRES_PASSWORD: example
+    volumes:
+      - authr_example_backend_pgdata:/var/lib/postgresql/data 
+    ports:
+    - "3002:5432"

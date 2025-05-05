@@ -21,7 +21,7 @@ export default defineConfig({
     port: 3000,
     allowedHosts: [".blebbit.org"],
     cors: {
-      origin: ["https://app.blebbit.org", "https://auth.blebbit.org"],
+      origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
     }
   },
 });

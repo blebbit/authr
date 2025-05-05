@@ -58,6 +58,7 @@ services:
     restart: always
     environment:
       POSTGRES_DB: authr
+      POSTGRES_USER: authr
       POSTGRES_PASSWORD: authr
     volumes:
       - authr_pgdata:/var/lib/postgresql/data 
@@ -70,6 +71,7 @@ services:
     restart: always
     environment:
       POSTGRES_DB: boss
+      POSTGRES_USER: boss
       POSTGRES_PASSWORD: boss
     volumes:
       - boss_pgdata:/var/lib/postgresql/data 

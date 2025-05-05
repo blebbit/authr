@@ -11,7 +11,7 @@ const ProfileView = ({session}: {session: any}) => {
     queryKey: [session?.handle, 'bskyProfile'],
     queryFn: async () => {
 
-      const r = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/xrpc/${session?.did}/app.bsky.actor.profile/self`, {
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/com.atproto.repo.getRecord?repo=${session?.did}&collection=app.bsky.actor.profile&rkey=self`, {
         credentials: 'include'
       })
 

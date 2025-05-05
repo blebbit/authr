@@ -25,6 +25,16 @@ interface Config {
   port: number;
   nodeEnv: string;
 
+  db: {
+    host: string;
+    port: number;
+    user: string;
+    password: string;
+    database: string;
+    ssl: boolean;
+    maxConnections: number;
+  }
+
   oauth: {
     clientName: string;
     publicUrl: string;
@@ -48,11 +58,26 @@ interface Config {
     path: string , // Cookie is valid for the entire site
     domain: string // Optional: Set if needed for subdomains
   }
+
+  webhook: {
+    secret: string;
+    url: string;
+  }
 }
 
 const config: Config = {
   port: Number(process.env.PORT) || 3333,
   nodeEnv: process.env.NODE_ENV || 'development',
+
+  db: {
+    host: process.env.DB_HOST || 'localhost',
+    port: Number(process.env.DB_PORT) || 5432,
+    user: process.env.DB_USER || 'authr',
+    password: process.env.DB_PASSWORD || 'authr',
+    database: process.env.DB_NAME || 'authr',
+    ssl: stringToBoolean(process.env.DB_SSL || "false"),
+    maxConnections: Number(process.env.DB_MAX_CONNECTIONS) || 10,
+  },
 
   oauth: {
     clientName: process.env.OAUTH_CLIENT_NAME || 'blebbit',
@@ -80,6 +105,11 @@ const config: Config = {
     // note the leading dot to make the cookie valid for all subdomains
     domain: process.env.COOKIE_DOMAIN || ".blebbit.org",
     httpOnly: stringToBoolean(process.env.COOKIE_HTTP_ONLY || "true"), // **CRITICAL:** Prevents client-side JS access (XSS mitigation)
+  },
+
+  webhook: {
+    secret: process.env.WEBHOOK_SECRET || 'authr-webhook-secret',
+    url: process.env.WEBHOOK_URL || 'http://localhost:3001/webhooks/authr', // example backend URL
   }
 };
 

@@ -4,7 +4,7 @@ import { handleXrpc } from '../controllers/xrpc-proxy';
 
 const router = Router();
 
-router.get('/xrpc/:account/:collection/:rkey', handleXrpc)
-router.post('/xrpc/:account/:collection/:rkey', handleXrpc)
+router.get('/xrpc/:method', handleXrpc)
+router.post('/xrpc/:method', handleXrpc)
 
 export default router;
