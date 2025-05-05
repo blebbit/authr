@@ -1,16 +1,25 @@
+# backend-cloudflare
+
+Example proxied and auth'd xrpc proxy which runs separately from authr,
+for example an appview server on cloudflare.
+
+You'll need
+- a Cloudflare KV setup,
+- another tunnel host like "api" in addition to "app" and "auth"
+
 ```txt
-npm install
-npm run dev
+pnpm install
+pnpm run dev
 ```
 
 ```txt
-npm run deploy
+pnpm run deploy
 ```
 
 [For generating/synchronizing types based on your Worker configuration run](https://developers.cloudflare.com/workers/wrangler/commands/#types):
 
 ```txt
-npm run cf-typegen
+pnpm run cf-typegen
 ```
 
 Pass the `CloudflareBindings` as generics when instantiation `Hono`:
