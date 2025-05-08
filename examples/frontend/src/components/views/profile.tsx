@@ -35,18 +35,21 @@ const ProfileView = ({session}: {session: any}) => {
     enabled: !!(session?.did)
   })
 
-  // const bskyPreferences = useQuery({
-  //   queryKey: [session?.handle, 'bskyPreferences'],
-  //   queryFn: async () => {
+  const bskyPreferences = useQuery({
+    queryKey: [session?.handle, 'bskyPreferences'],
+    queryFn: async () => {
 
-  //     const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getPreferences`, {
-  //       credentials: 'include'
-  //     })
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getPreferences`, {
+        credentials: 'include'
+        // headers: {
+        //   'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
+        // }
+      })
 
-  //     return r.json()
-  //   },
-  //   enabled: !!(session?.did)
-  // })
+      return r.json()
+    },
+    enabled: !!(session?.did)
+  })
 
   const switchAccount = (did: string) => {
     console.log("switchAccount", did)
@@ -90,9 +93,9 @@ const ProfileView = ({session}: {session: any}) => {
         {bskyProfile2.data ? JSON.stringify(bskyProfile2.data, null, 2) : null }
       </pre>
       <hr/>
-      {/* <pre>
+      <pre>
         {bskyPreferences.data ? JSON.stringify(bskyPreferences.data, null, 2) : null }
-      </pre> */}
+      </pre>
       <hr/>
 
     </div>
