@@ -15,7 +15,7 @@ const app = new Hono<{Bindings: Bindings}>()
 
 app.use(cors({
   origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
-  allowHeaders: ['*'],
+  allowHeaders: ['Content-Type', 'Authorization', 'atproto-proxy'],
   allowMethods: ['POST', 'GET', 'OPTIONS'],
   exposeHeaders: ['Content-Length'],
   maxAge: 600,

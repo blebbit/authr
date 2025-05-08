@@ -14,6 +14,7 @@ const common = {
     allowedHosts: [".blebbit.org"],
     cors: {
       origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
+      credentials: true,
     }
   },
 }

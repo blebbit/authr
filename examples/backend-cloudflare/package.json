@@ -7,11 +7,9 @@
     "preview": "$npm_execpath run build && wrangler dev dist-server/index.js",
     "deploy": "$npm_execpath run build && wrangler deploy dist-server/index.js",
     "cf-typegen": "wrangler types --env-interface CloudflareBindings",
-
     "db:migrate": "tsx -r dotenv/config ./src/db/migrator",
     "db:seed": "tsx -r dotenv/config ./src/db/seed",
     "db:reset": "pnpm db:migrate && pnpm db:seed",
-
     "check-types": "tsc --noemit --skipLibCheck",
     "lint": "eslint ./src --max-warnings 0 && pnpm check-types",
     "lint:fix": "eslint ./src --fix",
@@ -23,6 +21,7 @@
     "dotenv": "^16.5.0",
     "hono": "^4.7.8",
     "kysely": "^0.28.2",
+    "multiformats": "^13.3.2",
     "zod": "^3.24.4"
   },
   "devDependencies": {

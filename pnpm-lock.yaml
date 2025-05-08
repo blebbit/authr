@@ -4,6 +4,10 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  oauth-client: link:../../Library/pnpm/global/5/node_modules/@atproto/oauth-client
+  api: link:../../Library/pnpm/global/5/node_modules/@atproto/api
+
 importers:
 
   .:
@@ -29,6 +33,9 @@ importers:
       '@whatwg-node/cookie-store':
         specifier: ^0.2.3
         version: 0.2.3
+      api:
+        specifier: link:../../Library/pnpm/global/5/node_modules/@atproto/api
+        version: link:../../Library/pnpm/global/5/node_modules/@atproto/api
       cookie-parser:
         specifier: ^1.4.7
         version: 1.4.7
@@ -38,6 +45,9 @@ importers:
       kysely:
         specifier: ^0.27.6
         version: 0.27.6
+      oauth-client:
+        specifier: link:../../Library/pnpm/global/5/node_modules/@atproto/oauth-client
+        version: link:../../Library/pnpm/global/5/node_modules/@atproto/oauth-client
       pg:
         specifier: ^8.14.1
         version: 8.15.5

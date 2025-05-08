@@ -41,9 +41,11 @@
     "@blebbit/flexicon": "^0.0.5",
     "@tanstack/react-query": "^5.74.11",
     "@whatwg-node/cookie-store": "^0.2.3",
+    "api": "link:../../Library/pnpm/global/5/node_modules/@atproto/api",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
     "kysely": "^0.27.6",
+    "oauth-client": "link:../../Library/pnpm/global/5/node_modules/@atproto/oauth-client",
     "pg": "^8.14.1",
     "pg-boss": "^10.2.0"
   }

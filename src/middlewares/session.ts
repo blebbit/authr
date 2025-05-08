@@ -19,8 +19,10 @@ export const sessionHandler = async (req: Request, res: Response, next: NextFunc
     // setup Agent for the oauth session tied to the blebbit session
     const client = await getClient()
     const oauthSession = await client.restore(session.did)
+    // console.log("sessionHandler.oauthSession:", oauthSession)
     const agent = new Agent(oauthSession)
     req.agent = agent
+    req.client = client
 
     // get the latest oauth session from the database
     const r = await db.selectFrom("oauth_session")

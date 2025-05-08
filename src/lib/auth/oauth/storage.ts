@@ -4,12 +4,11 @@ import type {
   NodeSavedState,
   NodeSavedStateStore,
 } from '@atproto/oauth-client-node'
+import { JoseKey } from '@atproto/jwk-jose'
 
 import { Kysely } from 'kysely'
 import { Database } from '../../../db/models'
 import { sendEvent } from '@/lib/events'
-import { access } from 'fs'
-import e from 'express'
 
 export class StateStore implements NodeSavedStateStore {
   constructor(private db: Kysely<Database>) {}
@@ -58,7 +57,17 @@ export class SessionStore implements NodeSavedSessionStore {
   }
 
   async set(key: string, val: NodeSavedSession) {
-    console.log("SessionStore.set", key)
+    console.log("SessionStore.set", key, val)
+
+    try {
+      const bskyPubKey = await JoseKey.fromImportable('{"kty":"EC","alg":"ES256K","use":"sig","crv":"secp256k1","x":"GgskXhf9OJFxYNovWiwq35akQopFXS6Tzuv0Y-B6q8I","y":"Cv8TnJVvra7TmYsaO-_nwhpD2jpfdnRE_TAeuvxLgJE"}')
+      const validateResp = await bskyPubKey.verifyJwt(val.tokenSet.access_token as any)
+      console.log("SessionStore.bskyPubKey", bskyPubKey)
+      console.log("SessionStore.validateResp", validateResp)
+    } catch (error) {
+      console.error("SessionStore.bskyPubKey error", error)
+    }
+
     const session = JSON.stringify(val)
 
     // do we want to delete this or just overwrite it?
@@ -66,6 +75,7 @@ export class SessionStore implements NodeSavedSessionStore {
     if (existing) {
       await this.del(key)
     }
+
     // TODO // add something for atproto vs google vs ... (to the table schema, write an atproto default here)
     await this.db
       .insertInto("oauth_session")
@@ -85,6 +95,7 @@ export class SessionStore implements NodeSavedSessionStore {
         scope: val.tokenSet.scope,
         access_token: val.tokenSet.access_token,
         expires_at: val.tokenSet.expires_at,
+        session,
       })
     } catch (error) {
       console.error("Error sending event:", error)
@@ -97,6 +108,15 @@ export class SessionStore implements NodeSavedSessionStore {
       .where("key", "=", key)
       .returningAll()
       .executeTakeFirstOrThrow()
+
+    // try {
+    //   // send webhook event
+    //   await sendEvent("oauth_session.del", {
+    //     key,
+    //   })
+    // } catch (error) {
+    //   console.error("Error sending event:", error)
+    // }
   }
 }
 

@@ -22,6 +22,9 @@ export default defineConfig({
     allowedHosts: [".blebbit.org"],
     cors: {
       origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
+      credentials: true,
+      methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+      allowedHeaders: ["Content-Type", "Authorization", "atproto-proxy"],
     }
   },
 });

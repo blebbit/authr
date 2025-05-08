@@ -1,4 +1,5 @@
-import { NodeOAuthClient } from '@atproto/oauth-client-node'
+// import { NodeOAuthClient } from '@atproto/oauth-client-node'
+import { NodeOAuthClient } from '@/lib/atproto/oauth-client-node'
 import { JoseKey } from '@atproto/jwk-jose'
 
 import { SessionStore, StateStore } from './storage'
@@ -10,7 +11,7 @@ import config from '../../../config'
 async function loadKeyset() {
   return Promise.all([
     JoseKey.fromImportable(config.oauth.jwks[0]),
-    JoseKey.fromImportable(config.oauth.jwks[1]),
+    // JoseKey.fromImportable(config.oauth.jwks[1]),
     // JoseKey.fromImportable(process.env.PRIVATE_KEY_3),
   ])
 }

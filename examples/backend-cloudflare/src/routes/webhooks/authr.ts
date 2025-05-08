@@ -40,8 +40,17 @@ export async function handleAuthrWebhook(c: Context) {
   const data = JSON.parse(text)
   console.log('Received webhook data:', data)
 
-  await c.env.KV.put(data.data.sub, JSON.stringify(data.data))
-  console.log('Stored data in KV:', data.data.sub, data.data)
+  switch (data.event) {
+    case 'oauth_session.set':
+      await c.env.KV.put(data.data.key, JSON.stringify(data.data))
+      console.log('Stored data in KV:', data.data.key)
+      break
+    case 'oauth_session.del':
+      await c.env.KV.del(data.data.key)
+      console.log('Removed data in KV:', data.data.key)
+      break
+
+  }
 
   return c.json({
     endpoint: 'webhooks.authr.handle',

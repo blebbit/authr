@@ -19,7 +19,7 @@ app.use(cookieParser());
 app.use(cors({
   origin: ['https://app.blebbit.org',"https://auth.blebbit.org", "https://api.blebbit.org"], // Allow all origins
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow all HTTP methods
-  allowedHeaders: '*', // Allow all headers
+  allowedHeaders: ['Content-Type', 'Authorization', 'atproto-proxy'], // Allow all headers
   credentials: true, // Allow credentials (cookies, authorization headers, etc.)
 }));
 
