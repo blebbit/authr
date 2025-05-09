@@ -1,7 +1,8 @@
 import express from 'express';
 
 // middleware
-var cors = require('cors')
+// var cors = require('cors')
+import cors from 'cors';
 import cookieParser from 'cookie-parser';
 import { errorHandler } from './middlewares/errorHandler';
 import { sessionHandler } from './middlewares/session';

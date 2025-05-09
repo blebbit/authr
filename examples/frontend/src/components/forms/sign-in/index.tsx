@@ -60,7 +60,7 @@ export function HandleForm() {
       },
       body: b
     })
-    const data = await resp.json()
+    const data: any = await resp.json()
     console.log("data:", data)
     if (data.error) {
       // TODO, update form or page...

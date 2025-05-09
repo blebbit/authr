@@ -1,35 +1,15 @@
 {
-  "name": "backend",
+  "name": "my-app2",
   "type": "module",
   "scripts": {
-    "dev": "vite --port 3001",
-    "build": "vite build && vite build --ssr",
-    "preview": "$npm_execpath run build && wrangler dev dist-server/index.js",
-    "deploy": "$npm_execpath run build && wrangler deploy dist-server/index.js",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
-    "db:migrate": "tsx -r dotenv/config ./src/db/migrator",
-    "db:seed": "tsx -r dotenv/config ./src/db/seed",
-    "db:reset": "pnpm db:migrate && pnpm db:seed",
-    "check-types": "tsc --noemit --skipLibCheck",
-    "lint": "eslint ./src --max-warnings 0 && pnpm check-types",
-    "lint:fix": "eslint ./src --fix",
-    "prettier": "prettier --write ./src"
+    "dev": "wrangler dev",
+    "deploy": "wrangler deploy --minify",
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
   },
   "dependencies": {
-    "@atproto/api": "^0.15.5",
-    "@blebbit/flexicon": "^0.0.5",
-    "dotenv": "^16.5.0",
-    "hono": "^4.7.8",
-    "kysely": "^0.28.2",
-    "multiformats": "^13.3.2",
-    "zod": "^3.24.4"
+    "hono": "^4.7.8"
   },
   "devDependencies": {
-    "@cloudflare/vite-plugin": "^0.1.15",
-    "@hono/vite-build": "^1.5.0",
-    "tsx": "^4.19.4",
-    "vite": "^6.1.1",
-    "vite-plugin-ssr-hot-reload": "^0.4.1",
     "wrangler": "^4.4.0"
   }
 }

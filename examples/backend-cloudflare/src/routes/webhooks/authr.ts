@@ -1,15 +1,20 @@
 import { Context } from 'hono'
 
 import { getConfig } from '../../config'
-const config = getConfig(process.env)
 
 export async function handleAuthrWebhook(c: Context) {
+  const config = getConfig(c.env)
+  console.log("config:", config)
+  console.log("c.env:", c.env)
+
   // Check if the response contains the expected signature
   const signatureHeader = c.req.header('X-Signature')
 
   if (!signatureHeader) {
     throw new Error('No signature header received')
   }
+
+  console.log("Webhook secret:", config.webhook.secret)
 
   const encoder = new TextEncoder()
   const key = await crypto.subtle.importKey(
@@ -31,6 +36,9 @@ export async function handleAuthrWebhook(c: Context) {
   const expectedSignatureHex = expectedSignatureArray
     .map((b) => b.toString(16).padStart(2, '0'))
     .join('')
+
+  console.log('Expected signature:', expectedSignatureHex)
+  console.log('Received signature:', signatureHeader)
 
   if (signatureHeader !== expectedSignatureHex) {
     throw new Error('Invalid signature')

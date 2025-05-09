@@ -7,14 +7,11 @@ import { showRoutes } from 'hono/dev'
 
 import { addRoutes } from './routes'
 
-type Bindings = {
-	DB: D1Database;
-}
-
-const app = new Hono<{Bindings: Bindings}>()
+const app = new Hono<{Bindings: CloudflareBindings}>()
 
 app.use(cors({
-  origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
+  // origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
+  origin: "https://app.authr.blebbit.dev",
   allowHeaders: ['Content-Type', 'Authorization', 'atproto-proxy'],
   allowMethods: ['POST', 'GET', 'OPTIONS'],
   exposeHeaders: ['Content-Length'],
@@ -22,6 +19,9 @@ app.use(cors({
   credentials: true,
 }))
 app.use(logger())
+
+// app.get('/authr-dev-test-route', (c) => c.json(c.env))
+
 
 addRoutes(app)
 

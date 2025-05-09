@@ -4,7 +4,6 @@ import { JoseKey } from '@atproto/jwk-jose'
 import * as jose from 'jose'
 
 import { getConfig } from '../../config'
-const config = getConfig(process.env)
 
 // only export
 export function addRoutes(app: Hono) {
@@ -38,7 +37,10 @@ async function xrpcProxy(c: Context) {
 
   // Get oauth session from KV
   const results = await c.env.KV.get(authr_session.did)
+  console.log("xrpcProxy.KV.results:", results)
+
   const oauth_session = JSON.parse(results as string)
+  console.log("xrpcProxy.oauth_session:", oauth_session)
 
   const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl)
 
@@ -200,6 +202,9 @@ export const DefaultSession: Session = {
 };
 
 export async function getSession(c: Context): Promise<Session | null> {
+  const config = getConfig(c.env)
+  console.log("config:", config)
+
   const cookie = getCookie(c, config.cookie.name);
 
   if (!cookie) {

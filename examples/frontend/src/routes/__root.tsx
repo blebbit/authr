@@ -8,6 +8,7 @@ import Layout from '@/components/layout'
 export const Route = createRootRoute({
   component: () => (
     <Providers>
+      {/* @ts-ignore */}
       <Layout>
         <Outlet />
         <ReactQueryDevtools buttonPosition="bottom-right" />

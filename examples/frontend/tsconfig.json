@@ -13,13 +13,17 @@
     "verbatimModuleSyntax": true,
     "noEmit": true,
 
+    // disable some error checks
+    "skipDefaultLibCheck": true,
+    "noImplicitAny": false,
+
     /* Linting */
     "skipLibCheck": true,
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
-    "noUncheckedSideEffectImports": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false,
+    "noUncheckedSideEffectImports": false,
     "baseUrl": ".",
     "paths": {
       "@/*": ["./src/*"],

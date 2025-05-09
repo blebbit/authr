@@ -16,6 +16,7 @@
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.8",
+    "@types/cors": "^2.8.18",
     "@types/express": "^5.0.1",
     "@types/node": "^22.13.14",
     "@types/pg": "^8.11.11",
@@ -34,9 +35,13 @@
     "typescript": "^5.8.2"
   },
   "dependencies": {
+    "@atproto-labs/handle-resolver-node": "^0.1.15",
     "@atproto/api": "^0.15.5",
     "@atproto/jwk-jose": "^0.1.5",
+    "@atproto/jwk-webcrypto": "^0.1.6",
+    "@atproto/oauth-client": "^0.3.16",
     "@atproto/oauth-client-node": "^0.2.13",
+    "@atproto/syntax": "^0.4.0",
     "@authzed/authzed-node": "^1.2.3",
     "@blebbit/flexicon": "^0.0.5",
     "@tanstack/react-query": "^5.74.11",
@@ -44,7 +49,9 @@
     "api": "link:../../Library/pnpm/global/5/node_modules/@atproto/api",
     "cookie-parser": "^1.4.7",
     "cors": "^2.8.5",
+    "jose": "^6.0.11",
     "kysely": "^0.27.6",
+    "multiformats": "^13.3.3",
     "oauth-client": "link:../../Library/pnpm/global/5/node_modules/@atproto/oauth-client",
     "pg": "^8.14.1",
     "pg-boss": "^10.2.0"

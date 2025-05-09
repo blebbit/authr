@@ -5,6 +5,8 @@ volumes:
 
 services:
 
+  # if we decide to support different databases in the example...
+
   example-db:
     image: "postgres:16"
     restart: always

@@ -1,0 +1,13 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "authr-example-frontend",
+  "compatibility_date": "2025-02-04",
+  "pages_build_output_dir": "./dist",
+  "compatibility_flags": ["nodejs_compat"],
+  "vars": {
+    "VITE_AUTHR_COOKIE_NAME": "authr_session",
+    "VITE_AUTHR_COOKIE_DOMAIN": ".authr.blebbit.den",
+    "VITE_AUTHR_OAUTH_HOST": "https://auth.authr.blebbit.dev",
+    "VITE_XRPC_HOST": "https://api.authr.blebbit.org"
+  }
+}

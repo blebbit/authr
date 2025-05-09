@@ -1,6 +1,9 @@
+// import { cloudflare } from '@cloudflare/vite-plugin'
 import { defineConfig } from "vite";
 import viteReact from "@vitejs/plugin-react";
 import tailwindcss from "@tailwindcss/vite";
+import { cloudflare } from 'unenv'
+
 
 import { TanStackRouterVite } from "@tanstack/router-plugin/vite";
 import { resolve } from "node:path";
@@ -18,6 +21,8 @@ export default defineConfig({
     },
   },
   server: {
+    preset: 'cloudflare-pages',
+    unenv: cloudflare,
     port: 3000,
     allowedHosts: [".blebbit.org"],
     cors: {

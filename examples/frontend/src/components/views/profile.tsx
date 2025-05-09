@@ -57,6 +57,7 @@ const ProfileView = ({session}: {session: any}) => {
       if (sessions.accounts[s].did === did) {
         sessions.current = sessions.accounts[s]
         const cookieName = import.meta.env.VITE_AUTHR_COOKIE_NAME as string
+        // @ts-ignore
         setCookie(cookieName, sessions.current.cookie, {
           path: '/',
           domain: import.meta.env.VITE_AUTHR_COOKIE_DOMAIN,

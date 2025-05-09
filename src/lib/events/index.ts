@@ -26,6 +26,7 @@ export async function sendEvent(
     false,
     ['sign'],
   )
+  console.log('Webhook Key:', key)
 
   const signature = await crypto.subtle.sign(
     'HMAC',

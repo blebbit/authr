@@ -1,3 +1,7 @@
 overrides:
   oauth-client: link:../../Library/pnpm/global/5/node_modules/@atproto/oauth-client
   api: link:../../Library/pnpm/global/5/node_modules/@atproto/api
+
+packages:
+  - 'examples/*'
+  - './'
