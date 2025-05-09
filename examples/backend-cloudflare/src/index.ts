@@ -9,19 +9,20 @@ import { addRoutes } from './routes'
 
 const app = new Hono<{Bindings: CloudflareBindings}>()
 
-app.use(cors({
-  // origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
-  origin: "https://app.authr.blebbit.dev",
+app.use('*', cors({
+  origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
+  // origin: "https://app.authr.blebbit.dev",
   allowHeaders: ['Content-Type', 'Authorization', 'atproto-proxy'],
   allowMethods: ['POST', 'GET', 'OPTIONS'],
   exposeHeaders: ['Content-Length'],
   maxAge: 600,
   credentials: true,
+  slug: 'love',
 }))
+
 app.use(logger())
 
 // app.get('/authr-dev-test-route', (c) => c.json(c.env))
-
 
 addRoutes(app)
 
