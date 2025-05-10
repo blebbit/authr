@@ -11,18 +11,18 @@ const app = new Hono<{Bindings: CloudflareBindings}>()
 
 const origins: any = {
   dev: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
-  stg: ["https://app.authr.blebbit.org", "https://api.authr.blebbit.org", "https://auth.authr.blebbit.org"]
+  stg: ["https://app.authr.blebbit.dev", "https://api.authr.blebbit.dev", "https://auth.authr.blebbit.dev"]
 }
 
 app.use('*', cors({
   origin: (origin: string, c: Context) => {  
-    // console.log("CORS.origin:", origin)
+    console.log("CORS.origin:", origin, c.env.AUTHR_ENV, origins[c.env.AUTHR_ENV], origins)
     const validOrigins: string[] = origins[c.env.AUTHR_ENV]
     if (validOrigins.includes(origin)) {
-      // console.log("CORS.return:", origin)
+      console.log("CORS.return:", origin)
       return origin
     }
-    // console.log("CORS.return:", "")
+    console.log("CORS.return:", "empty")
     return ""
   },
   allowHeaders: ['Content-Type', 'Authorization', 'Cookie', 'atproto-proxy'],
