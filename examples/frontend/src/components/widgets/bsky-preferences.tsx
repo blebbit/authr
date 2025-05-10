@@ -13,7 +13,7 @@ export const BskyPreferences = ({ data }: { data: any }) => {
 }
 
 const BskyPreferenceItems = ({ bskyPreferences }: { bskyPreferences: any }) => {
-  let prefs = {};
+  let prefs: any = {};
 
   for (const key in bskyPreferences) {
     const pref = bskyPreferences[key];
@@ -26,7 +26,7 @@ const BskyPreferenceItems = ({ bskyPreferences }: { bskyPreferences: any }) => {
   return (
     <div className="flex flex-col gap-3 pl-2">
       { Object.entries(prefs).map(([key, elems]) => {
-        return <BskyPreferenceItem key={key} pref={key} elems={elems} />
+        return <BskyPreferenceItem key={key} pref={key} elems={elems as any[]} />
       })}
     </div>
   )

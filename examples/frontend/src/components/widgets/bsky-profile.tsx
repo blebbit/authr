@@ -1,6 +1,6 @@
 import { RespError } from "./resp-error";
 
-export const BskyProfile = ({ data, pds }: { data: any, pds: string }) => {
+export const BskyProfile = ({ data }: { data: any }) => {
   return (
     <div className="flex flex-col gap-2 p-4 border rounded-md bg-white shadow-sm">
       <h2 className="font-light text-2xl">Bluesky Profile:</h2>

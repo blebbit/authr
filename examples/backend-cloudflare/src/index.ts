@@ -1,4 +1,4 @@
-import { Hono } from 'hono'
+import { Hono, Context } from 'hono'
 
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
@@ -9,9 +9,22 @@ import { addRoutes } from './routes'
 
 const app = new Hono<{Bindings: CloudflareBindings}>()
 
+const origins: any = {
+  dev: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
+  stg: ["https://app.authr.blebbit.org", "https://api.authr.blebbit.org", "https://auth.authr.blebbit.org"]
+}
+
 app.use('*', cors({
-  origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
-  // origin: "https://app.authr.blebbit.dev",
+  origin: (origin: string, c: Context) => {  
+    // console.log("CORS.origin:", origin)
+    const validOrigins: string[] = origins[c.env.AUTHR_ENV]
+    if (validOrigins.includes(origin)) {
+      // console.log("CORS.return:", origin)
+      return origin
+    }
+    // console.log("CORS.return:", "")
+    return ""
+  },
   allowHeaders: ['Content-Type', 'Authorization', 'Cookie', 'atproto-proxy'],
   allowMethods: ['POST', 'GET', 'OPTIONS'],
   exposeHeaders: ['Content-Length'],

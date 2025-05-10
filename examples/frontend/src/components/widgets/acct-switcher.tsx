@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query'
 
 export const AccountSwitcher = () => {
   const queryClient = useQueryClient()
-  const [sessions, setSessions] = useLocalStorage("blebbit/sessions", { accounts: [], current: { did: "" } });
+  const [sessions, setSessions] = useLocalStorage("blebbit/sessions", { accounts: [], current: {} as any });
   const [_, setCookie] = useCookies()
 
   const switchAccount = (did: string) => {
