@@ -41,7 +41,7 @@ importers:
         version: 0.0.5
       '@tanstack/react-query':
         specifier: ^5.74.11
-        version: 5.74.11(react@19.1.0)
+        version: 5.75.5(react@19.1.0)
       '@whatwg-node/cookie-store':
         specifier: ^0.2.3
         version: 0.2.3
@@ -84,7 +84,7 @@ importers:
         version: 5.0.1
       '@types/node':
         specifier: ^22.13.14
-        version: 22.15.1
+        version: 22.15.17
       '@types/pg':
         specifier: ^8.11.11
         version: 8.11.14
@@ -114,7 +114,7 @@ importers:
         version: 6.0.10
       ts-node:
         specifier: ^10.9.2
-        version: 10.9.2(@types/node@22.15.1)(typescript@5.8.3)
+        version: 10.9.2(@types/node@22.15.17)(typescript@5.8.3)
       tsc-alias:
         specifier: ^1.8.13
         version: 1.8.15
@@ -123,50 +123,20 @@ importers:
         version: 6.2.1(typescript@5.8.3)
       tsx:
         specifier: ^4.19.3
-        version: 4.19.3
+        version: 4.19.4
       typescript:
         specifier: ^5.8.2
         version: 5.8.3
 
   examples/backend-cloudflare:
     dependencies:
-      '@atproto/api':
-        specifier: ^0.15.5
-        version: 0.15.5
-      '@blebbit/flexicon':
-        specifier: ^0.0.5
-        version: 0.0.5
-      dotenv:
-        specifier: ^16.5.0
-        version: 16.5.0
       hono:
         specifier: ^4.7.8
         version: 4.7.8
-      kysely:
-        specifier: ^0.28.2
-        version: 0.28.2
-      multiformats:
-        specifier: ^13.3.2
-        version: 13.3.3
-      zod:
-        specifier: ^3.24.4
-        version: 3.24.4
+      set-cookie-parser:
+        specifier: ^2.7.1
+        version: 2.7.1
     devDependencies:
-      '@cloudflare/vite-plugin':
-        specifier: ^0.1.15
-        version: 0.1.21(vite@6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.4))(workerd@1.20250507.0)(wrangler@4.14.4)
-      '@hono/vite-build':
-        specifier: ^1.5.0
-        version: 1.6.1(hono@4.7.8)
-      tsx:
-        specifier: ^4.19.4
-        version: 4.19.4
-      vite:
-        specifier: ^6.1.1
-        version: 6.3.5(@types/node@22.15.17)(jiti@2.4.2)(lightningcss@1.29.2)(tsx@4.19.4)
-      vite-plugin-ssr-hot-reload:
-        specifier: ^0.4.1
-        version: 0.4.2
       wrangler:
         specifier: ^4.4.0
         version: 4.14.4
@@ -206,6 +176,9 @@ importers:
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      lucide:
+        specifier: ^0.509.0
+        version: 0.509.0
       lucide-react:
         specifier: ^0.503.0
         version: 0.503.0(react@19.1.0)
@@ -1464,9 +1437,6 @@ packages:
     resolution: {integrity: sha512-K7JJNrRVvyjAVnbXOH2XLRhFXDkeP54Kt2P4FR1Kl2KDGlIbkua5VqZQD2rot3qaDrpufyUa63nuLai1kOLTsQ==}
     engines: {node: '>=12'}
 
-  '@tanstack/query-core@5.74.9':
-    resolution: {integrity: sha512-qmjXpWyigDw4SfqdSBy24FzRvpBPXlaSbl92N77lcrL+yvVQLQkf0T6bQNbTxl9IEB/SvVFhhVZoIlQvFnNuuw==}
-
   '@tanstack/query-core@5.75.5':
     resolution: {integrity: sha512-kPDOxtoMn2Ycycb76Givx2fi+2pzo98F9ifHL/NFiahEDpDwSVW6o12PRuQ0lQnBOunhRG5etatAhQij91M3MQ==}
 
@@ -1477,11 +1447,6 @@ packages:
     resolution: {integrity: sha512-S31U00nJOQIbxydRH1kOwdLRaLBrda8O5QjzmgkRg60UZzPGdbI6+873Qa0YGUfPeILDbR2ukgWyg7CJQPy4iA==}
     peerDependencies:
       '@tanstack/react-query': ^5.75.5
-      react: ^18 || ^19
-
-  '@tanstack/react-query@5.74.11':
-    resolution: {integrity: sha512-FFhn9ZiYRUOsxLAWZYxVfQTpVE7UWRaAeHJIWVDHKlmZZGc16rMHW9KrFZ8peC4hA71QUf/shJD8dPSMqDnRmA==}
-    peerDependencies:
       react: ^18 || ^19
 
   '@tanstack/react-query@5.75.5':
@@ -1647,9 +1612,6 @@ packages:
 
   '@types/mime@1.3.5':
     resolution: {integrity: sha512-/pyBZWSLD2n0dcHE3hq8s8ZvcETHtEuF+3E7XVt0Ig2nvsVQXdghHVcEkIWjy9A0wKfTn97a/PSDYohKIlnP/w==}
-
-  '@types/node@22.15.1':
-    resolution: {integrity: sha512-gSZyd0Qmv7qvbd2fJ9HGdYmv1yhNdelIA4YOtN6vkcmSwFhthxSEsBgU/JYZcXjWT6DFzoATcHrc52Ckh8SeRA==}
 
   '@types/node@22.15.17':
     resolution: {integrity: sha512-wIX2aSZL5FE+MR0JlvF87BNVrtFWf6AE6rxSE9X7OwnVvoyCQjpzSRJ+M87se/4QCkCiebQAqrJ0y6fwIyi7nw==}
@@ -2468,10 +2430,6 @@ packages:
     resolution: {integrity: sha512-FIyV/64EkKhJmjgC0g2hygpBv5RNWVPyNCqSAD7eTCv6eFWNIi4PN1UvdSJGicN/o35bnevgis4Y0UDC0qi8jQ==}
     engines: {node: '>=14.0.0'}
 
-  kysely@0.28.2:
-    resolution: {integrity: sha512-4YAVLoF0Sf0UTqlhgQMFU9iQECdah7n+13ANkiuVfRvlK+uI0Etbgd7bVP36dKlG+NXWbhGua8vnGt+sdhvT7A==}
-    engines: {node: '>=18.0.0'}
-
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
     engines: {node: '>= 0.8.0'}
@@ -2566,6 +2524,9 @@ packages:
     resolution: {integrity: sha512-HGGkdlPWQ0vTF8jJ5TdIqhQXZi6uh3LnNgfZ8MHiuxFfX3RZeA79r2MW2tHAZKlAVfoNE8esm3p+O6VkIvpj6w==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
+
+  lucide@0.509.0:
+    resolution: {integrity: sha512-+PUi/uilEjgcBuaLXq4y4fh/AHLgFuFyNrMbezuhofkiqRZbbj6cf5E29VndCuFcGsGpo9WIKocmfBB2GTvS7w==}
 
   luxon@3.6.1:
     resolution: {integrity: sha512-tJLxrKJhO2ukZ5z0gyjY1zPh3Rh88Ej9P7jNrZiHMUXHae1yvI2imgOZtL1TO8TW6biMMKfTtAOoEJANgtWBMQ==}
@@ -3102,6 +3063,9 @@ packages:
     resolution: {integrity: sha512-61g9pCh0Vnh7IutZjtLGGpTA355+OPn2TyDv/6ivP2h/AdAVX9azsoxmg2/M6nZeQZNYBEwIcsne1mJd9oQItQ==}
     engines: {node: '>= 18'}
 
+  set-cookie-parser@2.7.1:
+    resolution: {integrity: sha512-IOc8uWeOZgnb3ptbCURJWNjWUPcO3ZnTTdzsurqERrP6nPyv+paC55vJM0LpOlT2ne+Ix+9+CRG1MNLlyZ4GjQ==}
+
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
@@ -3320,11 +3284,6 @@ packages:
 
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
-
-  tsx@4.19.3:
-    resolution: {integrity: sha512-4H8vUNGNjQ4V2EOoGw005+c+dGuPSnhpPBPHBtsZdGZBk/iJb4kguGlPWaZTZ3q5nMtFOEsY0nRDlh9PJyd6SQ==}
-    engines: {node: '>=18.0.0'}
-    hasBin: true
 
   tsx@4.19.4:
     resolution: {integrity: sha512-gK5GVzDkJK1SI1zwHf32Mqxf2tSJkNx+eYcNly5+nHvWqXUJYUkWBQtKauoESz3ymezAI++ZwT855x5p5eop+Q==}
@@ -4635,8 +4594,6 @@ snapshots:
 
   '@tanstack/history@1.115.0': {}
 
-  '@tanstack/query-core@5.74.9': {}
-
   '@tanstack/query-core@5.75.5': {}
 
   '@tanstack/query-devtools@5.74.7': {}
@@ -4645,11 +4602,6 @@ snapshots:
     dependencies:
       '@tanstack/query-devtools': 5.74.7
       '@tanstack/react-query': 5.75.5(react@19.1.0)
-      react: 19.1.0
-
-  '@tanstack/react-query@5.74.11(react@19.1.0)':
-    dependencies:
-      '@tanstack/query-core': 5.74.9
       react: 19.1.0
 
   '@tanstack/react-query@5.75.5(react@19.1.0)':
@@ -4815,7 +4767,7 @@ snapshots:
 
   '@types/cors@2.8.18':
     dependencies:
-      '@types/node': 22.15.1
+      '@types/node': 22.15.17
 
   '@types/estree@1.0.7': {}
 
@@ -4843,17 +4795,13 @@ snapshots:
 
   '@types/mime@1.3.5': {}
 
-  '@types/node@22.15.1':
-    dependencies:
-      undici-types: 6.21.0
-
   '@types/node@22.15.17':
     dependencies:
       undici-types: 6.21.0
 
   '@types/pg@8.11.14':
     dependencies:
-      '@types/node': 22.15.1
+      '@types/node': 22.15.17
       pg-protocol: 1.9.5
       pg-types: 4.0.2
 
@@ -5737,8 +5685,6 @@ snapshots:
 
   kysely@0.27.6: {}
 
-  kysely@0.28.2: {}
-
   levn@0.4.1:
     dependencies:
       prelude-ls: 1.2.1
@@ -5810,6 +5756,8 @@ snapshots:
   lucide-react@0.503.0(react@19.1.0):
     dependencies:
       react: 19.1.0
+
+  lucide@0.509.0: {}
 
   luxon@3.6.1: {}
 
@@ -6273,6 +6221,8 @@ snapshots:
     transitivePeerDependencies:
       - supports-color
 
+  set-cookie-parser@2.7.1: {}
+
   setprototypeof@1.2.0: {}
 
   sharp@0.33.5:
@@ -6463,14 +6413,14 @@ snapshots:
     dependencies:
       jose: 6.0.10
 
-  ts-node@10.9.2(@types/node@22.15.1)(typescript@5.8.3):
+  ts-node@10.9.2(@types/node@22.15.17)(typescript@5.8.3):
     dependencies:
       '@cspotcode/source-map-support': 0.8.1
       '@tsconfig/node10': 1.0.11
       '@tsconfig/node12': 1.0.11
       '@tsconfig/node14': 1.0.3
       '@tsconfig/node16': 1.0.4
-      '@types/node': 22.15.1
+      '@types/node': 22.15.17
       acorn: 8.14.1
       acorn-walk: 8.3.4
       arg: 4.1.3
@@ -6500,13 +6450,6 @@ snapshots:
       typescript: 5.8.3
 
   tslib@2.8.1: {}
-
-  tsx@4.19.3:
-    dependencies:
-      esbuild: 0.25.3
-      get-tsconfig: 4.10.0
-    optionalDependencies:
-      fsevents: 2.3.3
 
   tsx@4.19.4:
     dependencies:

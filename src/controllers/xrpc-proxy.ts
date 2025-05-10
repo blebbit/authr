@@ -38,6 +38,10 @@ export const handleXrpcManual = async (req: Request, res: Response, next: NextFu
   console.log("xrpcProxy.search:", req.query)
   console.log("xrpcProxy.body:", req.body)
 
+  if (!req.session) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
   const db_session = await db
     .selectFrom("oauth_session")
     .where("key", "=", req.session.did)

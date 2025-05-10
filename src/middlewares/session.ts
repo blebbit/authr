@@ -11,7 +11,7 @@ export const sessionHandler = async (req: Request, res: Response, next: NextFunc
   // get the blebbit session from the cookie
   const session = await getSession(req);
 
-  // console.log("sessionHandler.session:", session)
+  console.log("sessionHandler.session:", session)
 
   // lookup in database or cache (?)
   if (session) {

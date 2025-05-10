@@ -47,10 +47,8 @@ export const AuthrProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
   // handle session
   const session = {
-    did: claims?.did,
-    handle: claims?.handle,
-    pds: claims?.pds,
-    cookie: ba
+    cookie: ba,
+    ...claims,
   }
   console.log("AuthrProvider.session", session)
   console.log("AuthrProvider.sessions.pre", sessions)

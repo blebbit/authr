@@ -12,12 +12,11 @@ const app = new Hono<{Bindings: CloudflareBindings}>()
 app.use('*', cors({
   origin: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
   // origin: "https://app.authr.blebbit.dev",
-  allowHeaders: ['Content-Type', 'Authorization', 'atproto-proxy'],
+  allowHeaders: ['Content-Type', 'Authorization', 'Cookie', 'atproto-proxy'],
   allowMethods: ['POST', 'GET', 'OPTIONS'],
   exposeHeaders: ['Content-Length'],
   maxAge: 600,
   credentials: true,
-  slug: 'love',
 }))
 
 app.use(logger())

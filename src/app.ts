@@ -9,7 +9,7 @@ import { sessionHandler } from './middlewares/session';
 
 // routes
 import oauthRoutes from './routes/oauth';
-import xrpcRoutes from './routes/xrpc';
+// import xrpcRoutes from './routes/xrpc';
 
 // App
 const app = express();
@@ -18,20 +18,18 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: ['https://app.blebbit.org',"https://auth.blebbit.org", "https://api.blebbit.org"], // Allow all origins
-  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE', // Allow all HTTP methods
-  allowedHeaders: ['Content-Type', 'Authorization', 'atproto-proxy'], // Allow all headers
-  credentials: true, // Allow credentials (cookies, authorization headers, etc.)
+  origin: ['https://app.blebbit.org',"https://auth.blebbit.org", "https://api.blebbit.org"],
+  methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
+  allowedHeaders: 'Content-Type,Authorization,Cookie,ATProto-Proxy',
+  credentials: true,
 }));
-
-// Unauth'd Routes
-// app.options('*', cors())
-app.use('/oauth', oauthRoutes);
 
 app.use(sessionHandler)
 
+app.use('/oauth', oauthRoutes);
+
 // TODO, only enable with config
-app.use('/', xrpcRoutes);
+// app.use('/', xrpcRoutes);
 
 // Global error handler (should be after routes)
 app.use(errorHandler);

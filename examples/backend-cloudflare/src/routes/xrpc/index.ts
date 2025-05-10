@@ -32,8 +32,20 @@ async function xrpcProxy(c: Context) {
 
   // TODO, we only want to use the session pds if the request is for the current user repo...
   // proxy with fetch and headers (auth & at-proxy)
-  const proxyUrl = `${authr_session.pds}${url.pathname}${url.search}`
+  let proxyUrl = `${authr_session.pds}${url.pathname}${url.search}`
   console.log("xrpcProxy.proxyUrl:", proxyUrl)
+
+  // const oauthPrefix = '/xrpc/@atproto'
+  // let oauthHeaders: any = {}
+  // if (url.pathname.startsWith(oauthPrefix)) {
+  //   proxyUrl = `https://bsky.social${url.pathname.substring(5)}${url.search}`
+  //   oauthHeaders = {
+  //     'sec-fetch-mode': 'same-origin',
+  //     'sec-fetch-site': 'same-origin',
+  //     'referer': `https://bsky.social/account/${authr_session.did}`
+  //   }
+
+  // }
 
   // Get oauth session from KV
   const results = await c.env.KV.get(authr_session.did)
@@ -52,28 +64,48 @@ async function xrpcProxy(c: Context) {
       'Authorization': `DPoP ${oauth_session.access_token}`,
       'DPoP': dpop_jwt,
       'atproto-proxy': c.req.header('atproto-proxy'),
+      // ...oauthHeaders,
     },
     body: c.req.body,
   })
 
   console.log("xrpcProxy.resp1:", resp)
 
-  if (resp.status === 401) {
+  if (resp.status === 400 || resp.status === 401) {
+    const nonce = resp.headers.get('dpop-nonce')
+    // const cookies = setCookie.parse(resp, { decodeValues: true }) 
+
+
+
     const data: any = await resp.json()
-    console.log("xrpcProxy.401.data:", data)
-    if (data.error && data.error === "use_dpop_nonce") {
-      const nonce = resp.headers.get('dpop-nonce')
+    console.log("xrpcProxy.401x.data:", data)
+    // console.log("xrpcProxy.401x.cookies:", cookies)
+    if (data.error && (data.error === "use_dpop_nonce" || data.error_description === 'CSRF mismatch')) {
+
+      // for (const cookie of cookies) {
+      //   if (cookie.name === 'csrf-token') {
+      //     oauthHeaders['cookie'] = `${cookie.name}=${cookie.value}`
+      //     oauthHeaders['X-CSRF-Token'] = cookie.value
+      //     break
+      //   }
+      // }
 
       const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl, nonce as string)
+
+      const headers = {
+        // 'Content-Type': c.req.header('Content-Type') || 'application/json',
+        // 'Accept': c.req.header('Accept') || 'application/json',
+        'Authorization': `dpop ${oauth_session.access_token}`,
+        'DPoP': dpop_jwt,
+        'atproto-proxy': c.req.header('atproto-proxy'),
+        // ...oauthHeaders,
+      }
+      // console.log("xrpcProxy.resp2.oauthHeaders:", oauthHeaders)
+      console.log("xrpcProxy.resp2.headers:", headers)
+
       const resp2 = await fetch(proxyUrl, {
         method: c.req.method,
-        headers: {
-          // 'Content-Type': c.req.header('Content-Type') || 'application/json',
-          // 'Accept': c.req.header('Accept') || 'application/json',
-          'Authorization': `dpop ${oauth_session.access_token}`,
-          'DPoP': dpop_jwt,
-          'at-proxy': c.req.header('at-proxy'),
-        },
+        headers,
         body: c.req.body,
       })
 

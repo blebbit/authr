@@ -1,16 +1,17 @@
 import { Request, Response, NextFunction } from 'express';
 import { isValidHandle } from '@atproto/syntax'
 
+import * as jose from 'jose';
+
 import config from '@/config';
 
 import { getClient } from "@/lib/auth/oauth/client";
 import { addSession } from "@/lib/auth/session";
 import { lookupInfo } from '@/lib/atproto/lookup';
-import { sendEvent } from '@/lib/events';
 
 // for saving some extra data
-import { Database } from '../db/models';
 import { db } from '../db/client';
+import crypto from 'crypto';
 
 // GET
 export const clientMetadata = async (req: Request, res: Response, next: NextFunction) => {
@@ -197,4 +198,85 @@ export const callback = async (req: Request, res: Response, next: NextFunction) 
 
 export const refresh = async (req: Request, res: Response, next: NextFunction) => {
   // ...
+  console.log("oauth.refresh.query:", req.query)
+
+  if (!req.query.did) {
+    return res.status(400).json({ message: "Missing did" });
+  }
+  var did = req.query.did
+
+  // validation
+
+  // do we have a session, and is the session the same as the did?
+  let authd = false
+  if (req.session && req.session.did === did) {
+    authd = true
+  } else if (req.headers['x-apikey'] && req.headers['x-apikey'] === config.webhook.secret) {
+    authd = true
+    // check for api key
+    if (!req.query.did) {
+      return res.status(400).json({ message: "Missing did" });
+    }
+  }
+
+  if (!authd) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  // 
+  const client = await getClient()
+  const oauthSession = await client.restore(did as string)
+  // console.log("sessionHandler.oauthSession:", oauthSession)
+
+  // get the latest oauth session from the database
+  const r = await db.selectFrom("oauth_session")
+    .where("key", "=", req.query.did as string)
+    .selectAll()
+    .executeTakeFirst()
+  const session = {
+    aud: r?.aud,
+    sub: r?.sub,
+    iss: r?.iss, 
+    token_type: r?.token_type,
+    access_token: r?.access_token,
+    refresh_token: r?.refresh_token,
+    expires_at: r?.expires_at,
+    scope: r?.scope,
+  }
+
+  console.log("oauth.refresh.session:", session)
+
+  res.status(200).json(session)
+}
+
+
+export const info = async (req: Request, res: Response, next: NextFunction) => {
+  console.log("oauth.info.session:", req.session)
+
+  if (!req.session) {
+    return res.status(401).json({ message: "Unauthorized" });
+  }
+
+  const r = req.session
+
+  const claims = jose.decodeJwt(r.access_token)
+  console.log(claims)
+
+  const session = {
+    aud: r.aud,
+    sub: r.sub,
+    iss: r.iss, 
+    token_type: r.token_type,
+    scope: r.scope,
+    access_issued_at: claims.iat,
+    access_expires_at: claims.exp,
+    refresh_expires_at: r.expires_at,
+    access_token_hash: crypto.createHash('sha256').update(r.access_token).digest('hex'),
+    refresh_token_hash: crypto.createHash('sha256').update(r.refresh_token).digest('hex'),
+  }
+
+  console.log("oauth.info.session:", session)
+
+  res.status(200).json(session)
+
 }
