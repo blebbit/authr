@@ -47,7 +47,7 @@ export async function initBoss() {
 
     // create cronjob to look for aging tokens and submit them to the refresh queue
     await boss.createQueue(AtprotoOauthRefreshCron)
-    await boss.schedule(AtprotoOauthRefreshCron, '*/10 * * * *', {
+    await boss.schedule(AtprotoOauthRefreshCron, '*/5 * * * *', {
       // jobId: 'atproto-oauth-refresh-cron',
       // other job data
     },{
@@ -59,21 +59,20 @@ export async function initBoss() {
       console.log('AtprotoOauthRefreshCron job:', job)
       // lookup aging tokens
 
-      const dids = await db
+      const sessions = await db
         .selectFrom("oauth_session")
-        .selectAll()
-        // .where("expires_at", "<", new Date(Date.now() + 1000 * 60 * 60 * 24 * 7)) // expires in less than a week
-        // .where("expires_at", ">", new Date(Date.now() + 1000 * 60 * 60 * 24 * 2)) // expires in more than 2 days
+        .select(["key", "expires_at"])
+        .where("expires_at", "<", new Date(Date.now() + 1000 * 60 * 10)) // expires in less than 10 minutes
         .execute()
 
-      console.log('AtprotoOauthRefreshCron dids:', dids)
+      console.log('AtprotoOauthRefreshCron sessions:', sessions)
       // submit them to the refresh queue
 
-      const jobs = dids.map((did) => ({
+      const jobs = sessions.map((session) => ({
         name: AtprotoOauthRefreshQueue,
         data: {
           // job data
-          did: did.key,
+          did: session.key,
         }
       }))
       console.log('AtprotoOauthRefreshCron jobs:', jobs)
