@@ -35,6 +35,16 @@ interface Config {
     maxConnections: number;
   }
 
+  pgboss: {
+    host: string;
+    port: number;
+    user: string;
+    password: string;
+    database: string;
+    ssl: boolean;
+    maxConnections: number;
+  }
+
   oauth: {
     clientName: string;
     publicUrl: string;
@@ -77,6 +87,16 @@ const config: Config = {
     database: process.env.DB_NAME || 'authr',
     ssl: stringToBoolean(process.env.DB_SSL || "false"),
     maxConnections: Number(process.env.DB_MAX_CONNECTIONS) || 10,
+  },
+
+  pgboss: {
+    host: process.env.PG_BOSS_HOST || 'localhost',
+    port: Number(process.env.PG_BOSS_PORT) || 5434,
+    user: process.env.PG_BOSS_USER || 'pgboss',
+    password: process.env.PG_BOSS_PASSWORD || 'pgboss',
+    database: process.env.PG_BOSS_NAME || 'pgboss',
+    ssl: stringToBoolean(process.env.PG_BOSS_SSL || "false"),
+    maxConnections: Number(process.env.PG_BOSS_MAX_CONNECTIONS) || 10,
   },
 
   oauth: {

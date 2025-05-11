@@ -29,6 +29,12 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('expires_at', 'timestamp')
     .execute()
 
+  await db.schema
+    .createIndex('oauth_session_expires_at_index')
+    .on('oauth_session')
+    .column('expires_at')
+    .execute()
+
   // extra user info, per DID, typically used to persist information during the oauth login flow
   //   but could also last for the lifetime of the account
   await db.schema

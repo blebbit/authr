@@ -3,7 +3,7 @@ version: "3"
 volumes:
   spice_pgdata:
   authr_pgdata:
-  boss_pgdata:
+  pgboss_pgdata:
 
 services:
   spicedb:
@@ -66,15 +66,15 @@ services:
     - "5432:5432"
  
 
-  boss-pg:
+  pgboss-pg:
     image: "postgres:16"
     restart: always
     environment:
-      POSTGRES_DB: boss
-      POSTGRES_USER: boss
-      POSTGRES_PASSWORD: boss
+      POSTGRES_DB: pgboss
+      POSTGRES_USER: pgboss
+      POSTGRES_PASSWORD: pgboss
     volumes:
-      - boss_pgdata:/var/lib/postgresql/data 
+      - pgboss_pgdata:/var/lib/postgresql/data 
     ports:
     - "5434:5432"
  

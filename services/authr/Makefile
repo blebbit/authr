@@ -5,7 +5,7 @@ dc.up:
 dc.down:
 	@docker compose -f docker-compose.yaml down
 dc.clean: dc.down
-	@docker volume rm authr_authr_pgdata authr_boss_pgdata authr_spice_pgdata
+	@docker volume rm authr_authr_pgdata authr_pgboss_pgdata authr_spice_pgdata
 
 
 authr.db.psql:
