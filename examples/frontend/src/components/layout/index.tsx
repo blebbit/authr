@@ -2,6 +2,7 @@
 
 import React from 'react';
 import { Outlet } from '@tanstack/react-router';
+import { Link } from '@tanstack/react-router';
 
 
 import Navbar from '../navbar';
@@ -9,7 +10,13 @@ import Navbar from '../navbar';
 const Layout: React.FC<{ }> = ({  }) => {
   return (
     <div className='flex flex-col min-h-screen'>
-      <Navbar><></></Navbar>
+      <Navbar>
+        <div className="flex flex-grow justify-center gap-4">
+          <Link to="/posts" className='text-white hover:underline'>Posts</Link>
+          <Link to="/profile" className='text-white hover:underline'>Profile</Link>
+          <Link to="/sign-in" className='text-white hover:underline'>Sign In</Link>
+        </div>
+      </Navbar>
       <main
         className='flex-grow p-4'
       ><Outlet /></main>

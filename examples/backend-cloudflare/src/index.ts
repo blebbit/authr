@@ -5,6 +5,7 @@ import { logger } from 'hono/logger'
 
 import { showRoutes } from 'hono/dev'
 
+import { sessions } from './middleware/session'
 import { addRoutes } from './routes'
 
 const app = new Hono<{Bindings: CloudflareBindings}>()
@@ -16,13 +17,13 @@ const origins: any = {
 
 app.use('*', cors({
   origin: (origin: string, c: Context) => {  
-    console.log("CORS.origin:", origin, c.env.AUTHR_ENV, origins[c.env.AUTHR_ENV], origins)
+    // console.log("CORS.origin:", origin, c.env.AUTHR_ENV, origins[c.env.AUTHR_ENV], origins)
     const validOrigins: string[] = origins[c.env.AUTHR_ENV]
     if (validOrigins.includes(origin)) {
-      console.log("CORS.return:", origin)
+      // console.log("CORS.return:", origin)
       return origin
     }
-    console.log("CORS.return:", "empty")
+    // console.log("CORS.return:", "empty")
     return ""
   },
   allowHeaders: ['Content-Type', 'Authorization', 'Cookie', 'atproto-proxy'],
@@ -33,6 +34,8 @@ app.use('*', cors({
 }))
 
 app.use(logger())
+
+app.use(sessions())
 
 // app.get('/authr-dev-test-route', (c) => c.json(c.env))
 

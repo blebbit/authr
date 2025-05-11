@@ -26,7 +26,7 @@ export async function addSession(req: Request, res: Response, user: Session) {
     ...user,
   }
 
-  console.log("addSession.payload:", payload);
+  // console.log("addSession.payload:", payload);
 
   try {
     // import an ES module in a CommonJS module. Specifically, the jose library is now distributed as an ES module, and your index.ts file is being treated as a CommonJS module.
@@ -51,7 +51,18 @@ export async function addSession(req: Request, res: Response, user: Session) {
         domain: config.cookie.domain
     });
 
-    console.log(`Cookie '${config.cookie.name}' set.`);
+    // console.log(`Cookie '${config.cookie.name}' set.`);
+    // Verify and decode the JWT using jwtVerify from jose
+
+    // also return from the function, helpful when refreshing in middleware
+    const { payload: retPayload } = await jose.jwtVerify(jwt, config.cookie.secret, {
+      issuer: config.cookie.issuer,
+      audience: config.cookie.audience,
+    });
+
+    // console.log("getSession.payload:", payload);
+
+    return retPayload as Session;
 
   } catch (error) {
     console.error('Error creating session JWT or setting cookie:', error);
@@ -84,8 +95,8 @@ export async function getSession(req: Request): Promise<Session | null> {
 
     return payload as Session;
   } catch (error) {
-    console.error('Error verifying session JWT:', error);
-    return null; // or handle the error as needed
+    // console.error('Error verifying session JWT:', error);
+    throw error;
   }
 }
 
@@ -98,6 +109,6 @@ export async function removeSession(req: Request, res: Response) {
     maxAge: 0, // Set to 0 to delete the cookie immediately
   });
 
-  console.log(`Cookie '${config.cookie.name}' removed.`);
+  // console.log(`Cookie '${config.cookie.name}' removed.`);
   // Optionally, you can also clear the session data on the server side if needed
 }

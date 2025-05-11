@@ -3,8 +3,12 @@
   "type": "module",
   "scripts": {
     "dev": "wrangler dev --port 3001",
-    "deploy": "wrangler deploy --minify",
-    "cf-typegen": "wrangler types --env-interface CloudflareBindings"
+    "cf-typegen": "wrangler types --env-interface CloudflareBindings",
+    "db:mig:list:local": "wrangler d1 migrations list --local authr-example",
+    "db:mig:list:remote": "wrangler d1 migrations list --remote authr-example",
+    "db:mig:apply:local": "wrangler d1 migrations apply --local authr-example",
+    "db:mig:apply:remote": "wrangler d1 migrations apply --remote authr-example",
+    "deploy": "wrangler deploy --minify"
   },
   "dependencies": {
     "hono": "^4.7.8",

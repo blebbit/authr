@@ -10,8 +10,14 @@
     "enabled": true
   },
   "kv_namespaces": [{
-    "binding": "KV",
-    "id": "a8b27092b45e4358a18ec4dd4a4349b0"
+    "id": "a8b27092b45e4358a18ec4dd4a4349b0",
+    "binding": "KV"
+  }],
+  "d1_databases": [{
+    "database_id": "81fd5aa4-782a-4965-af8d-867cc7e0817d",
+    "database_name": "authr-example",
+    "binding": "DB",
+    "migrations_dir": "migrations"
   }],
   "vars": {
     "AUTHR_ENV": "stg",

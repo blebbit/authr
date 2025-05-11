@@ -3,19 +3,45 @@ import { Agent } from '@atproto/api';
 import { TokenRefreshError } from '@atproto/oauth-client';
 
 import { getClient } from "../lib/auth/oauth/client";
-import { getSession } from "../lib/auth/session";
+import { getSession, addSession } from "../lib/auth/session";
 
 import { db } from '../db/client';
 
 export const sessionHandler = async (req: Request, res: Response, next: NextFunction) => {
+  console.log("sessionHandler.req.path:", req.path)
+  let authrSession = null
 
-  // get the blebbit session from the cookie
-  const authrSession = await getSession(req);
+  try {
+    // get the blebbit session from the cookie
+    authrSession = await getSession(req);
+    console.log("sessionHandler.authrSession:", authrSession)
+  } catch (error) {
+    if (error.claim === 'exp' && error.code === 'ERR_JWT_EXPIRED') {
+      console.error("Authr cookie expired...:", error)
 
-  console.log("sessionHandler.authrSession:", authrSession)
+      authrSession = await addSession(req, res, {
+        did: error.payload.did,
+        pds: error.payload.pds,
+        handle: error.payload.handle,
+      });
+
+    } else {
+      console.error("Error getting session:", error)
+    }
+  }
 
   // lookup in database or cache (?)
   if (authrSession) {
+
+    // check for expired session
+    if (new Date(authrSession.exp) > new Date()) {
+      console.log("sessionHandler.sessionExpired:", authrSession.exp)
+      return res.status(401).json({
+        error: "Session expired",
+        message: "Session expired",
+        status: 401,
+      })
+    }
 
     // setup Agent for the oauth session tied to the blebbit session
     const client = await getClient()
@@ -23,7 +49,7 @@ export const sessionHandler = async (req: Request, res: Response, next: NextFunc
 
     try {
       oauthSession = await client.restore(authrSession.did)
-      console.log("sessionHandler.oauthSession:", oauthSession)
+      // console.log("sessionHandler.oauthSession:", oauthSession)
     }
     catch (error) {
       if (error instanceof TokenRefreshError) {

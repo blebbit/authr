@@ -75,10 +75,10 @@ export function getConfig(env: any): Config {
     },
   }
 
-  console.log("env:", env)
 
   // if (config.nodeEnv === 'development') {
-    console.log("config:", config)
+  //   console.log("env:", env)
+  //   console.log("config:", config)
   // }
 
   return config;
