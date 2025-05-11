@@ -19,18 +19,22 @@ const app = express();
 app.use(express.json());
 app.use(cookieParser());
 app.use(cors({
-  origin: process.env.NODE_ENVRIONMENT === "development" ?
-    ['https://app.blebbit.org',"https://auth.blebbit.org", "https://api.blebbit.org"]
-    :
-    ['https://app.authr.blebbit.dev',"https://authr.blebbit.dev", "https://api.authr.blebbit.dev"]
-  ,
-  // origin: function (origin, callback) {
-  //   // db.loadOrigins is an example call to load
-  //   // a list of origins from a backing database
-  //   db.loadOrigins(function (error, origins) {
-  //     callback(error, origins)
-  //   })
-  // },
+  // origin: process.env.AUTHR_ENV === "dev" ?
+  //   ['https://app.blebbit.org',"https://auth.blebbit.org", "https://api.blebbit.org"]
+  //   :
+  //   ['https://app.authr.blebbit.dev',"https://authr.blebbit.dev", "https://api.authr.blebbit.dev"]
+  // ,
+  origin: function (o, callback) {
+    console.log("CORS ENV", process.env)
+    console.log("CORS ORIGIN", o)
+    const origins = process.env.AUTHR_ENV === "dev" ?
+      ['https://app.blebbit.org',"https://auth.blebbit.org", "https://api.blebbit.org"]
+      :
+      ['https://app.authr.blebbit.dev',"https://authr.blebbit.dev", "https://api.authr.blebbit.dev"]
+
+    console.log("CORS ORIGINS", origins)
+    callback(null, origins)
+  },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',
   allowedHeaders: 'Content-Type,Authorization,Cookie,ATProto-Proxy',
   credentials: true,
