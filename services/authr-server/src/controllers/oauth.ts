@@ -204,6 +204,7 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     return res.status(400).json({ message: "Missing did" });
   }
   var did = req.query.did
+  // var force = req.query.force
 
   // validation
 
@@ -223,10 +224,10 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     return res.status(401).json({ message: "Unauthorized" });
   }
 
-  // 
+  // try to restore the session
   const client = await getClient()
-  const oauthSession = await client.restore(did as string)
-  // console.log("sessionHandler.oauthSession:", oauthSession)
+  const oauthSession = await client.restore(did as string, true)
+  console.log("sessionHandler.oauthSession:", oauthSession)
 
   // get the latest oauth session from the database
   const r = await db.selectFrom("oauth_session")
