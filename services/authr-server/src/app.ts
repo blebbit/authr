@@ -25,14 +25,14 @@ app.use(cors({
   //   ['https://app.authr.blebbit.dev',"https://authr.blebbit.dev", "https://api.authr.blebbit.dev"]
   // ,
   origin: function (o, callback) {
-    console.log("CORS ENV", process.env)
-    console.log("CORS ORIGIN", o)
+    // console.log("CORS ENV", process.env)
+    // console.log("CORS ORIGIN", o)
     const origins = process.env.AUTHR_ENV === "dev" ?
       ['https://app.blebbit.org',"https://auth.blebbit.org", "https://api.blebbit.org"]
       :
       ['https://app.authr.blebbit.dev',"https://authr.blebbit.dev", "https://api.authr.blebbit.dev"]
 
-    console.log("CORS ORIGINS", origins)
+    // console.log("CORS ORIGINS", origins)
     callback(null, origins)
   },
   methods: 'GET,HEAD,PUT,PATCH,POST,DELETE',

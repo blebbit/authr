@@ -227,7 +227,7 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
   // try to restore the session
   const client = await getClient()
   const oauthSession = await client.restore(did as string, true)
-  console.log("sessionHandler.oauthSession:", oauthSession)
+  // console.log("oauth.refresh.oauthSession:", oauthSession)
 
   // get the latest oauth session from the database
   const r = await db.selectFrom("oauth_session")
@@ -245,14 +245,14 @@ export const refresh = async (req: Request, res: Response, next: NextFunction) =
     scope: r?.scope,
   }
 
-  console.log("oauth.refresh.session:", session)
+  // console.log("oauth.refresh.session:", session)
 
   res.status(200).json(session)
 }
 
 
 export const info = async (req: Request, res: Response, next: NextFunction) => {
-  console.log("oauth.info.session:", req.session)
+  // console.log("oauth.info.session:", req.session)
 
   if (!req.session) {
     return res.status(401).json({ message: "Unauthorized" });
@@ -276,7 +276,7 @@ export const info = async (req: Request, res: Response, next: NextFunction) => {
     refresh_token_hash: crypto.createHash('sha256').update(r.refresh_token).digest('hex'),
   }
 
-  console.log("oauth.info.session:", session)
+  // console.log("oauth.info.session:", session)
 
   res.status(200).json(session)
 

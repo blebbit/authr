@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import { Agent } from '@atproto/api';
+import { TokenRefreshError } from '@atproto/oauth-client';
 
 import { getClient } from "../lib/auth/oauth/client";
 import { getSession } from "../lib/auth/session";
@@ -9,28 +10,55 @@ import { db } from '../db/client';
 export const sessionHandler = async (req: Request, res: Response, next: NextFunction) => {
 
   // get the blebbit session from the cookie
-  const session = await getSession(req);
+  const authrSession = await getSession(req);
 
-  console.log("sessionHandler.session:", session)
+  console.log("sessionHandler.authrSession:", authrSession)
 
   // lookup in database or cache (?)
-  if (session) {
+  if (authrSession) {
 
     // setup Agent for the oauth session tied to the blebbit session
     const client = await getClient()
-    const oauthSession = await client.restore(session.did)
-    // console.log("sessionHandler.oauthSession:", oauthSession)
+    let oauthSession = null
+
+    try {
+      oauthSession = await client.restore(authrSession.did)
+      console.log("sessionHandler.oauthSession:", oauthSession)
+    }
+    catch (error) {
+      if (error instanceof TokenRefreshError) {
+        console.error("sessionHandler.tokenRefreshError:", error)
+        const url = await client.authorize(authrSession.handle, {
+          prompt: 'none',
+
+          // Build an internal state to map the login request to the user, and allow retries
+          // state: JSON.stringify({
+          //   user,
+          //   handle,
+          //   redirect,
+          // }),
+        })
+        res.redirect(url)
+      }
+      console.error("sessionHandler.restore.error:", error)
+    }
+
+    // if no oauthSession, nothing to do
+    if (!oauthSession) {
+      next()
+    }
+
     const agent = new Agent(oauthSession)
     req.agent = agent
     req.client = client
 
     // get the latest oauth session from the database
     const r = await db.selectFrom("oauth_session")
-      .where("key", "=", session.did)
+      .where("key", "=", authrSession.did)
       .selectAll()
       .executeTakeFirst()
     req.session = {
-      ...session,
+      ...authrSession,
       aud: r?.aud,
       sub: r?.sub,
       iss: r?.iss, 
@@ -42,7 +70,6 @@ export const sessionHandler = async (req: Request, res: Response, next: NextFunc
     }
 
   }
-
 
   next()
 }
