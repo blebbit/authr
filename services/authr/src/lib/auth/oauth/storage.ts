@@ -59,10 +59,10 @@ export class SessionStore implements NodeSavedSessionStore {
   }
 
   async set(key: string, val: NodeSavedSession) {
-    console.log("SessionStore.set", key, val)
+    console.log("SessionStore.set", key)
 
     const claims = jose.decodeJwt(val.tokenSet.access_token)
-    console.log("SessionStore.set.claims:", claims);
+    // console.log("SessionStore.set.claims:", claims);
 
     // try {
     //   // TODO, need to get this from the PDS / oauth provider
@@ -105,7 +105,7 @@ export class SessionStore implements NodeSavedSessionStore {
       .returningAll()
       .executeTakeFirstOrThrow()
 
-    console.log("SessionStore.event", key)
+    // console.log("SessionStore.event", key)
 
     try {
       // send webhook event
@@ -116,6 +116,7 @@ export class SessionStore implements NodeSavedSessionStore {
   }
 
   async del(key: string) {
+    // console.log("SessionStore.del", key)
     await this.db
       .deleteFrom("oauth_session")
       .where("key", "=", key)

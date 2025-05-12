@@ -10,7 +10,6 @@ import { getSession, addSession } from "@/lib/auth/session";
 import { db } from '@/db/client';
 
 export default async (c: Context, next: Next) => {
-  console.log("sessionHandler.req.path:", c.req.path)
 
   if (c.req.path === '/oauth/callback') {
     // skip this middleware for the authorize endpoint
@@ -23,7 +22,6 @@ export default async (c: Context, next: Next) => {
   try {
     // get the blebbit session from the cookie
     authrSession = await getSession(c);
-    console.log("sessionHandler.authrSession:", authrSession)
   } catch (error) {
     if (error.claim === 'exp' && error.code === 'ERR_JWT_EXPIRED') {
       console.error("Authr cookie expired...:", error)
@@ -38,6 +36,8 @@ export default async (c: Context, next: Next) => {
       console.error("Error getting session:", error)
     }
   }
+
+  console.log("sessionHandler:", c.req.path, authrSession?.did)
 
   // lookup in database or cache (?)
   if (authrSession) {
@@ -54,7 +54,7 @@ export default async (c: Context, next: Next) => {
 
     try {
       oauthSession = await client.restore(authrSession.did)
-      console.log("sessionHandler.oauthSession:", oauthSession)
+      // console.log("sessionHandler.oauthSession:", oauthSession)
     }
     catch (error) {
       if (error instanceof TokenRefreshError) {
@@ -95,6 +95,6 @@ export default async (c: Context, next: Next) => {
     })
   }
 
-  console.log("sessionHandler.next:")
+  // console.log("sessionHandler.next:")
   await next()
 }

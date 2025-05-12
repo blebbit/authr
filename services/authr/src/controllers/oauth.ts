@@ -117,7 +117,7 @@ export const callback = async (c: Context) => {
   try {
     const { session: atSession } = await at.callback(parsedQs /* are there more options here like authorize()? */)
     session = atSession
-    console.log("callback.session:", session)
+    // console.log("callback.session:", session)
   } catch (error) {
     console.error("callback.error:", error)
   }
@@ -131,7 +131,7 @@ export const callback = async (c: Context) => {
     .selectAll()
     .executeTakeFirst()
 
-  console.log("callback.userinfo:", userinfo)
+  // console.log("callback.userinfo:", userinfo)
 
   // if we don't have a userinfo, something went wrong during the login flow
   if (!userinfo || !userinfo.key) {
@@ -231,10 +231,10 @@ export const info = async (c: Context) => {
     return c.json({ message: "Unauthorized" });
   }
 
-  console.log("oauth.info.r:", r)
+  // console.log("oauth.info.r:", r)
 
   const claims = jose.decodeJwt(r.access_token)
-  console.log("oauth.info.claims:", claims)
+  // console.log("oauth.info.claims:", claims)
 
   const session = {
     aud: r.aud,

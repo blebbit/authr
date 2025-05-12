@@ -8,7 +8,7 @@ import sessions from '@/middleware/session'
 import routes from '@/routes'
 
 import { migrateToLatest } from '@/db/migrator'
-import { initBoss } from '@/jobs/pgboss';
+import { tokenRefresher } from '@/jobs/token-refresher';
 
 import config from '@/config'
 
@@ -48,8 +48,8 @@ showRoutes(app)
 migrateToLatest()
   .then(async ()=>{
     // start pgboss process (and probably migrations?)
-    await initBoss()
-    console.log('pgboss started')
+    await tokenRefresher()
+    console.log('token-refresher started')
   })
   .then(()=>{
     serve({

@@ -26,7 +26,7 @@ export async function sendEvent(
     false,
     ['sign'],
   )
-  console.log('Webhook Key:', key)
+  // console.log('Webhook Key:', key)
 
   const signature = await crypto.subtle.sign(
     'HMAC',
@@ -52,6 +52,6 @@ export async function sendEvent(
     throw new Error(`Failed to send event: ${response.statusText}`)
   }
 
-  const responseBody = await response.json()
-  console.log('Event sent successfully:', responseBody)
+  return response.json()
+  // console.log('Event sent successfully:', responseBody)
 }

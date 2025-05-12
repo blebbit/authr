@@ -9,15 +9,7 @@ let boss: PgBoss = null as any;
 export const AtprotoOauthRefreshQueue = 'atproto-oauth-refresh';
 export const AtprotoOauthRefreshCron =  'atproto-oauth-refresh-cron';
 
-export async function getBoss() {
-  if (boss) {
-    return boss;
-  }
-
-  return initBoss();
-}
-
-export async function initBoss() {
+export async function tokenRefresher() {
   if (!boss) {
     boss = new PgBoss({
       host: config.pgboss.host,
@@ -56,7 +48,7 @@ export async function initBoss() {
       // removeOnFail: false,
     })
     await boss.work(AtprotoOauthRefreshCron, { pollingIntervalSeconds: 10 }, async (job) => {
-      console.log('AtprotoOauthRefreshCron job:', job)
+      console.log('CRON', job.map((j) => j.id))
       // lookup aging tokens
 
       const sessions = await db
@@ -65,7 +57,7 @@ export async function initBoss() {
         .where("refresh_expires_at", "<", new Date(Date.now() + 1000 * 60 * 10)) // expires in less than 10 minutes
         .execute()
 
-      console.log('AtprotoOauthRefreshCron sessions:', sessions)
+      // console.log('AtprotoOauthRefreshCron sessions:', sessions)
       // submit them to the refresh queue
 
       const jobs = sessions.map((session) => ({
@@ -75,7 +67,7 @@ export async function initBoss() {
           did: session.key,
         }
       }))
-      console.log('AtprotoOauthRefreshCron jobs:', jobs)
+      // console.log('AtprotoOauthRefreshCron jobs:', jobs)
 
       boss.insert(jobs)
     })
