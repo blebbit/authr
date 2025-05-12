@@ -1,10 +1,10 @@
-import { Router } from 'express';
+import { Hono } from 'hono'
 
 import { handleXrpc } from '../controllers/xrpc-proxy';
 
-const router = Router();
+const router = new Hono();
 
-router.get('/xrpc/:method', handleXrpc)
-router.post('/xrpc/:method', handleXrpc)
+router.get('/:method', handleXrpc)
+router.post('/:method', handleXrpc)
 
 export default router;

@@ -1,9 +1,9 @@
 import {
-  OauthStateTable,
-  OauthSessionTable,
-  OauthUserInfoTable,
-  AuthrSessionTable,
-} from './oauth'
+  type OauthStateTable,
+  type OauthSessionTable,
+  type OauthUserInfoTable,
+  type AuthrSessionTable,
+} from './oauth.js'
 
 export interface Database {
   oauth_state:   OauthStateTable 

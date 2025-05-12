@@ -1,11 +1,10 @@
-// import { NodeOAuthClient } from '@atproto/oauth-client-node'
 import { NodeOAuthClient } from '@/lib/atproto/oauth-client-node'
 import { JoseKey } from '@atproto/jwk-jose'
 
 import { SessionStore, StateStore } from './storage'
 
-import { db } from '../../../db/client'
-import config from '../../../config'
+import { db } from '@/db/client'
+import config from '@/config'
 
 // for dynamic jwks.json
 async function loadKeyset() {

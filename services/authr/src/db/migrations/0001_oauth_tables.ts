@@ -19,20 +19,27 @@ export async function up(db: Kysely<any>): Promise<void> {
     .addColumn('created_at', 'timestamp', (col) => col.defaultTo(sql`now()`).notNull())
     .addColumn('updated_at', 'timestamp', (col) => col.defaultTo(sql`now()`).notNull())
     .addColumn('session', 'varchar', (col) => col.notNull())
+    .addColumn('iss', 'varchar')
     .addColumn('aud', 'varchar')
     .addColumn('sub', 'varchar')
-    .addColumn('iss', 'varchar')
     .addColumn('scope', 'varchar')
-    .addColumn('refresh_token', 'varchar')
-    .addColumn('access_token', 'varchar')
     .addColumn('token_type', 'varchar')
-    .addColumn('expires_at', 'timestamp')
+    .addColumn('access_token', 'varchar')
+    .addColumn('refresh_token', 'varchar')
+    .addColumn('access_expires_at', 'timestamp')
+    .addColumn('refresh_expires_at', 'timestamp')
     .execute()
 
+  // so we can quickly find sessions nearing expiration
   await db.schema
-    .createIndex('oauth_session_expires_at_index')
+    .createIndex('oauth_session_access_expires_at_index')
     .on('oauth_session')
-    .column('expires_at')
+    .column('access_expires_at')
+    .execute()
+  await db.schema
+    .createIndex('oauth_session_refresh_expires_at_index')
+    .on('oauth_session')
+    .column('refresh_expires_at')
     .execute()
 
   // extra user info, per DID, typically used to persist information during the oauth login flow

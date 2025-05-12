@@ -1,7 +1,7 @@
 import PgBoss from 'pg-boss';
 
 import config from '@/config';
-import { db } from '@/db/client';
+import { db } from '../db/client';
 import { getClient } from "@/lib/auth/oauth/client";
 
 let boss: PgBoss = null as any;
@@ -47,7 +47,7 @@ export async function initBoss() {
 
     // create cronjob to look for aging tokens and submit them to the refresh queue
     await boss.createQueue(AtprotoOauthRefreshCron)
-    await boss.schedule(AtprotoOauthRefreshCron, '*/5 * * * *', {
+    await boss.schedule(AtprotoOauthRefreshCron, '*/2 * * * *', {
       // jobId: 'atproto-oauth-refresh-cron',
       // other job data
     },{

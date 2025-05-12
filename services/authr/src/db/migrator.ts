@@ -1,11 +1,14 @@
-import * as path from 'path'
+import path from 'path';
+import { fileURLToPath } from 'url';
+const __filename = fileURLToPath(import.meta.url); // get the resolved path to the file
+const __dirname = path.dirname(__filename); // get the name of the directory
 import { promises as fs } from 'fs'
 import {
   Migrator,
   FileMigrationProvider,
 } from 'kysely'
 
-import { db } from './client'
+import { db } from './client.js'
 
 export async function migrateToLatest() {
   console.log("database.migrate.begin")

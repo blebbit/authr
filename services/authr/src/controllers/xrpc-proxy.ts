@@ -1,4 +1,5 @@
-import { Request, Response, NextFunction } from 'express';
+import { type Context } from 'hono'
+import { HTTPException } from 'hono/http-exception'
 import { JoseKey } from '@atproto/jwk-jose'
 import * as jose from 'jose'
 
@@ -11,26 +12,26 @@ import { db } from '@/db/client';
   - caching responses
 */ 
 
-export const handleXrpcAgent = async (req: Request, res: Response, next: NextFunction) => {
+export const handleXrpcAgent = async (c: Context) => {
   // note the lack of error handling here... ¯\_(ツ)_/¯
 
-  const nsid = req.path.substring(6)
+  const nsid = c.req.path.substring(6)
   // console.log("xrpc.nsid:", nsid)
 
-  const resp = await req.agent.call(
+  const resp = await c.get('agent').call(
     nsid,
-    req.query,
-    req.body,
+    c.req.query(),
+    await c.req.json(),
     {
-      headers: req.headers
+      headers: c.req.header()
     }
   )
   console.log("xrpc.resp:", resp)
 
-  res.status(200).json(resp.data)
+  return c.json(resp.data)
 };
 
-export const handleXrpcManual = async (req: Request, res: Response, next: NextFunction) => {
+export const handleXrpcManual = async (c: Context) => {
   console.log("xrpcProxy.url:", req.originalUrl)
   console.log("xrpcProxy.method:", req.method)
   console.log("xrpcProxy.path:", req.path)
@@ -38,18 +39,20 @@ export const handleXrpcManual = async (req: Request, res: Response, next: NextFu
   console.log("xrpcProxy.search:", req.query)
   console.log("xrpcProxy.body:", req.body)
 
-  if (!req.session) {
-    return res.status(401).json({ message: "Unauthorized" });
+  const session = c.get('session')
+
+  if (!session) {
+    throw new HTTPException(401, { message: "Unauthorized" })
   }
 
   const db_session = await db
     .selectFrom("oauth_session")
-    .where("key", "=", req.session.did)
+    .where("key", "=", session.did)
     .selectAll()
     .executeTakeFirst()
 
   if (!db_session) {
-    return res.status(404).json({ message: "Session not found" });
+    throw new HTTPException(401, { message: "Session not found" })
   }
   console.log("xrpcProxy.result:", db_session)
 
@@ -59,22 +62,22 @@ export const handleXrpcManual = async (req: Request, res: Response, next: NextFu
   const tKey = await JoseKey.fromJWK(at_session.dpopJwk)
   console.log("xrpcProxy.tKey:", tKey);
 
-  const proxyUrl = `${req.session.pds}${req.originalUrl}`
+  const proxyUrl = `${session.pds}${req.originalUrl}`
   console.log("xrpcProxy.proxyUrl:", proxyUrl)
 
-  const dpop_jwt = await genDpopProof(req.method, at_session, proxyUrl, req?.query?.nonce as string)
+  const dpop_jwt = await genDpopProof(c.req.method, at_session, proxyUrl, c.req.query('nonce') as string)
   console.log("xrpcProxy.dpop_jwt:", dpop_jwt);
 
   const resp = await fetch(proxyUrl, {
-    method: req.method,
+    method: c.req.method,
     headers: {
       // 'Content-Type': c.req.header('Content-Type') || 'application/json',
       // 'Accept': c.req.header('Accept') || 'application/json',
-      'Authorization': `DPoP ${req.session.access_token}`,
+      'Authorization': `DPoP ${session.access_token}`,
       'DPoP': dpop_jwt,
       // 'atproto-proxy': req.headers['atproto-proxy'],
     },
-    body: req.body,
+    body: await c.req.json(),
   })
 
   console.log("xrpcProxy.resp1:", resp)

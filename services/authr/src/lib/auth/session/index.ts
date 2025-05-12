@@ -1,6 +1,7 @@
-import { Request, Response } from 'express';
+import { type Context } from 'hono';
+import { getCookie, setCookie } from 'hono/cookie';
 
-import config from '../../../config';
+import config from '@/config';
 
 // TODO, migrate this to use a JWKS keyset like we do in atproto oauth?
 //       allows for better key rotation and management
@@ -18,7 +19,7 @@ export const DefaultSession: Session = {
   handle: "",
 };
 
-export async function addSession(req: Request, res: Response, user: Session) {
+export async function addSession(c: Context, user: Session) {
 
   // create payload for JWT
   const payload = {
@@ -42,11 +43,11 @@ export async function addSession(req: Request, res: Response, user: Session) {
         .sign(config.cookie.secret);
 
     // Set the JWT as a cookie ont he response
-    res.cookie(config.cookie.name, jwt, {
+    setCookie(c, config.cookie.name, jwt, {
         httpOnly: config.cookie.httpOnly,
         secure: config.cookie.secure,
         sameSite: config.cookie.sameSite as 'lax' | 'strict' | 'none' | undefined,
-        maxAge: config.cookie.expirationMillis,
+        maxAge: config.cookie.expirationMillis / 1000, // Convert milliseconds to seconds
         path: config.cookie.path,
         domain: config.cookie.domain
     });
@@ -73,8 +74,8 @@ export async function addSession(req: Request, res: Response, user: Session) {
   }
 }
 
-export async function getSession(req: Request): Promise<Session | null> {
-  const cookie = req.cookies[config.cookie.name];
+export async function getSession(c: Context): Promise<Session | null> {
+  const cookie = getCookie(c, config.cookie.name);
 
   if (!cookie) {
     console.log(`Cookie '${config.cookie.name}' not found.`);
@@ -100,9 +101,9 @@ export async function getSession(req: Request): Promise<Session | null> {
   }
 }
 
-export async function removeSession(req: Request, res: Response) {
+export async function removeSession(c: Context) {
   // Remove the cookie by setting its expiration date to the past
-  res.cookie(config.cookie.name, '', {
+  setCookie(c, config.cookie.name, '', {
     httpOnly: config.cookie.httpOnly,
     secure: config.cookie.secure,
     sameSite: config.cookie.sameSite as 'lax' | 'strict' | 'none' | undefined,

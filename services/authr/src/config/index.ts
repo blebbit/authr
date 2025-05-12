@@ -24,6 +24,7 @@ const stringToBoolean = (stringValue: string) => {
 interface Config {
   port: number;
   nodeEnv: string;
+  authrEnv: string;
 
   db: {
     host: string;
@@ -78,6 +79,7 @@ interface Config {
 const config: Config = {
   port: Number(process.env.PORT) || 3333,
   nodeEnv: process.env.NODE_ENV || 'development',
+  authrEnv: process.env.AUTHR_ENV || 'dev',
 
   db: {
     host: process.env.DB_HOST || 'localhost',

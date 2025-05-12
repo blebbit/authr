@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import { Hono } from 'hono'
 import {
   clientMetadata,
   jwks,
@@ -6,9 +6,9 @@ import {
   callback,
   refresh,
   info,
-} from '../controllers/oauth';
+} from '@/controllers/oauth';
 
-const router = Router();
+const router = new Hono();
 
 router.get('/client-metadata.json', clientMetadata);
 router.get('/jwks.json', jwks);

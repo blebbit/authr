@@ -8,8 +8,8 @@ export const OAuthInfoTypeSchema = z.object({
   iss: z.string(),
   token_type: z.string(),
   scope: z.string(),
-  access_issued_at: z.number(),
-  access_expires_at: z.number(),
+  access_issued_at: z.string(),
+  access_expires_at: z.string(),
   refresh_expires_at: z.string(),
   access_token_hash: z.string(),
   refresh_token_hash: z.string(),
@@ -84,12 +84,12 @@ export const OAuthInfo = ({ oauthInfo, cookie }: { oauthInfo: OAuthInfoType, coo
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Access Issued At:</dt>
-            <dd className="ml-2 font-light text-gray-600">{new Date(oauthInfo.access_issued_at * 1000).toLocaleString()}</dd>
+            <dd className="ml-2 font-light text-gray-600">{new Date(oauthInfo.access_issued_at).toLocaleString()}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Access Expires At:</dt>
-            <dd className="ml-2 font-light text-gray-600">{new Date(oauthInfo.access_expires_at * 1000).toLocaleString()}</dd>
+            <dd className="ml-2 font-light text-gray-600">{new Date(oauthInfo.access_expires_at).toLocaleString()}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">

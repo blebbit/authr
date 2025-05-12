@@ -1,10 +1,6 @@
 import {
-  ColumnType,
-  Generated,
-  Insertable,
-  JSONColumnType,
-  Selectable,
-  Updateable,
+  type ColumnType,
+  type Generated,
 } from 'kysely'
 
 
@@ -24,14 +20,16 @@ export interface OauthSessionTable {
   key: string
   created_at: ColumnType<Date, string | undefined, never>
   updated_at: ColumnType<Date, string | undefined, never>
+  session: string
   iss: string
-  sub: string
   aud: string
+  sub: string
+  scope: string
   token_type: string
   access_token: string
   refresh_token: string
-  expires_at: ColumnType<Date, string | undefined, never>
-  scope: string
+  access_expires_at: ColumnType<Date, string | undefined, never>
+  refresh_expires_at: ColumnType<Date, string | undefined, never>
 }
 
 // used during oauth login
@@ -51,4 +49,7 @@ export interface AuthrSessionTable {
   // expiers_at: ColumnType<Date, string | undefined, never> // should be optional, how to do this in Kysely?
   device_id: string
   device_name: string
+  session_id: string
+
+  // tokens and expriations
 }
