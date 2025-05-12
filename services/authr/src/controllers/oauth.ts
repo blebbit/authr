@@ -170,30 +170,28 @@ export const callback = async (c: Context) => {
 
 export const refresh = async (c: Context) => {
   // ...
-  console.log("oauth.refresh.query:", req.query)
+  console.log("oauth.refresh.query:", c.req.query())
 
-  if (!req.query.did) {
-    return res.status(400).json({ message: "Missing did" });
+  const did = c.req.query('did')
+
+  if (!did) {
+    c.status(400)
+    return c.json({ message: "Missing did" });
   }
-  var did = req.query.did
-  // var force = req.query.force
-
   // validation
 
   // do we have a session, and is the session the same as the did?
+  const session = c.get('session')
   let authd = false
-  if (req.session && req.session.did === did) {
+  if (session && session.did === did) {
     authd = true
-  } else if (req.headers['x-apikey'] && req.headers['x-apikey'] === config.webhook.secret) {
+  } else if (c.req.header('x-apikey') && c.req.header('x-apikey') === config.webhook.secret) {
     authd = true
-    // check for api key
-    if (!req.query.did) {
-      return res.status(400).json({ message: "Missing did" });
-    }
   }
 
   if (!authd) {
-    return res.status(401).json({ message: "Unauthorized" });
+    c.status(401)
+    return c.json({ message: "Unauthorized" });
   }
 
   // try to restore the session
@@ -203,23 +201,24 @@ export const refresh = async (c: Context) => {
 
   // get the latest oauth session from the database
   const r = await db.selectFrom("oauth_session")
-    .where("key", "=", req.query.did as string)
+    .where("key", "=", did as string)
     .selectAll()
     .executeTakeFirst()
-  const session = {
+  const ret = {
+    iss: r?.iss, 
     aud: r?.aud,
     sub: r?.sub,
-    iss: r?.iss, 
+    scope: r?.scope,
     token_type: r?.token_type,
     access_token: r?.access_token,
     refresh_token: r?.refresh_token,
-    expires_at: r?.expires_at,
-    scope: r?.scope,
+    access_expires_at: r?.access_expires_at,
+    refresh_expires_at: r?.refresh_expires_at,
   }
 
   // console.log("oauth.refresh.session:", session)
 
-  res.status(200).json(session)
+  return c.json(ret)
 }
 
 
