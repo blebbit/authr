@@ -61,8 +61,8 @@ export async function initBoss() {
 
       const sessions = await db
         .selectFrom("oauth_session")
-        .select(["key", "expires_at"])
-        .where("expires_at", "<", new Date(Date.now() + 1000 * 60 * 10)) // expires in less than 10 minutes
+        .select(["key", "refresh_expires_at"])
+        .where("refresh_expires_at", "<", new Date(Date.now() + 1000 * 60 * 10)) // expires in less than 10 minutes
         .execute()
 
       console.log('AtprotoOauthRefreshCron sessions:', sessions)
