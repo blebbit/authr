@@ -11,7 +11,7 @@ export const BskyPreferences = ({ data }: { data: any }) => {
       const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getPreferences`, {
         credentials: 'include',
         headers: {
-          'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
+          // 'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
         }
       })
 
@@ -36,7 +36,7 @@ export const BskyPreferences = ({ data }: { data: any }) => {
         credentials: 'include',
         method: 'POST',
         headers: {
-          'atproto-proxy': "did:web:api.bsky.app#bsky_appview",
+          // 'atproto-proxy': "did:web:api.bsky.app#bsky_appview",
           'content-type': 'application/json',
         },
         body: JSON.stringify(curr)

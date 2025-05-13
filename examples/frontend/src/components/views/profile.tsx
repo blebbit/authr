@@ -44,7 +44,7 @@ const ProfileView = () => {
       const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getProfile?actor=${session?.did}`, {
         credentials: 'include',
         headers: {
-          'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
+          // 'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
         }
       })
 
@@ -60,7 +60,7 @@ const ProfileView = () => {
       const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getPreferences`, {
         credentials: 'include',
         headers: {
-          'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
+          // 'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
         }
       })
 

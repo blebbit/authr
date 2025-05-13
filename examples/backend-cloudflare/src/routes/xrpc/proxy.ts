@@ -56,17 +56,23 @@ async function xrpcProxy(c: Context) {
 
   const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl)
 
-  const headers = {
+  // setup common headers
+  const commonHeaders: any = {
     'Content-Type': c.req.header('Content-Type') || 'application/json',
     'Accept': c.req.header('Accept') || 'application/json',
     'Authorization': `DPoP ${oauth_session.access_token}`,
-    'DPoP': dpop_jwt,
-    'atproto-proxy': c.req.header('atproto-proxy'),
-    // ...oauthHeaders,
   }
+  const ap = c.req.header('atproto-proxy')
+  if (ap && ap.length > 0) {
+    commonHeaders['atproto-proxy'] = ap
+  }
+
   const send1: any = {
     method: c.req.method,
-    headers,
+    headers: {
+      ...commonHeaders,
+      'DPoP': dpop_jwt,
+    },
   }
   if (c.req.method === 'POST') {
     send1.body = await c.req.text()
@@ -94,20 +100,12 @@ async function xrpcProxy(c: Context) {
 
       const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl, nonce as string)
 
-      const headers = {
-        'Content-Type': c.req.header('Content-Type') || 'application/json',
-        'Accept': c.req.header('Accept') || 'application/json',
-        'Authorization': `dpop ${oauth_session.access_token}`,
-        'DPoP': dpop_jwt,
-        'atproto-proxy': c.req.header('atproto-proxy'),
-        // ...oauthHeaders,
-      }
-      // console.log("xrpcProxy.resp2.oauthHeaders:", oauthHeaders)
-      console.log("xrpcProxy.resp2.headers:", headers)
-
       const send2: any = {
         method: c.req.method,
-        headers,
+        headers: {
+          ...commonHeaders,
+          'DPoP': dpop_jwt,
+        },
       }
       if (c.req.method === 'POST') {
         send2.body = await c.req.text()
