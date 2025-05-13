@@ -1,6 +1,5 @@
-import { Context, Next } from 'hono'
+import { Context } from 'hono'
 import { getCookie } from 'hono/cookie'
-
 import { getConfig } from '../config'
 
 export type Session = {
@@ -15,43 +14,6 @@ export const DefaultSession: Session = {
   handle: "",
 };
 
-
-// Get authr cookie and session details
-//   todo, make this a function that takes options and returns a middleware
-export const sessions = (options: { required: boolean } = { required: false }) => {
-  const middleware = async (c: Context, next: Next) => {
-    const config = getConfig(c.env)
-
-    const authrSession = await getSession(c)
-
-    if (options.required && !authrSession) {
-      return c.json({
-        error: 'Session not found',
-      }, 401)
-    }
-
-    if (authrSession) {
-      c.set("authrSession", authrSession)
-
-      const results = await c.env.KV.get(authrSession.did)
-      if (!results && c.req.method === 'POST') {
-        return c.json({
-          error: 'Session not found',
-        }, 401)
-      }
-      const atSession = JSON.parse(results as string)
-
-      if (atSession) {
-        c.set("atSession", atSession)
-      }
-    }
-
-    await next()
-  }
-
-  return middleware
-}
-
 export async function getSession(c: Context): Promise<Session | null> {
   const config = getConfig(c.env)
   // console.log("config:", config)
@@ -59,7 +21,7 @@ export async function getSession(c: Context): Promise<Session | null> {
   const cookie = getCookie(c, config.cookie.name);
 
   if (!cookie) {
-    // console.log(`Cookie '${config.cookie.name}' not found.`);
+    console.log(`Cookie '${config.cookie.name}' not found.`);
     return null;
   }
 

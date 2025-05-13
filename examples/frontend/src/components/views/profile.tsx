@@ -10,20 +10,6 @@ const ProfileView = () => {
   const authr = useAuthrContext();
   const session = authr.session
 
-  // get an arbitrary record
-  // const bskyProfile = useQuery({
-  //   queryKey: [session?.handle, 'bskyRecord'],
-  //   queryFn: async () => {
-
-  //     const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/com.atproto.repo.getRecord?repo=${session?.did}&collection=app.bsky.actor.profile&rkey=self`, {
-  //       credentials: 'include'
-  //     })
-
-  //     return r.json()
-  //   },
-  //   enabled: !!(session?.did)
-  // })
-
   const oauthInfo = useQuery({
     queryKey: [session?.handle, 'oauthInfo'],
     queryFn: async () => {

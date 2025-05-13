@@ -35,7 +35,7 @@ app.use('*', cors({
 
 app.use(logger())
 
-app.use(sessions())
+app.use(sessions({ required: true }))
 
 // app.get('/authr-dev-test-route', (c) => c.json(c.env))
 

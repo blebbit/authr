@@ -5,7 +5,7 @@ import { addRoutes as proxyRoutes } from './proxy'
 
 export function addRoutes(app: Hono) {
   // custom xrpc routes
-  postRoutes(app)
+  // postRoutes(app)
 
   // should be last as fallback
   proxyRoutes(app)
