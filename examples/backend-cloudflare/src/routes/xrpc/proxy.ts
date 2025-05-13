@@ -13,16 +13,8 @@ export function addRoutes(app: Hono) {
 
 // handlers
 async function xrpcProxy(c: Context) {
-  const url = new URL(c.req.url)
 
-  console.log("xrpcProxy.url:", url)
-  console.log("xrpcProxy.method:", c.req.method)
-  console.log("xrpcProxy.path:", c.req.path)
-  console.log("xrpcProxy.headers:", c.req.header())
-  console.log("xrpcProxy.search:", c.req.query())
-  // console.log("xrpcProxy.body:", c.req.body)
-
- // Get authr cookie and session details
+ // Get authr session details
   const authr_session = await getSession(c)
   if (!authr_session) {
     return c.json({
@@ -30,31 +22,27 @@ async function xrpcProxy(c: Context) {
     }, 401)
   }
 
+  // Lookup oauth session in KV
+  const results = await c.env.KV.get(authr_session.did)
+  // console.log("xrpcProxy.KV.results:", results)
+
+  if (!results && c.req.method === 'POST') {
+    return c.json({
+      error: 'Session not found',
+    }, 401)
+  }
+  const oauth_session = JSON.parse(results as string)
+  // console.log("xrpcProxy.oauth_session:", oauth_session)
+
+
+  // TODO, this is where we need to handle permissions too, if enabled
   // TODO, we only want to use the session pds if the request is for the current user repo...
-  // proxy with fetch and headers (auth & at-proxy)
+
+
+  // construct our proxied URL
+  const url = new URL(c.req.url)
   let proxyUrl = `${authr_session.pds}${url.pathname}${url.search}`
   console.log("xrpcProxy.proxyUrl:", proxyUrl)
-
-  // const oauthPrefix = '/xrpc/@atproto'
-  // let oauthHeaders: any = {}
-  // if (url.pathname.startsWith(oauthPrefix)) {
-  //   proxyUrl = `https://bsky.social${url.pathname.substring(5)}${url.search}`
-  //   oauthHeaders = {
-  //     'sec-fetch-mode': 'same-origin',
-  //     'sec-fetch-site': 'same-origin',
-  //     'referer': `https://bsky.social/account/${authr_session.did}`
-  //   }
-
-  // }
-
-  // Get oauth session from KV
-  const results = await c.env.KV.get(authr_session.did)
-  console.log("xrpcProxy.KV.results:", results)
-
-  const oauth_session = JSON.parse(results as string)
-  console.log("xrpcProxy.oauth_session:", oauth_session)
-
-  const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl)
 
   // setup common headers
   const commonHeaders: any = {
@@ -67,7 +55,11 @@ async function xrpcProxy(c: Context) {
     commonHeaders['atproto-proxy'] = ap
   }
 
-  const send1: any = {
+  // generate DPoP proof
+  const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl)
+
+  // construct payload
+  const payload1: any = {
     method: c.req.method,
     headers: {
       ...commonHeaders,
@@ -75,32 +67,24 @@ async function xrpcProxy(c: Context) {
     },
   }
   if (c.req.method === 'POST') {
-    send1.body = await c.req.text()
+    payload1.body = await c.req.text()
   }
 
-  const resp = await fetch(proxyUrl, send1)
+  // send request, likely to fail with 401 because we need a DPoP nonce
+  const resp = await fetch(proxyUrl, payload1)
+  // console.log("xrpcProxy.resp1:", resp)
 
-  console.log("xrpcProxy.resp1:", resp)
-
+  // bad request, let's try to fix it (most often dpop nonce)
   if (resp.status === 400 || resp.status === 401) {
     const nonce = resp.headers.get('dpop-nonce')
 
     const data: any = await resp.json()
-    console.log("xrpcProxy.401x.data:", data)
-    // console.log("xrpcProxy.401x.cookies:", cookies)
     if (data.error && (data.error === "use_dpop_nonce" || data.error_description === 'CSRF mismatch')) {
 
-      // for (const cookie of cookies) {
-      //   if (cookie.name === 'csrf-token') {
-      //     oauthHeaders['cookie'] = `${cookie.name}=${cookie.value}`
-      //     oauthHeaders['X-CSRF-Token'] = cookie.value
-      //     break
-      //   }
-      // }
-
+      // calculate new dpop proof with nonce
       const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl, nonce as string)
 
-      const send2: any = {
+      const payload2: any = {
         method: c.req.method,
         headers: {
           ...commonHeaders,
@@ -108,12 +92,12 @@ async function xrpcProxy(c: Context) {
         },
       }
       if (c.req.method === 'POST') {
-        send2.body = await c.req.text()
+        payload2.body = await c.req.text()
       }
 
-      const resp2 = await fetch(proxyUrl, send2)
+      const resp2 = await fetch(proxyUrl, payload2)
 
-      console.log("xrpcProxy.resp2:", resp2)
+      // console.log("xrpcProxy.resp2:", resp2)
       return resp2
     }
     return c.json(data)
@@ -123,34 +107,33 @@ async function xrpcProxy(c: Context) {
 }
 
 async function genDpopProof(method: string, oauth_session: any, proxyUrl: string, nonce?: string) {
-  // console.log("c.env:", c.env);
 
-  console.log("xrpcProxy.oauth_session:", oauth_session)
+  // the original session object created by oauth login/callback
   const at_session = JSON.parse(oauth_session.session)
-  console.log("xrpcProxy.at_session:", at_session)
+  // access token is a JWT
+  const accessToken = oauth_session.access_token;
 
-  // at_session.dpopJwk.alg = "ES256"
+  // each session has a unique dpop key
   const tKey = await JoseKey.fromJWK(at_session.dpopJwk)
-  console.log("xrpcProxy.tKey:", tKey);
 
   // Calculate pkcs_access_token (base64url encoded SHA-256 hash of the access token)
-  const accessToken = oauth_session.access_token;
   const accessTokenHash = await calcATH(accessToken);
-  // console.log("xrpcProxy.pkcsAccessToken:", accessTokenHash);
+
+  // extract the claims from the access token
   const claims = jose.decodeJwt(accessToken)
-  console.log("xrpcProxy.claims:", claims);
 
+  // create a unique identifier for the DPoP proof
   const jti = createJTI();
-  // console.log("xrpcProxy.jti:", jti);
 
+  // clean up the proxy URL
   const pUrl = new URL(proxyUrl);
   const htu = `${pUrl.protocol}//${pUrl.host}${pUrl.pathname}`;
-  // console.log("xrpcProxy.htu:", htu);
 
-  // for iat/exp
+  // for token times (iat/exp)
   const now = new Date();
   const inow = Math.floor(now.getTime() / 1000); // Issued at time (seconds since epoch)
 
+  // build the inputs to the DPoP proof (JWT)
   const dpop_headers = {
     alg: "ES256",
     jwk: tKey.bareJwk,
@@ -167,37 +150,13 @@ async function genDpopProof(method: string, oauth_session: any, proxyUrl: string
     iss: at_session.tokenSet.iss, // Issuer
   };
 
-  // console.log("xrpcProxy.tKey.alg:", tKey.alg);
-  // console.log("xrpcProxy.tKey.algorithms:", tKey.algorithms);
-
-
-  console.log("xrpcProxy.dpop_headers:", dpop_headers);
-  console.log("xrpcProxy.dpop_payload:", dpop_payload);
-
-  // Create DPoP JWT
-  console.log("xrpcProxy.tKey.alg:", tKey.alg);
+  // Create DPoP JWT with our session key
   const dpop_jwt = await tKey.createJwt(dpop_headers, dpop_payload)
-  console.log("xrpcProxy.dpop_jwt:", dpop_jwt);
 
   return dpop_jwt;
 }
 
 async function calcATH(access_token: string) {
-
-  // Calculate pkcs_access_token (base64url encoded SHA-256 hash of the access token)
-  console.log("xrpcProxy.calcATH.access_token:", access_token);
-  // const encodedToken = new TextEncoder().encode(access_token);
-  // const hashBuffer = await crypto.subtle.digest('SHA-256', encodedToken);
-
-  // // Convert ArrayBuffer to Base64 string
-  // const hashArray = Array.from(new Uint8Array(hashBuffer)); // convert buffer to byte array
-  // const base64Hash = btoa(String.fromCharCode.apply(null, hashArray)); // convert bytes to base64 string
-
-  // // Convert Base64 to Base64URL and remove padding
-  // const pkcsAccessToken = base64Hash
-  //   .replace(/\+/g, '-')
-  //   .replace(/\//g, '_')
-  //   .replace(/=/g, '');
 
   const bytes = new TextEncoder().encode(access_token)
   const digest = await crypto.subtle.digest('SHA-256', bytes)
@@ -210,8 +169,6 @@ async function calcATH(access_token: string) {
     .replace(/=/g, '');
 
   return ath
-
-  // return pkcsAccessToken;
 }
 
 function createJTI() {
@@ -239,7 +196,7 @@ export const DefaultSession: Session = {
 
 export async function getSession(c: Context): Promise<Session | null> {
   const config = getConfig(c.env)
-  console.log("config:", config)
+  // console.log("config:", config)
 
   const cookie = getCookie(c, config.cookie.name);
 
