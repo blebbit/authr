@@ -18,9 +18,9 @@ async function xrpcProxy(c: Context) {
   console.log("xrpcProxy.url:", url)
   console.log("xrpcProxy.method:", c.req.method)
   console.log("xrpcProxy.path:", c.req.path)
-  console.log("xrpcProxy.headers:", c.req.headers)
-  console.log("xrpcProxy.search:", c.req.search)
-  console.log("xrpcProxy.body:", c.req.body)
+  console.log("xrpcProxy.headers:", c.req.header())
+  console.log("xrpcProxy.search:", c.req.query())
+  // console.log("xrpcProxy.body:", c.req.body)
 
  // Get authr cookie and session details
   const authr_session = await getSession(c)
@@ -56,26 +56,28 @@ async function xrpcProxy(c: Context) {
 
   const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl)
 
-  const resp = await fetch(proxyUrl, {
+  const headers = {
+    'Content-Type': c.req.header('Content-Type') || 'application/json',
+    'Accept': c.req.header('Accept') || 'application/json',
+    'Authorization': `DPoP ${oauth_session.access_token}`,
+    'DPoP': dpop_jwt,
+    'atproto-proxy': c.req.header('atproto-proxy'),
+    // ...oauthHeaders,
+  }
+  const send1: any = {
     method: c.req.method,
-    headers: {
-      // 'Content-Type': c.req.header('Content-Type') || 'application/json',
-      // 'Accept': c.req.header('Accept') || 'application/json',
-      'Authorization': `DPoP ${oauth_session.access_token}`,
-      'DPoP': dpop_jwt,
-      'atproto-proxy': c.req.header('atproto-proxy'),
-      // ...oauthHeaders,
-    },
-    body: c.req.body,
-  })
+    headers,
+  }
+  if (c.req.method === 'POST') {
+    send1.body = await c.req.text()
+  }
+
+  const resp = await fetch(proxyUrl, send1)
 
   console.log("xrpcProxy.resp1:", resp)
 
   if (resp.status === 400 || resp.status === 401) {
     const nonce = resp.headers.get('dpop-nonce')
-    // const cookies = setCookie.parse(resp, { decodeValues: true }) 
-
-
 
     const data: any = await resp.json()
     console.log("xrpcProxy.401x.data:", data)
@@ -93,8 +95,8 @@ async function xrpcProxy(c: Context) {
       const dpop_jwt = await genDpopProof(c.req.method, oauth_session, proxyUrl, nonce as string)
 
       const headers = {
-        // 'Content-Type': c.req.header('Content-Type') || 'application/json',
-        // 'Accept': c.req.header('Accept') || 'application/json',
+        'Content-Type': c.req.header('Content-Type') || 'application/json',
+        'Accept': c.req.header('Accept') || 'application/json',
         'Authorization': `dpop ${oauth_session.access_token}`,
         'DPoP': dpop_jwt,
         'atproto-proxy': c.req.header('atproto-proxy'),
@@ -103,11 +105,15 @@ async function xrpcProxy(c: Context) {
       // console.log("xrpcProxy.resp2.oauthHeaders:", oauthHeaders)
       console.log("xrpcProxy.resp2.headers:", headers)
 
-      const resp2 = await fetch(proxyUrl, {
+      const send2: any = {
         method: c.req.method,
         headers,
-        body: c.req.body,
-      })
+      }
+      if (c.req.method === 'POST') {
+        send2.body = await c.req.text()
+      }
+
+      const resp2 = await fetch(proxyUrl, send2)
 
       console.log("xrpcProxy.resp2:", resp2)
       return resp2

@@ -1,12 +1,60 @@
-import { Divide } from "lucide-react";
+import { MegaphoneOff } from "lucide-react";
+import { useMutation } from "@tanstack/react-query";
 import { RespError } from "./resp-error";
+import { TID } from '@atproto/common-web'
+        // id: TID.nextStr(),
 
 export const BskyPreferences = ({ data }: { data: any }) => {
+  const mutation = useMutation({
+    mutationFn: async (newTodo: any) => {
+      // get current preferences
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getPreferences`, {
+        credentials: 'include',
+        headers: {
+          'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
+        }
+      })
+
+      const curr = await r.json()
+      console.log("M.curr", curr.preferences)
+
+      const mutes = curr.preferences.filter( (p: any) =>
+        p.$type === "app.bsky.actor.defs#mutedWordsPref"
+      )[0]
+      console.log("M.mutes", mutes)
+
+      mutes.items.push({
+        id: TID.nextStr(),
+        actorTarget: "all",
+        value: "mango moussilini",
+        targets: ["tag", "content"]
+      })
+
+      console.log("M.post", curr)
+
+      return fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.putPreferences`, {
+        credentials: 'include',
+        method: 'POST',
+        headers: {
+          'atproto-proxy': "did:web:api.bsky.app#bsky_appview",
+          'content-type': 'application/json',
+        },
+        body: JSON.stringify(curr)
+      })
+    },
+  })
 
   return (
     <div className="flex flex-col gap-2 p-4 border rounded-md bg-white shadow-sm">
       { data.error ? <RespError error={data.error} /> : null }
-      <h2 className="font-light text-2xl">Preferences</h2>
+      <span className="flex gap-2 justify-between items-center">
+        <h2 className="font-light text-2xl">Preferences</h2>
+        <span className="p-1 border rounded-md hover:cursor-pointer" onClick={() => {
+          mutation.mutate({ id: TID.nextStr(), text: 'Hello World' })
+        }}>
+          <MegaphoneOff className="text-red-500" />
+        </span>
+      </span>
       { data.preferences ? <BskyPreferenceItems bskyPreferences={data.preferences} /> : null }
     </div>
   );

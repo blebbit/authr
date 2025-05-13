@@ -62,6 +62,7 @@ export const handleXrpcManual = async (c: Context) => {
   const tKey = await JoseKey.fromJWK(at_session.dpopJwk)
   console.log("xrpcProxy.tKey:", tKey);
 
+  // TODO, this is broken, need to migrate to Hono
   const proxyUrl = `${session.pds}${req.originalUrl}`
   console.log("xrpcProxy.proxyUrl:", proxyUrl)
 
