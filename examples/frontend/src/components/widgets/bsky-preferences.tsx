@@ -15,7 +15,7 @@ export const BskyPreferences = ({ data }: { data: any }) => {
         }
       })
 
-      const curr = await r.json()
+      const curr: { preferences: any } = await r.json()
       console.log("M.curr", curr.preferences)
 
       const mutes = curr.preferences.filter( (p: any) =>
