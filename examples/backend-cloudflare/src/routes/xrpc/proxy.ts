@@ -77,12 +77,13 @@ export async function xrpcProxy(c: Context) {
           'DPoP': dpop_jwt,
         },
       }
+      console.log("xrpcProxy.payload:", payload2)
       if (c.req.method === 'POST') {
         payload2.body = await c.req.text()
       }
 
       const resp2 = await fetch(proxyUrl, payload2)
-      // console.log("xrpcProxy.resp2:", resp2)
+      console.log("xrpcProxy.resp:", resp2)
 
       return resp2
     }

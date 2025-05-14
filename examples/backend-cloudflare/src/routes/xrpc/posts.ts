@@ -1,7 +1,5 @@
 import { Hono, Context } from 'hono'
-import { P256Keypair, Secp256k1Keypair } from '@atproto/crypto'
-import { createServiceJwt, verifyJwt } from '@atproto/xrpc-server'
-import { IdResolver } from '@atproto/identity'
+import { verifyJwt } from '@atproto/xrpc-server'
 
 import { xrpcProxy } from './proxy'
 
@@ -27,7 +25,8 @@ async function getPost(c: Context) {
 
 
 async function getPosts(c: Context) {
-  console.log("getPosts.start", c.get("authrSession"))
+  console.log("getPosts.authrSession", c.get("authrSession"))
+  console.log("getPosts.headers", c.req.header())
 
   // this little trick allows us to proxy
   // our own api through the user's pds
@@ -37,9 +36,7 @@ async function getPosts(c: Context) {
     return xrpcProxy(c)
   }
 
-  console.log("getPosts.our-handler", proxy)
-
-  console.log("getPosts.header", c.req.header())
+  console.log("getPosts.our-handler", "incoming request is from the user's PDS")
 
   const authorizationHeader = c.req.header('Authorization')
   if (authorizationHeader) {

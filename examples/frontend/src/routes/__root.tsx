@@ -11,8 +11,10 @@ export const Route = createRootRoute({
       {/* @ts-ignore */}
       <Layout>
         <Outlet />
-        <ReactQueryDevtools buttonPosition="bottom-right" />
       </Layout>
+      <div className="fixed bottom-0 right-0 z-50">
+        <ReactQueryDevtools />
+      </div>
       <TanStackRouterDevtools />
     </Providers>
   ),

@@ -1,6 +1,7 @@
 import { z } from 'zod';
 import { RotateCcw } from 'lucide-react';
-import { useQuery } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useAuthr } from '@blebbit/authr-react';
 
 export const OAuthInfoTypeSchema = z.object({
   aud: z.string(),
@@ -30,26 +31,38 @@ export interface OAuthInfoType {
 
 // AI wrote this tailwind, it's not very good
 export const OAuthInfo = ({ oauthInfo, cookie }: { oauthInfo: OAuthInfoType, cookie: string }) => {
-  const refreshOauthInfo = async () => {
-    const response = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/refresh?did=${oauthInfo.sub}`, {
-      method: "POST",
-      credentials: 'include',
-      headers: {
-        "Content-Type": "application/json",
-      },
-    })
-    if (!response.ok) {
-      throw new Error('Failed to refresh OAuth info');
-    }
-    return await response.json();
-  };
+  const queryClient = useQueryClient();
+  const authr = useAuthr();
+
+  const refreshOauthInfo = useMutation({
+    mutationFn: async () => {
+      console.log("refreshOauthInfo.mutate", oauthInfo.sub)
+      const response = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/refresh?did=${oauthInfo.sub}`, {
+        method: "POST",
+        credentials: 'include',
+        headers: {
+          "Content-Type": "application/json",
+        },
+      })
+      if (!response.ok) {
+        throw new Error('Failed to refresh OAuth info');
+      }
+      return await response.json();
+    },
+    onSuccess: () => {
+      console.log("invalidating queries", session.handle, 'oauthInfo')
+      queryClient.invalidateQueries({ queryKey: [session.handle, 'oauthInfo'] });
+    },
+  })
+
+  const session = authr.session
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 border border-gray-200 overflow-hidden">
 
       <div className="flex justify-between items-center mb-4">
         <h2 className="text-2xl font-light text-gray-700">OAuth Information</h2>
-        <span className="border rounded-md py-1 px-2 cursor-pointer hover:bg-gray-200" onClick={refreshOauthInfo}>
+        <span className="border rounded-md py-1 px-2 cursor-pointer hover:bg-gray-200" onClick={() => refreshOauthInfo.mutate()}>
           <RotateCcw className="h-6 w-6 text-gray-500 hover:text-gray-700 cursor-pointer" />
         </span>
       </div>
