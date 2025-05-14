@@ -2,9 +2,15 @@
 
 // import ThemeProvider from "./theme";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { AuthrProvider, CookieProvider } from '@blebbit/authr-react';
+import { type AuthrOptions, AuthrProvider, CookieProvider } from '@blebbit/authr-react';
 
 const queryClient = new QueryClient();
+
+const options: AuthrOptions = {
+  cookieName: import.meta.env.VITE_AUTHR_COOKIE_NAME as string,
+  cookieDomain: import.meta.env.VITE_AUTHR_COOKIE_DOMAIN as string,
+}
+
 
 const Providers = ({
   children,
@@ -19,7 +25,7 @@ const Providers = ({
         enableSystem
         disableTransitionOnChange
       > */}
-      <AuthrProvider>
+      <AuthrProvider options={options}>
         <QueryClientProvider client={queryClient}>
           {children}
         </QueryClientProvider>

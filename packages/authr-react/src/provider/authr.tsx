@@ -6,19 +6,19 @@ import { useLocalStorage } from "@uidotdev/usehooks";
 
 import * as jose from 'jose';
 
-type AuthrContext = {
+export type AuthrContext = {
   session: any;
   sessions: any;
   switchAccount: (did: string) => void;
   // logout: (did: string) => void;
 }
 
-type AuthrOptions = {
+export type AuthrOptions = {
   cookieName: string;
   cookieDomain: string;
 }
 
-type AuthrSession = {
+export type AuthrSession = {
   cookie?: string
   did: string
   pds: string
@@ -26,7 +26,7 @@ type AuthrSession = {
   sessionId?: string
 }
 
-type AuthrSessions = {
+export type AuthrSessions = {
   current?: AuthrSession
   accounts: AuthrSession[]
 }
@@ -43,19 +43,16 @@ export const useAuthr = () => {
 
 export default AuthrContext;
 
-export const AuthrProvider: React.FC<{ children: React.ReactNode }> = ({ children }: { children: React.ReactNode}) => {
+export const AuthrProvider: React.FC<{ options: AuthrOptions; children: React.ReactNode }> = ({ options, children }) => {
 
   // hooks
+
   const [cookies, setCookies] = useCookies()
   const [sessions, setSessions] = useLocalStorage<AuthrSessions>("blebbit/sessions", { current: undefined, accounts: [] });
   
-  const options: AuthrOptions = {
-    cookieName: "authr_session",
-    cookieDomain: ".blebbit.org",
-  }
-
   // console.log("AuthrProvider.sessions.pre", sessions)
   console.log("AuthrProvider cookieName", options.cookieName)
+  console.log("AuthrProvider cookieDomain", options.cookieDomain)
   console.log("AuthrProvider.cookies.all", cookies)
 
   React.useEffect(() => { 
@@ -85,11 +82,9 @@ export const AuthrProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       if (!found && session.did) {
         sessions.accounts.push(session)
       }
-      // always set current session
-      sessions.current = session
 
       // finalize
-      setSessions(sessions)
+      setSessions({ current: session, accounts: sessions.accounts })
       console.log("AuthrProvider.sessions.post", sessions)
     }
   }, [cookies])
@@ -100,9 +95,12 @@ export const AuthrProvider: React.FC<{ children: React.ReactNode }> = ({ childre
     sessions,
     switchAccount: (did: string) => {
       const newSession = sessions.accounts.find(s => s.did === did);
+      console.log("AuthrProvider.switchAccount", did, newSession)
       if (newSession) {
         // this should trigger changing the current session
         // @not-ts-ignore (double check this)
+        console.log("AuthrProvider.switchAccount", newSession)
+        setSessions({ current: newSession, accounts: sessions.accounts })
         setCookies(options.cookieName, newSession.cookie, {
           path: '/',
           domain: options.cookieDomain,

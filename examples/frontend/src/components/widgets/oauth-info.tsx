@@ -1,7 +1,9 @@
 import { z } from 'zod';
 import { RotateCcw } from 'lucide-react';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { useAuthr } from '@blebbit/authr-react';
+import * as jose from 'jose';
+import { useCookies } from 'react-cookie';
 
 export const OAuthInfoTypeSchema = z.object({
   aud: z.string(),
@@ -30,14 +32,35 @@ export interface OAuthInfoType {
 }
 
 // AI wrote this tailwind, it's not very good
-export const OAuthInfo = ({ oauthInfo, cookie }: { oauthInfo: OAuthInfoType, cookie: string }) => {
+export const OAuthInfo = ({ session }: { session: any }) => {
   const queryClient = useQueryClient();
-  const authr = useAuthr();
+  const [cookies] = useCookies();
+  console.log("OAuthInfo.session", session, cookies)
+
+  const oauthInfo = useQuery({
+    queryKey: [session?.handle, 'oauthInfo'],
+    queryFn: async () => {
+      const claims = await jose.decodeJwt(session.cookie)
+      console.log("oauthInfo.queryFn", session.did, claims, cookies)
+
+      const r = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/info`, {
+        credentials: 'include',
+      })
+
+      console.log("oauthInfo.queryFn.r", r)
+
+      const data = await r.json()
+      console.log("oauthInfo.queryFn.data", data)
+      return data
+    },
+    enabled: !!(session?.did)
+  })
+
 
   const refreshOauthInfo = useMutation({
     mutationFn: async () => {
-      console.log("refreshOauthInfo.mutate", oauthInfo.sub)
-      const response = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/refresh?did=${oauthInfo.sub}`, {
+      console.log("refreshOauthInfo.mutate", session.did)
+      const response = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/refresh?did=${session.did}`, {
         method: "POST",
         credentials: 'include',
         headers: {
@@ -55,7 +78,15 @@ export const OAuthInfo = ({ oauthInfo, cookie }: { oauthInfo: OAuthInfoType, coo
     },
   })
 
-  const session = authr.session
+  if (oauthInfo.isLoading) {
+    return <div className="flex items-center justify-center h-full">Loading...</div>;
+  }
+  if (oauthInfo.isError) {
+    return <div className="flex items-center justify-center h-full">Error loading OAuth info</div>;
+  }
+
+  const data: any = oauthInfo.data
+  console.log("OAuthInfo.data", data)
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 border border-gray-200 overflow-hidden">
@@ -72,57 +103,57 @@ export const OAuthInfo = ({ oauthInfo, cookie }: { oauthInfo: OAuthInfoType, coo
           {/* chanded the above to flex */}
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Audience (aud):</dt>
-            <dd className="ml-2 font-light text-gray-600 break-all">{oauthInfo.aud}</dd>
+            <dd className="ml-2 font-light text-gray-600 break-all">{data.aud}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Subject (sub):</dt>
-            <dd className="ml-2 font-light text-gray-600 break-all">{oauthInfo.sub}</dd>
+            <dd className="ml-2 font-light text-gray-600 break-all">{data.sub}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Issuer (iss):</dt>
-            <dd className="ml-2 font-light text-gray-600 break-all">{oauthInfo.iss}</dd>
+            <dd className="ml-2 font-light text-gray-600 break-all">{data.iss}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Token Type:</dt>
-            <dd className="ml-2 font-light text-gray-600">{oauthInfo.token_type}</dd>
+            <dd className="ml-2 font-light text-gray-600">{data.token_type}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-2 flex items-end">
             <dt className="font-medium text-gray-500">Scope:</dt>
-            <dd className="ml-2 font-light text-gray-600 break-all">{oauthInfo.scope}</dd>
+            <dd className="ml-2 font-light text-gray-600 break-all">{data.scope}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Access Issued At:</dt>
-            <dd className="ml-2 font-light text-gray-600">{new Date(oauthInfo.access_issued_at).toLocaleString()}</dd>
+            <dd className="ml-2 font-light text-gray-600">{new Date(data.access_issued_at).toLocaleString()}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Access Expires At:</dt>
-            <dd className="ml-2 font-light text-gray-600">{new Date(oauthInfo.access_expires_at).toLocaleString()}</dd>
+            <dd className="ml-2 font-light text-gray-600">{new Date(data.access_expires_at).toLocaleString()}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Refresh Expires At:</dt>
-            <dd className="ml-2 font-light text-gray-600">{new Date(oauthInfo.refresh_expires_at).toLocaleString()}</dd>
+            <dd className="ml-2 font-light text-gray-600">{new Date(data.refresh_expires_at).toLocaleString()}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Access Token Hash:</dt>
-            <dd className="ml-2 font-light text-gray-600 max-w-1/2">{oauthInfo.access_token_hash}</dd>
+            <dd className="ml-2 font-light text-gray-600 max-w-1/2">{data.access_token_hash}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Refresh Token Hash:</dt>
-            <dd className="ml-2 font-light text-gray-600 max-w-1/2">{oauthInfo.refresh_token_hash}</dd>
+            <dd className="ml-2 font-light text-gray-600 max-w-1/2">{data.refresh_token_hash}</dd>
           </div>
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Authr Cookie:</dt>
-            <dd className="ml-2 font-light text-gray-600 max-w-1/2">{cookie}</dd>
+            <dd className="ml-2 font-light text-gray-600 max-w-1/2">{session.cookie}</dd>
           </div>
         </dl>
       )}

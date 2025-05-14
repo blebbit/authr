@@ -8,20 +8,7 @@ import { BskyPreferences } from "@/components//widgets/bsky-preferences";
 
 const ProfileView = () => {
   const authr = useAuthr();
-  const session = authr.session
-
-  const oauthInfo = useQuery({
-    queryKey: [session?.handle, 'oauthInfo'],
-    queryFn: async () => {
-
-      const r = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/info`, {
-        credentials: 'include',
-      })
-
-      return r.json()
-    },
-    enabled: !!(session?.did)
-  })
+  const session = authr.sessions.current
 
   const bskyProfile = useQuery({
     queryKey: [session?.handle, 'bskyProfile'],
@@ -60,7 +47,7 @@ const ProfileView = () => {
 
       {session ? <AtprotoInfo session={session} /> : null }
       {bskyProfile.data ? <BskyProfile data={bskyProfile.data} /> : null }
-      <OAuthInfo oauthInfo={oauthInfo.data as OAuthInfoType} cookie={session.cookie} />
+      <OAuthInfo session={session} />
       {bskyPreferences.data ? <BskyPreferences data={bskyPreferences.data} /> : null }
 
     </div>
