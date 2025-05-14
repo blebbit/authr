@@ -34,17 +34,19 @@ const PostsView = () => {
   console.log("authrPosts", authrPosts)
   console.log("authrPosts.data", authrPosts.data)
 
-  if (authrPosts.data?.error) {
+  const data = authrPosts.data as any
+
+  if (data?.error) {
     return (
       <div className="flex flex-col gap-4">
-        <p>Error: {authrPosts.data.error}</p>
+        <p>Error: {data.error}</p>
       </div>
     )
   }
 
   return (
     <div className="flex flex-col gap-4">
-      {authrPosts.data?.posts ? authrPosts.data.posts.map(post => (
+      {data?.posts ? data.posts.map(post => (
         <div key={post.id} className="border-b py-4">
           <h2 className="text-xl font-semibold">{post.title}</h2>
           <p className="text-gray-600">{post.content}</p>

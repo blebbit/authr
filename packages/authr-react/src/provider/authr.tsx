@@ -65,7 +65,7 @@ export const AuthrProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       const claims = jose.decodeJwt(authrCookie || "")
 
       // build session object
-      const session: AuthrSession = {
+      const session: any = {
         cookie: authrCookie,
         ...claims,
       }

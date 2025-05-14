@@ -1,22 +1,11 @@
 "use client"
 
-import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "@tanstack/react-form"
 import { z } from "zod"
 
 import { useSearch } from "@tanstack/react-router"
 
 import { Button } from "@/components/ui/button"
-import {
-  Form,
-  FormControl,
-  FormDescription,
-  FormField,
-  FormItem,
-  FormLabel,
-  FormMessage,
-} from "@/components/ui/form"
-import { Input } from "@/components/ui/input"
 
 const formSchema = z.object({
   title: z.string().min(2, {
@@ -48,7 +37,7 @@ export function HandleForm() {
     },
     // Define what meta values to expect on submission
     onSubmitMeta: defaultMeta,
-    onSubmit: async ({ value, meta }) => {
+    onSubmit: async ({ value, meta }: { value: any, meta: FormMeta }) => {
       // Do something with the values passed via handleSubmit
       value.action = meta.submitAction
       console.log(`onSubmit:`, value)
