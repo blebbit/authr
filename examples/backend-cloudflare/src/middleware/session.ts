@@ -17,12 +17,18 @@ export const DefaultSession: Session = {
 
 
 // Get authr cookie and session details
-//   todo, make this a function that takes options and returns a middleware
 export const sessions = (options: { required: boolean } = { required: false }) => {
+
+  // TODO...
+  // - check if x-apikey is set (for internal app callsO)
+  // - check if atproto-proxy is set (for service-to-service calls proxied by the PDS)
+  // - make options have more required kinds?
+  //   (or separate out into different middleware that just checks if things have been set by this middleware?)
+
   const middleware = async (c: Context, next: Next) => {
     const config = getConfig(c.env)
 
-    const authrSession = await getSession(c)
+    const authrSession = await getAuthrSession(c)
 
     if (options.required && !authrSession) {
       return c.json({
@@ -46,13 +52,17 @@ export const sessions = (options: { required: boolean } = { required: false }) =
       }
     }
 
+    // if atproto-proxy is set, we are receiving a request from a PDS
+    //   verify with the method described here:
+    // http://docs.bsky.app/docs/advanced-guides/service-auth#usage
+
     await next()
   }
 
   return middleware
 }
 
-export async function getSession(c: Context): Promise<Session | null> {
+export async function getAuthrSession(c: Context): Promise<Session | null> {
   const config = getConfig(c.env)
   // console.log("config:", config)
 

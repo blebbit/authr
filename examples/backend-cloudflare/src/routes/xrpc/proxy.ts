@@ -10,7 +10,7 @@ export function addRoutes(app: Hono) {
 }
 
 // handlers
-async function xrpcProxy(c: Context) {
+export async function xrpcProxy(c: Context) {
 
  // Get authr session details
   const authrSession = c.get("authrSession")

@@ -23,6 +23,7 @@
     "AUTHR_ENV": "stg",
     "COOKIE_NAME": "authr_session",
     "COOKIE_ISSUER": "https://auth.authr.blebbit.dev",
-    "COOKIE_AUDIENCE": "https://app.authr.blebbit.dev"
+    "COOKIE_AUDIENCE": "https://app.authr.blebbit.dev",
+    "ATPROTO_SERVICE_DOMAIN": "api.authr.blebbit.org"
   }
 }

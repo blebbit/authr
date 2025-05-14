@@ -8,13 +8,20 @@
     "db:mig:list:remote": "wrangler d1 migrations list --remote authr-example",
     "db:mig:apply:local": "wrangler d1 migrations apply --local authr-example",
     "db:mig:apply:remote": "wrangler d1 migrations apply --remote authr-example",
-    "deploy": "wrangler deploy --minify"
+    "deploy": "wrangler deploy --minify",
+    "genkey": "tsx ./scripts/gen-service-key.ts"
   },
   "dependencies": {
+    "@atproto/crypto": "^0.4.4",
+    "@atproto/identity": "^0.4.8",
+    "@atproto/xrpc-server": "^0.7.18",
     "hono": "^4.7.8",
-    "set-cookie-parser": "^2.7.1"
+    "set-cookie-parser": "^2.7.1",
+    "uint8arrays": "^5.1.0"
   },
   "devDependencies": {
+    "tsx": "^4.19.4",
+    "typescript": "^5.8.3",
     "wrangler": "^4.4.0"
   }
 }
