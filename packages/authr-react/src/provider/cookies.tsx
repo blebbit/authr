@@ -3,7 +3,7 @@
 import * as React from "react"
 import { CookiesProvider } from 'react-cookie';
  
-export default function CookieProvider({
+export function CookieProvider({
   children,
   ...props
 }: React.ComponentProps<typeof CookiesProvider>) {

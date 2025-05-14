@@ -16,12 +16,12 @@ export const BskyPreferences = ({ data }: { data: any }) => {
       })
 
       const curr: { preferences: any } = await r.json()
-      console.log("M.curr", curr.preferences)
+      // console.log("M.curr", curr.preferences)
 
       const mutes = curr.preferences.filter( (p: any) =>
         p.$type === "app.bsky.actor.defs#mutedWordsPref"
       )[0]
-      console.log("M.mutes", mutes)
+      // console.log("M.mutes", mutes)
 
       mutes.items.push({
         id: TID.nextStr(),
@@ -69,7 +69,7 @@ const BskyPreferenceItems = ({ bskyPreferences }: { bskyPreferences: any }) => {
     prefs[pref.$type].push(pref);
   }
 
-  console.log("prefs", prefs);
+  // console.log("prefs", prefs);
   
   return (
     <div className="flex flex-col gap-3 pl-2">

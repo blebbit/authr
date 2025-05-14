@@ -66,6 +66,8 @@ async function getPosts(c: Context) {
       getSigningKey
     )
     console.log("getPosts.payload", payload)
+
+    // TODO, memorize the payload.jti to ensure it is not used again
   }
 
   // todo

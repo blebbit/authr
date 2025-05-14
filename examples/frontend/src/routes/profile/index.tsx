@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { useAuthrContext } from "@/components/context/authr";
+import { useAuthr } from "@blebbit/authr-react";
 
 import { AccountSwitcher } from '@/components/widgets/acct-switcher';
 import ProfileView from '@/components/views/profile';
@@ -10,7 +10,7 @@ export const Route = createFileRoute('/profile/')({
 })
 
 function RouteComponent() {
-  const authr = useAuthrContext();
+  const authr = useAuthr();
 
   return (
     <div className="flex flex-col gap-4 p-4">

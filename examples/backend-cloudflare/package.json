@@ -14,8 +14,10 @@
   "dependencies": {
     "@atproto/crypto": "^0.4.4",
     "@atproto/identity": "^0.4.8",
+    "@atproto/jwk-jose": "^0.1.6",
     "@atproto/xrpc-server": "^0.7.18",
     "hono": "^4.7.8",
+    "jose": "^6.0.11",
     "set-cookie-parser": "^2.7.1",
     "uint8arrays": "^5.1.0"
   },

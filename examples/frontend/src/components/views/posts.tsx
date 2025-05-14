@@ -1,9 +1,9 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { useAuthrContext } from "@/components/context/authr";
+import { useAuthr } from "@blebbit/authr-react";
 
 const PostsView = () => {
-  const authr = useAuthrContext();
+  const authr = useAuthr();
   const session = authr.session
 
   const authrPosts = useQuery({

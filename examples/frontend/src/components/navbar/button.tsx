@@ -1,9 +1,9 @@
 import { Link } from "@tanstack/react-router";
-import { useAuthrContext } from "@/components/context/authr";
+import { useAuthr } from "@blebbit/authr-react";
 
 const Button = () => {
   
-  const authr = useAuthrContext();
+  const authr = useAuthr();
 
   if (authr.session.did) {
     return (

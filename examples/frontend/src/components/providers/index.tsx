@@ -1,10 +1,10 @@
 "use client"
 
-import CookieProvider from './cookies'
 // import ThemeProvider from "./theme";
-import QueryProvider from "./query";
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { AuthrProvider, CookieProvider } from '@blebbit/authr-react';
 
-import { AuthrProvider } from '@/components/context/authr';
+const queryClient = new QueryClient();
 
 const Providers = ({
   children,
@@ -20,9 +20,9 @@ const Providers = ({
         disableTransitionOnChange
       > */}
       <AuthrProvider>
-        <QueryProvider>
+        <QueryClientProvider client={queryClient}>
           {children}
-        </QueryProvider>
+        </QueryClientProvider>
       </AuthrProvider>
       {/* </ThemeProvider> */}
     </CookieProvider>

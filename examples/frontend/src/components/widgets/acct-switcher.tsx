@@ -2,28 +2,16 @@
 import { useCookies } from 'react-cookie';
 import { useLocalStorage } from "@uidotdev/usehooks";
 import { useQueryClient } from '@tanstack/react-query'
+import { useAuthr } from "@blebbit/authr-react";
 
 export const AccountSwitcher = () => {
   const queryClient = useQueryClient()
   const [sessions, setSessions] = useLocalStorage("blebbit/sessions", { accounts: [], current: {} as any });
   const [_, setCookie] = useCookies()
+  const { switchAccount: authrSwitchAccount } = useAuthr()
 
   const switchAccount = (did: string) => {
-    console.log("switchAccount", did)
-    for (const s in sessions.accounts) {
-      if (sessions.accounts[s].did === did) {
-        sessions.current = sessions.accounts[s]
-        const cookieName = import.meta.env.VITE_AUTHR_COOKIE_NAME as string
-        // @ts-ignore
-        setCookie(cookieName, sessions.current.cookie, {
-          path: '/',
-          domain: import.meta.env.VITE_AUTHR_COOKIE_DOMAIN,
-          sameSite: 'lax', 
-        })
-        break
-      }
-    }
-    setSessions(sessions)
+    authrSwitchAccount(did)
     queryClient.invalidateQueries({
       queryKey: [sessions.current?.handle, 'oauthInfo'],
     })

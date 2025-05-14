@@ -1,13 +1,13 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { useAuthrContext } from "@/components/context/authr";
+import { useAuthr } from "@blebbit/authr-react";
 import { OAuthInfo, type OAuthInfoType } from "@/components/widgets/oauth-info";
 import { AtprotoInfo } from "@/components/widgets/atproto-info";
 import { BskyProfile } from "@/components/widgets/bsky-profile";
 import { BskyPreferences } from "@/components//widgets/bsky-preferences";
 
 const ProfileView = () => {
-  const authr = useAuthrContext();
+  const authr = useAuthr();
   const session = authr.session
 
   const oauthInfo = useQuery({

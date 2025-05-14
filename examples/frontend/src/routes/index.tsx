@@ -1,6 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import logo from '../logo.svg'
 
+import { Button } from '@blebbit/authr-react'
+
 export const Route = createFileRoute('/')({
   component: App,
 })
@@ -21,6 +23,8 @@ function App() {
         This is a demo app for the Authr identity and permission management service.
         It demonstrates how to use Authr with Vite, React, and TanStack.
       </span>
+
+      <Button className="border rounded py-2 px-4 hover:bg-gray-200" onClick={() => alert("hello!")}>hello</Button>
     </div>
   )
 }
