@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
 
-import UserButton from './button'
+import { AuthrButton } from '@blebbit/authr-react';
 
 const Navbar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 
@@ -11,7 +11,7 @@ const Navbar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
         <Link to="/">Authr Example</Link>
       </header>
       <div className="flex flex-grow"> {children} </div>
-      <UserButton />
+      <AuthrButton />
     </div>
   );
 }

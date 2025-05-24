@@ -12,18 +12,22 @@
     "genkey": "tsx ./scripts/gen-service-key.ts"
   },
   "dependencies": {
+    "@atproto/common-web": "^0.4.2",
     "@atproto/crypto": "^0.4.4",
     "@atproto/identity": "^0.4.8",
     "@atproto/jwk-jose": "^0.1.6",
     "@atproto/xrpc-server": "^0.7.18",
+    "@paralleldrive/cuid2": "^2.2.2",
     "hono": "^4.7.8",
     "jose": "^6.0.11",
     "set-cookie-parser": "^2.7.1",
-    "uint8arrays": "^5.1.0"
+    "uint8arrays": "^5.1.0",
+    "unenv": "^1.10.0"
   },
   "devDependencies": {
+    "@types/node": "^22.15.19",
     "tsx": "^4.19.4",
     "typescript": "^5.8.3",
-    "wrangler": "^4.4.0"
+    "wrangler": "^4.15.2"
   }
 }

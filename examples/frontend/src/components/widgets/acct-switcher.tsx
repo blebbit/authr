@@ -15,10 +15,8 @@ export const AccountSwitcher = () => {
       return null
     },
     onSuccess: (_, did: string) => {
-      console.log("invalidating queries", did, 'oauthInfo')
-      queryClient.invalidateQueries({ queryKey: [did, 'oauthInfo'], })
-      queryClient.invalidateQueries({ queryKey: [did, 'bskyProfile'], })
-      queryClient.invalidateQueries({ queryKey: [did, 'bskyPreferences'], })
+      console.log("invalidating acct queries", did)
+      queryClient.invalidateQueries({ queryKey: [did, 'acct'] })
     },
   })
 

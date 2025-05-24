@@ -1,9 +1,14 @@
 import { Hono, Context } from 'hono'
-import { verifyJwt } from '@atproto/xrpc-server'
+
+import { createRelationship, checkPermission, checkBulkPermissions } from '@/lib/authz'
 
 import { xrpcProxy } from './proxy'
+import { createRecord } from '@/lib/storage'
 
-import { getConfig } from '../../config'
+import { createId } from '@paralleldrive/cuid2'
+import { create } from '@atproto/common-web/dist/check'
+
+const POST_COLLECTION = 'app.blebbit.authr.post'
 
 // only export
 export function addRoutes(app: Hono) {
@@ -25,8 +30,11 @@ async function getPost(c: Context) {
 
 
 async function getPosts(c: Context) {
-  console.log("getPosts.authrSession", c.get("authrSession"))
-  console.log("getPosts.headers", c.req.header())
+  const authrSession = c.get("authrSession")
+  const pdsSession = c.get("pdsSession")
+  // console.log("getPosts.authrSession", authrSession)
+  // console.log("getPosts.pdsSession", pdsSession)
+  // console.log("getPosts.headers", c.req.header())
 
   // this little trick allows us to proxy
   // our own api through the user's pds
@@ -36,65 +44,87 @@ async function getPosts(c: Context) {
     return xrpcProxy(c)
   }
 
-  console.log("getPosts.our-handler", "incoming request is from the user's PDS")
+  // console.log("getPosts.our-handler", "incoming request is from the user's PDS")
 
-  const authorizationHeader = c.req.header('Authorization')
-  if (authorizationHeader) {
-    const jwt = authorizationHeader.split(' ')[1]
 
-    // Verifying a service JWT
-    // helper method to resolve a user's DID to their atproto signing key
-    const getSigningKey = async (
-      did: string,
-      forceRefresh: boolean,
-    ): Promise<string> => {
-      const resp = await fetch(`https://plc.blebbit.dev/${did}`)
-      const doc: any = await resp.json()
-      const key = doc.verificationMethod[0].publicKeyMultibase
-
-      return `did:key:${key}` // blebbit.app
-    }
-
-    // it is important to always check the aud & lxm of the provided service JWT
-    const payload = await verifyJwt(
-      jwt,
-      `did:web:${c.env.ATPROTO_SERVICE_DOMAIN}`,
-      "app.blebbit.authr.getPosts",
-      getSigningKey
-    )
-    console.log("getPosts.payload", payload)
-
-    // TODO, memorize the payload.jti to ensure it is not used again
-  }
-
+  // see if we have something to put permissions on
+  var did =  pdsSession?.iss || authrSession?.did || undefined
   // todo
   // - check our auth and pds-proxy auth
   // - implement actual getPosts
 
+  const result =
+    await c.env.DB
+    .prepare('SELECT * FROM records')
+    // .prepare('SELECT * FROM records WHERE acct = ? AND nsid = ?')
+    // .bind(did, POST_COLLECTION)
+    .all()
+
+  var posts = result.results as any[]
+  console.log("getPosts.posts", posts)
+
+  // authzed has something about providing a fetch bulk records where they will handle the logic
+  //   for getting more results until the page size is met, based on permissions
+  // https://authzed.com/docs/spicedb/modeling/protecting-a-list-endpoint#checking-with-checkbulkpermissions
+  if (did) {
+    const objs = posts.map((post) => {
+      return "blog/post:" + post.id
+    })
+    const permCheck = await checkBulkPermissions(c.env, objs, "read", "blog/user:" + did.replaceAll(":", "_")) as { pairs: any[] }
+    // console.log("getPosts.checkSession", JSON.stringify(permCheck, null, 2))
+
+    posts = posts.filter((post, index) => {
+      const perm = permCheck.pairs[index]
+      // TODO, ensure we have the same id for each item
+      return perm?.response?.item?.permissionship === 2
+    })
+  }
+
   return c.json({
-    posts: [{
-      id: '1',
-      title: 'First Post',
-      content: 'This is the first post.',
-    },{
-      id: '2',
-      title: 'Second Post',
-      content: 'This is the second post.',
-    }]
+    posts,
   })
 }
 
 async function createPost(c: Context) { 
 
   const authrSession = c.get("authrSession")
-  const atSession = c.get("atSession")
-  console.log("createPost.start", authrSession)
+  const pdsSession = c.get("pdsSession")
+
   const payload = await c.req.json()
   console.log("createPost.payload", payload)
 
-  return c.json({
-    error: 'Not implemented',
-  }, 501)
+  // DUAL+ Write Problem
+  // https://authzed.com/blog/the-dual-write-problem
+  // https://www.youtube.com/watch?v=6lDkXrFjuhc
+
+  // who's creating this post?
+  var did =  pdsSession?.iss || authrSession?.did || undefined
+  console.log("createPost.did", did)
+
+  // must be authenticated to perform writes of any kind
+  if (!did) {
+    return c.json({
+      error: 'Not authenticated',
+    }, 401)
+  }
+
+  const cid = createId()
+  console.log("createPost.cid", cid)
+  // write resource and assign owner to creator
+  const perm = await createRelationship(c.env, "blog/post:" + cid, "owner", "blog/user:" + did.replaceAll(":", "_"))
+  console.log("createPost.perm", perm)
+
+  // write to application database
+  const result = await createRecord(c, cid, did, POST_COLLECTION, {
+    draft: payload.record.draft,
+    title: payload.record.title,
+    content: payload.record.content,
+  }, payload.public)
+  console.log("createPost.result", result)
+
+  // write to account's PDS
+
+  return c.json(result)
 }
 
 async function updatePost(c: Context) {

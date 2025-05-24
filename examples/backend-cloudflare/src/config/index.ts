@@ -42,6 +42,12 @@ interface Config {
   webhook: {
     secret: string;
   }
+
+  authz: {
+    host: string;
+    port: string;
+    secret: string;
+  }
 }
 
 let config: Config = undefined as any;
@@ -50,6 +56,10 @@ export function getConfig(env: any): Config {
 
   if (config) {
     return config;
+  }
+
+  if (!env) {
+    throw new Error("getConfig: env is required on first init / call");
   }
 
   config = {
@@ -71,8 +81,14 @@ export function getConfig(env: any): Config {
     },
 
     webhook: {
-      secret: process.env.WEBHOOK_SECRET || 'authr-webhook-secret',
+      secret: env.WEBHOOK_SECRET || 'authr-webhook-secret',
     },
+
+    authz: {
+      host: env.AUTHZ_HOST || 'localhost',
+      port: env.AUTHZ_PORT || '3333',
+      secret: env.AUTHZ_SECRET || 'authr-example-backend-cloudflare',
+    }
   }
 
 

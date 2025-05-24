@@ -32,12 +32,12 @@ export const handleXrpcAgent = async (c: Context) => {
 };
 
 export const handleXrpcManual = async (c: Context) => {
-  console.log("xrpcProxy.url:", req.originalUrl)
-  console.log("xrpcProxy.method:", req.method)
-  console.log("xrpcProxy.path:", req.path)
-  console.log("xrpcProxy.headers:", req.headers)
-  console.log("xrpcProxy.search:", req.query)
-  console.log("xrpcProxy.body:", req.body)
+  // console.log("xrpcProxy.url:", c.req.originalUrl)
+  // console.log("xrpcProxy.method:", c.req.method)
+  // console.log("xrpcProxy.path:", req.path)
+  // console.log("xrpcProxy.headers:", req.headers)
+  // console.log("xrpcProxy.search:", req.query)
+  // console.log("xrpcProxy.body:", req.body)
 
   const session = c.get('session')
 

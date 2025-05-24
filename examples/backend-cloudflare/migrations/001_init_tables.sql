@@ -1,30 +1,20 @@
-CREATE TABLE users (
-    userId INTEGER PRIMARY KEY,
+-- a single table of all records
+CREATE TABLE records (
+    id VARCHAR PRIMARY KEY, -- UUID, do we need this or use it? (spicedb resource id?)
     createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL,
-    did TEXT NOT NULL,
-    handle TEXT NOT NULL,
-    email TEXT NOT NULL,
-    emailConfirmed BOOLEAN NOT NULL,
-    emailAuthFactor BOOLEAN NOT NULL,
-    active BOOLEAN NOT NULL
+    updatedAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+
+    -- assume most people want a private by default experience
+    public BOOLEAN NOT NULL DEFAULT FALSE,
+    
+    -- actual ATProto stuff
+    acct VARCHAR NOT NULL, -- DID
+    nsid VARCHAR NOT NULL, -- collection
+    rkey VARCHAR NOT NULL, -- TID
+    cid VARCHAR,           -- CID (hash, if public)
+
+    record TEXT NOT NULL -- JSON
 );
 
--- CreateIndex
-CREATE UNIQUE INDEX "user_did_idx" ON "users"("did");
-
--- CreateIndex
-CREATE UNIQUE INDEX "user_handle_idx" ON "users"("handle");
-
-
-CREATE TABLE posts (
-    postId INTEGER PRIMARY KEY,
-    createdAt DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updatedAt DATETIME NOT NULL,
-
-    published BOOLEAN NOT NULL,
-    record TEXT NOT NULL, -- JSON
-
-    ownerId INTEGER,
-    FOREIGN KEY(ownerId) REFERENCES users(userId)
-);
+-- same constraint as ATProto
+CREATE UNIQUE INDEX "aturi_idx" ON "records"("acct", "nsid", "rkey");

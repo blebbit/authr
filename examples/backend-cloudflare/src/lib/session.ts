@@ -1,5 +1,6 @@
 import { Context } from 'hono'
 import { getCookie } from 'hono/cookie'
+
 import { getConfig } from '../config'
 
 export type Session = {

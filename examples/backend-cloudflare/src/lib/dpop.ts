@@ -9,13 +9,12 @@ export async function genDpopProof(method: string, oauth_session: any, proxyUrl:
   const accessToken = oauth_session.access_token;
 
   // each session has a unique dpop key
-  const tKey = await JoseKey.fromJWK(at_session.dpopJwk)
 
   // Calculate pkcs_access_token (base64url encoded SHA-256 hash of the access token)
   const accessTokenHash = await calcATH(accessToken);
 
   // extract the claims from the access token
-  const claims = jose.decodeJwt(accessToken)
+  // const claims = jose.decodeJwt(accessToken)
 
   // create a unique identifier for the DPoP proof
   const jti = createJTI();
@@ -28,10 +27,13 @@ export async function genDpopProof(method: string, oauth_session: any, proxyUrl:
   const now = new Date();
   const inow = Math.floor(now.getTime() / 1000); // Issued at time (seconds since epoch)
 
+  // per-account DPoP key
+  const dpopKey = await JoseKey.fromJWK(at_session.dpopJwk)
+
   // build the inputs to the DPoP proof (JWT)
   const dpop_headers = {
     alg: "ES256",
-    jwk: tKey.bareJwk,
+    jwk: dpopKey.bareJwk,
     typ: "dpop+jwt",
   }
   const dpop_payload = {
@@ -46,7 +48,7 @@ export async function genDpopProof(method: string, oauth_session: any, proxyUrl:
   };
 
   // Create DPoP JWT with our session key
-  const dpop_jwt = await tKey.createJwt(dpop_headers, dpop_payload)
+  const dpop_jwt = await dpopKey.createJwt(dpop_headers, dpop_payload)
 
   return dpop_jwt;
 }

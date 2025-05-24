@@ -11,6 +11,17 @@ const options: AuthrOptions = {
   cookieDomain: import.meta.env.VITE_AUTHR_COOKIE_DOMAIN as string,
 }
 
+// const ThemeProvider = ({
+//   children,
+// }: {
+//   children: React.ReactNode
+// }) => {
+//   return (
+//     <ThemeProvider>
+//       {children}
+//     </ThemeProvider>
+//   )
+// }
 
 const Providers = ({
   children,
@@ -19,17 +30,12 @@ const Providers = ({
 }) => {
   return (
     <CookieProvider>
-      {/* <ThemeProvider 
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-      > */}
-      <AuthrProvider options={options}>
+      {/* <ThemeProvider> */}
         <QueryClientProvider client={queryClient}>
-          {children}
+          <AuthrProvider options={options}>
+            {children}
+          </AuthrProvider>
         </QueryClientProvider>
-      </AuthrProvider>
       {/* </ThemeProvider> */}
     </CookieProvider>
   )

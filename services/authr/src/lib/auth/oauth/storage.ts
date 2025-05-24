@@ -59,7 +59,7 @@ export class SessionStore implements NodeSavedSessionStore {
   }
 
   async set(key: string, val: NodeSavedSession) {
-    console.log("SessionStore.set", key)
+    console.log("SessionStore.set", key, val)
 
     const claims = jose.decodeJwt(val.tokenSet.access_token)
     // console.log("SessionStore.set.claims:", claims);
@@ -97,6 +97,8 @@ export class SessionStore implements NodeSavedSessionStore {
       access_expires_at: new Date(claims.exp as number).toISOString(),
       refresh_expires_at: val.tokenSet.expires_at
     }
+
+    // console.log("SessionStore.set.data", data)
 
     // TODO // add something for atproto vs google vs ... (to the table schema, write an atproto default here)
     await this.db

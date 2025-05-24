@@ -24,7 +24,7 @@ export async function xrpcProxy(c: Context) {
   // construct our proxied URL
   const url = new URL(c.req.url)
   let proxyUrl = `${authrSession.pds}${url.pathname}${url.search}`
-  console.log("xrpcProxy.proxyUrl:", proxyUrl)
+  // console.log("xrpcProxy.proxyUrl:", proxyUrl)
 
   // setup common headers
   const commonHeaders: any = {
@@ -83,7 +83,7 @@ export async function xrpcProxy(c: Context) {
       }
 
       const resp2 = await fetch(proxyUrl, payload2)
-      console.log("xrpcProxy.resp:", resp2)
+      // console.log("xrpcProxy.resp:", resp2)
 
       return resp2
     }

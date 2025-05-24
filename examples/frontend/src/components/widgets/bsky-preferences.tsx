@@ -6,7 +6,7 @@ import { TID } from '@atproto/common-web'
 
 export const BskyPreferences = ({ data }: { data: any }) => {
   const mutation = useMutation({
-    mutationFn: async (newTodo: any) => {
+    mutationFn: async (input: any) => {
       // get current preferences
       const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getPreferences`, {
         credentials: 'include',

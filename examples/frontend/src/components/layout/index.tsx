@@ -13,15 +13,13 @@ const Layout: React.FC<{ }> = ({  }) => {
       <Navbar>
         <div className="flex flex-grow justify-center gap-4">
           <Link to="/posts" className='text-white hover:underline'>Posts</Link>
-          <Link to="/profile" className='text-white hover:underline'>Profile</Link>
-          <Link to="/sign-in" className='text-white hover:underline'>Sign In</Link>
         </div>
       </Navbar>
       <main
         className='flex-grow p-4'
       ><Outlet /></main>
       <footer className='bg-gray-800 text-white p-4 w-full justify-center flex'>
-        <p>&copy; 2025 example.com</p>
+        <p>&copy; 2025 blebbit.app</p>
       </footer>
     </div>
   );

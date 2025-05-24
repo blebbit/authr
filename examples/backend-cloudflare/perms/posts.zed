@@ -1,0 +1,26 @@
+definition user {}
+definition group {
+  relation owner: user
+  relation member: user
+
+  permission write = owner
+  permission read = member + write
+}
+
+definition post {
+  relation owner: user | group#member
+  relation editor: user | group#member
+  relation commenter: user | group#member
+  relation reader: user | group#member
+
+  // owner like things
+  permission write = owner
+
+  // editor like things
+  permission read_draft = write + editor
+  permission feedback = read_draft
+
+  // viewer like things
+  permission comment = commenter + read_draft
+  permission read = reader + comment
+}

@@ -74,6 +74,11 @@ interface Config {
     secret: string;
     url: string;
   }
+
+  spicedb: {
+    host: string;
+    token: string;
+  }
 }
 
 const config: Config = {
@@ -132,11 +137,17 @@ const config: Config = {
   webhook: {
     secret: process.env.WEBHOOK_SECRET || 'authr-webhook-secret',
     url: process.env.WEBHOOK_URL || 'http://localhost:3001/webhooks/authr', // example backend URL
+  },
+
+  spicedb: {
+    host: process.env.SPICEDB_HOST || 'localhost:50081',
+    token: process.env.SPICEDB_TOKEN || 'blebbit-spicedb',
   }
+
 };
 
-if (config.nodeEnv === 'development') {
-  console.log("config:", config)
-}
+// if (config.nodeEnv === 'development') {
+//   console.log("config:", config)
+// }
 
 export default config;

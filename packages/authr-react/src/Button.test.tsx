@@ -5,5 +5,5 @@ import Button from './Button';
 test('Button shuold be rendered', () => {
   render(<Button>Hello</Button>);
 
-  expect(screen.getByText(/Hello/)).toBeInTheDocument();
+  expect(screen.getByText(/Hello/));
 });

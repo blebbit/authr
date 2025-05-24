@@ -11,14 +11,11 @@ const ProfileView = () => {
   const session = authr.sessions.current
 
   const bskyProfile = useQuery({
-    queryKey: [session?.handle, 'bskyProfile'],
+    queryKey: [session?.did, 'acct', 'bskyProfile'],
     queryFn: async () => {
 
       const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getProfile?actor=${session?.did}`, {
         credentials: 'include',
-        headers: {
-          // 'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
-        }
       })
 
       return r.json()
@@ -27,14 +24,11 @@ const ProfileView = () => {
   })
 
   const bskyPreferences = useQuery({
-    queryKey: [session?.handle, 'bskyPreferences'],
+    queryKey: [session?.did, 'acct', 'bskyPreferences'],
     queryFn: async () => {
 
       const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getPreferences`, {
         credentials: 'include',
-        headers: {
-          // 'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
-        }
       })
 
       return r.json()

@@ -8,7 +8,7 @@ volumes:
 services:
   spicedb:
     image: "authzed/spicedb"
-    command: "serve"
+    command: "serve --http-enabled"
     restart: "always"
     ports:
       - "8080:8080"

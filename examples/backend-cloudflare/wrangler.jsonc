@@ -2,7 +2,7 @@
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "authr-example-backend",
   "main": "src/index.ts",
-  "compatibility_date": "2025-05-09",
+  "compatibility_date": "2025-05-07",
   "compatibility_flags": [
     "nodejs_compat"
   ],

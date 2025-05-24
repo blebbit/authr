@@ -1,5 +1,5 @@
-import { useQuery } from "@tanstack/react-query"
 
+import { useQuery } from "@tanstack/react-query"
 import { useAuthr } from "@blebbit/authr-react";
 
 const PostsView = () => {
@@ -10,13 +10,16 @@ const PostsView = () => {
     queryKey: [session?.handle, 'authrPosts'],
     queryFn: async () => {
 
-      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.getPosts`, {
-        credentials: 'include',
-        headers: {
-          'x-authr-recursive-proxy': 'true',
-          'atproto-proxy': "did:web:api.blebbit.org#authr_appview"
+      const r = await fetch(
+        `${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.getPosts`,
+      {
+          credentials: 'include',
+          headers: {
+            'x-authr-recursive-proxy': 'true',
+            'atproto-proxy': "did:web:api.blebbit.org#authr_appview"
+          }
         }
-      })
+      )
 
       return r.json()
     },
@@ -46,12 +49,23 @@ const PostsView = () => {
 
   return (
     <div className="flex flex-col gap-4">
-      {data?.posts ? data.posts.map(post => (
-        <div key={post.id} className="border-b py-4">
-          <h2 className="text-xl font-semibold">{post.title}</h2>
-          <p className="text-gray-600">{post.content}</p>
-        </div>
-      )) : null}
+      {data?.posts ? data.posts.map(post => {
+        const record = JSON.parse(post.record)
+        return (
+          <div key={post.id} className="border-b py-4">
+            <span className="flex flex-row gap-2">
+              <h2 className="text-xl font-semibold">{record.title}</h2>
+              { record.draft ? <span className="text-sm text-gray-500">(draft)</span> : null }
+              { post.public ?
+                <span className="rounded px-1 py-0 text-[.6rem] text-white bg-green-500 inline-block align-middle max-h-4">public</span>
+                : 
+                <span className="rounded px-1 py-0 text-[.6rem] text-white bg-red-500 inline-block align-middle max-h-4">private</span>
+              }
+            </span>
+            <p className="text-gray-600">{record.content}</p>
+          </div>
+        )
+      }) : null}
     </div>
   );
 }

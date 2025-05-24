@@ -5,7 +5,7 @@ const Button = () => {
   
   const authr = useAuthr();
 
-  if (authr.session.did) {
+  if (authr?.session?.did) {
     return (
       <Link to="/profile" className="bg-white text-black px-2 py-1 rounded hover:bg-blue-200">
         @{authr.session.handle}

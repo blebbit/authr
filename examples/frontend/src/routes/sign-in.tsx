@@ -1,7 +1,7 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { z } from 'zod'
 
-import { HandleForm } from "@/components/forms/sign-in";
+import { HandleForm as AuthrSignin } from "@/components/forms/sign-in";
 
 // const SignInParams = z.object({
 //   handle: z.string().min(2, {
@@ -22,7 +22,7 @@ function SignInPage() {
         SignIn
       </h3>
       <div className="max-w-120 mx-auto border rounded-lg shadow-md p-8">
-        <HandleForm />
+        <AuthrSignin />
       </div>
     </div>
   )

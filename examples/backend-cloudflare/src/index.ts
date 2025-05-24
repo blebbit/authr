@@ -1,23 +1,31 @@
 import { Hono, Context } from 'hono'
-
 import { cors } from 'hono/cors'
 import { logger } from 'hono/logger'
-
 import { showRoutes } from 'hono/dev'
 
-import { sessions } from './middleware/session'
+import { sessions as authrMiddleware } from './middleware/session'
 import { addRoutes } from './routes'
 import { getDidDoc } from './routes/.well-known/diddoc'
 
-const app = new Hono<{Bindings: CloudflareBindings}>()
+// const authrRoutes = (app: Hono<{Bindings: CloudflareBindings}>) => {
+// }
+
+const authrConfig: any = {
+  // setting this to true currently breaks webhook receipt
+  required: false,
+};
 
 const origins: any = {
   dev: ["https://app.blebbit.org", "https://api.blebbit.org", "https://auth.blebbit.org"],
   stg: ["https://app.authr.blebbit.dev", "https://api.authr.blebbit.dev", "https://auth.authr.blebbit.dev"]
 }
 
+const app = new Hono<{Bindings: CloudflareBindings}>()
+
 // want open to public (without cors)
 app.get('/.well-known/did.json', getDidDoc)
+
+app.use(logger())
 
 app.use('*', cors({
   origin: (origin: string, c: Context) => {  
@@ -37,12 +45,8 @@ app.use('*', cors({
   credentials: true,
 }))
 
-app.use(logger())
-
-// setting this to true currently breaks webhook receipt
-app.use(sessions({ required: false }))
-
-// app.get('/authr-dev-test-route', (c) => c.json(c.env))
+app.use(authrMiddleware(authrConfig))
+// authrRoutes(app)
 
 addRoutes(app)
 

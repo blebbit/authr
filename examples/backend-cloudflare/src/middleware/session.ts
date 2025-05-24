@@ -1,5 +1,6 @@
 import { Context, Next } from 'hono'
 import { getCookie } from 'hono/cookie'
+import { verifyJwt } from '@atproto/xrpc-server'
 
 import { getConfig } from '../config'
 
@@ -29,6 +30,7 @@ export const sessions = (options: { required: boolean } = { required: false }) =
     const config = getConfig(c.env)
 
     const authrSession = await getAuthrSession(c)
+    const pdsSession = await getPdsSession(c)
 
     if (options.required && !authrSession) {
       return c.json({
@@ -88,4 +90,49 @@ export async function getAuthrSession(c: Context): Promise<Session | null> {
     console.error('Error verifying session JWT:', error);
     return null; // or handle the error as needed
   }
+}
+
+// for service based auth via the pds
+export async function getPdsSession(c: Context): Promise<any | null> {
+  // check for header
+  const authorizationHeader = c.req.header('Authorization')
+  if (authorizationHeader) {
+    // check path
+    const path = c.req.path
+    if (!path.startsWith('/xrpc/')) {
+      return null
+    }
+
+    const xrpcPath = path.split('/xrpc/')[1]
+
+    const jwt = authorizationHeader.split(' ')[1]
+
+    // Verifying a service JWT
+    // helper method to resolve a user's DID to their atproto signing key
+    const getSigningKey = async (
+      did: string,
+      forceRefresh: boolean,
+    ): Promise<string> => {
+      const resp = await fetch(`https://plc.blebbit.dev/${did}`)
+      const doc: any = await resp.json()
+      const key = doc.verificationMethod[0].publicKeyMultibase
+
+      return `did:key:${key}` // blebbit.app
+    }
+
+    // it is important to always check the aud & lxm of the provided service JWT
+    const payload = await verifyJwt(
+      jwt,
+      `did:web:${c.env.ATPROTO_SERVICE_DOMAIN}`,
+      xrpcPath,
+      getSigningKey
+    )
+
+    // TODO, store the payload.jti for some TTL so we can ensure not used again
+
+    // console.log("getPdsSession.payload", payload)
+    c.set("pdsSession", payload)
+    return payload
+  }
+  return null
 }
