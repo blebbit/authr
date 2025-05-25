@@ -14,7 +14,8 @@
   },
   "dependencies": {
     "@atproto/common-web": "^0.4.2",
-    "@blebbit/authr-react": "workspace:*",
+    "@blebbit/authr-react-common": "workspace:*",
+    "@blebbit/authr-react-tanstack": "workspace:*",
     "@hookform/resolvers": "^5.0.1",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
     "@radix-ui/react-label": "^2.1.4",
@@ -56,6 +57,6 @@
     "vite": "^6.3.5",
     "vitest": "^3.0.5",
     "web-vitals": "^4.2.4",
-    "wrangler": "^4.14.4"
+    "wrangler": "~4.15"
   }
 }

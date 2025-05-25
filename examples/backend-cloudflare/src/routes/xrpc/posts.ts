@@ -76,7 +76,7 @@ async function getPosts(c: Context) {
     posts = posts.filter((post, index) => {
       const perm = permCheck.pairs[index]
       // TODO, ensure we have the same id for each item
-      return perm?.response?.item?.permissionship === 2
+      return post.public || perm?.response?.item?.permissionship === 2
     })
   }
 

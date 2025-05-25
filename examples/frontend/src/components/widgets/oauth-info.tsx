@@ -1,7 +1,6 @@
 import { z } from 'zod';
 import { RotateCw } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { useAuthr } from '@blebbit/authr-react';
 import * as jose from 'jose';
 import { useCookies } from 'react-cookie';
 import { cn } from '@/lib/utils';
@@ -36,22 +35,22 @@ export interface OAuthInfoType {
 export const OAuthInfo = ({ session }: { session: any }) => {
   const queryClient = useQueryClient();
   const [cookies] = useCookies();
-  console.log("OAuthInfo.session", session, cookies)
+  // console.log("OAuthInfo.session", session, cookies)
 
   const oauthInfo = useQuery({
     queryKey: [session?.did, 'acct', 'oauthInfo'],
     queryFn: async () => {
       const claims = await jose.decodeJwt(session.cookie)
-      console.log("oauthInfo.queryFn", session.did, claims, cookies)
+      // console.log("oauthInfo.queryFn", session.did, claims, cookies)
 
       const r = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/info`, {
         credentials: 'include',
       })
 
-      console.log("oauthInfo.queryFn.r", r)
+      // console.log("oauthInfo.queryFn.r", r)
 
       const data = await r.json()
-      console.log("oauthInfo.queryFn.data", data)
+      // console.log("oauthInfo.queryFn.data", data)
       return data
     },
     enabled: !!(session?.did)
@@ -60,7 +59,7 @@ export const OAuthInfo = ({ session }: { session: any }) => {
 
   const refreshOauthInfo = useMutation({
     mutationFn: async () => {
-      console.log("refreshOauthInfo.mutate", session.did)
+      // console.log("refreshOauthInfo.mutate", session.did)
       const response = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/refresh?did=${session.did}`, {
         method: "POST",
         credentials: 'include',
@@ -87,7 +86,7 @@ export const OAuthInfo = ({ session }: { session: any }) => {
   }
 
   const data: any = oauthInfo.data
-  console.log("OAuthInfo.data", data)
+  // console.log("OAuthInfo.data", data)
 
   return (
     <div className="bg-white shadow-md rounded-lg p-4 border border-gray-200 overflow-hidden">

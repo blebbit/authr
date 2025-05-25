@@ -43,7 +43,7 @@ export const AuthrButton = () => {
           <DropdownMenuLabel>
           </DropdownMenuLabel>
           <DropdownMenuSeparator />
-          <DropdownMenuItem onSelect={() => navigate({ to: "/profile" })}>Profile</DropdownMenuItem>
+          <DropdownMenuItem onSelect={() => navigate({ to: "/account" })}>Account</DropdownMenuItem>
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Switch account...</DropdownMenuSubTrigger>
             <DropdownMenuPortal>

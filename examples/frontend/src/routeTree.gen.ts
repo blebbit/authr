@@ -13,8 +13,8 @@
 import { Route as rootRoute } from './routes/__root'
 import { Route as SignInImport } from './routes/sign-in'
 import { Route as IndexImport } from './routes/index'
-import { Route as ProfileIndexImport } from './routes/profile/index'
 import { Route as PostsIndexImport } from './routes/posts/index'
+import { Route as AccountIndexImport } from './routes/account/index'
 import { Route as PostsNewImport } from './routes/posts/new'
 
 // Create/Update Routes
@@ -31,15 +31,15 @@ const IndexRoute = IndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
-const ProfileIndexRoute = ProfileIndexImport.update({
-  id: '/profile/',
-  path: '/profile/',
-  getParentRoute: () => rootRoute,
-} as any)
-
 const PostsIndexRoute = PostsIndexImport.update({
   id: '/posts/',
   path: '/posts/',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const AccountIndexRoute = AccountIndexImport.update({
+  id: '/account/',
+  path: '/account/',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -74,18 +74,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PostsNewImport
       parentRoute: typeof rootRoute
     }
+    '/account/': {
+      id: '/account/'
+      path: '/account'
+      fullPath: '/account'
+      preLoaderRoute: typeof AccountIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/posts/': {
       id: '/posts/'
       path: '/posts'
       fullPath: '/posts'
       preLoaderRoute: typeof PostsIndexImport
-      parentRoute: typeof rootRoute
-    }
-    '/profile/': {
-      id: '/profile/'
-      path: '/profile'
-      fullPath: '/profile'
-      preLoaderRoute: typeof ProfileIndexImport
       parentRoute: typeof rootRoute
     }
   }
@@ -97,16 +97,16 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/posts/new': typeof PostsNewRoute
+  '/account': typeof AccountIndexRoute
   '/posts': typeof PostsIndexRoute
-  '/profile': typeof ProfileIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/posts/new': typeof PostsNewRoute
+  '/account': typeof AccountIndexRoute
   '/posts': typeof PostsIndexRoute
-  '/profile': typeof ProfileIndexRoute
 }
 
 export interface FileRoutesById {
@@ -114,16 +114,16 @@ export interface FileRoutesById {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
   '/posts/new': typeof PostsNewRoute
+  '/account/': typeof AccountIndexRoute
   '/posts/': typeof PostsIndexRoute
-  '/profile/': typeof ProfileIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/posts/new' | '/posts' | '/profile'
+  fullPaths: '/' | '/sign-in' | '/posts/new' | '/account' | '/posts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/posts/new' | '/posts' | '/profile'
-  id: '__root__' | '/' | '/sign-in' | '/posts/new' | '/posts/' | '/profile/'
+  to: '/' | '/sign-in' | '/posts/new' | '/account' | '/posts'
+  id: '__root__' | '/' | '/sign-in' | '/posts/new' | '/account/' | '/posts/'
   fileRoutesById: FileRoutesById
 }
 
@@ -131,16 +131,16 @@ export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SignInRoute: typeof SignInRoute
   PostsNewRoute: typeof PostsNewRoute
+  AccountIndexRoute: typeof AccountIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
-  ProfileIndexRoute: typeof ProfileIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SignInRoute: SignInRoute,
   PostsNewRoute: PostsNewRoute,
+  AccountIndexRoute: AccountIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
-  ProfileIndexRoute: ProfileIndexRoute,
 }
 
 export const routeTree = rootRoute
@@ -156,8 +156,8 @@ export const routeTree = rootRoute
         "/",
         "/sign-in",
         "/posts/new",
-        "/posts/",
-        "/profile/"
+        "/account/",
+        "/posts/"
       ]
     },
     "/": {
@@ -169,11 +169,11 @@ export const routeTree = rootRoute
     "/posts/new": {
       "filePath": "posts/new.tsx"
     },
+    "/account/": {
+      "filePath": "account/index.tsx"
+    },
     "/posts/": {
       "filePath": "posts/index.tsx"
-    },
-    "/profile/": {
-      "filePath": "profile/index.tsx"
     }
   }
 }

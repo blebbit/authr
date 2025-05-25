@@ -9,6 +9,7 @@ import * as jose from 'jose';
 export type AuthrContext = {
   session: any;
   sessions: any;
+  login: (value: AuthrLoginInput) => Promise<void>;
   switchAccount: (did: string) => void;
   // logout: (did: string) => void;
 }
@@ -16,6 +17,12 @@ export type AuthrContext = {
 export type AuthrOptions = {
   cookieName: string;
   cookieDomain: string;
+  oauthHost: string;
+}
+
+export type AuthrLoginInput = {
+  handle: string;
+  redirect?: string;
 }
 
 export type AuthrSession = {
@@ -90,9 +97,31 @@ export const AuthrProvider: React.FC<{ options: AuthrOptions; children: React.Re
   }, [cookies])
 
   // Build up final context object
-  const contextValue = {
+  const contextValue: AuthrContext = {
     session: sessions.current,
     sessions,
+    login: async (value: AuthrLoginInput) => {
+      const b = JSON.stringify(value)
+      const resp = await fetch(`${options.oauthHost}/oauth/login`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: b
+      })
+      const data: any = await resp.json()
+      console.log("data:", data)
+      if (data.error) {
+        // TODO, update form or page...
+        alert(data.error)
+        return
+      }
+
+      // this should always be the case, this is the callback to our auth server (post user approval)
+      const redir = data.redirect
+      window.location.href = redir
+
+    },
     switchAccount: (did: string) => {
       const newSession = sessions.accounts.find(s => s.did === did);
       console.log("AuthrProvider.switchAccount", did, newSession)

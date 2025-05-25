@@ -1,6 +1,6 @@
 
 import { useQuery } from "@tanstack/react-query"
-import { useAuthr } from "@blebbit/authr-react";
+import { useAuthr } from "@blebbit/authr-react-tanstack";
 
 const PostsView = () => {
   const authr = useAuthr();

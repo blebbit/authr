@@ -1,13 +1,11 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import { useAuthr } from "@blebbit/authr-react";
-
 import ProfileView from '@/components/views/profile';
 
 
 // import { AccountPortal } from '@blebbit/authr-react';
 
-export const Route = createFileRoute('/profile/')({
+export const Route = createFileRoute('/account/')({
   component: RouteComponent,
 })
 

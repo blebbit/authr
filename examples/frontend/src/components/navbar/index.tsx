@@ -1,7 +1,7 @@
 import React from 'react';
 import { Link } from '@tanstack/react-router';
 
-import { AuthrButton } from '@blebbit/authr-react';
+import { AuthrButton } from '@blebbit/authr-react-tanstack';
 
 const Navbar: React.FC<{ children: React.ReactNode }> = ({ children }) => {
 

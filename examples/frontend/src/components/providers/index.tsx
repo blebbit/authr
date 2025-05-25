@@ -2,13 +2,14 @@
 
 // import ThemeProvider from "./theme";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
-import { type AuthrOptions, AuthrProvider, CookieProvider } from '@blebbit/authr-react';
+import { type AuthrOptions, AuthrProvider, CookieProvider } from '@blebbit/authr-react-tanstack';
 
 const queryClient = new QueryClient();
 
 const options: AuthrOptions = {
   cookieName: import.meta.env.VITE_AUTHR_COOKIE_NAME as string,
   cookieDomain: import.meta.env.VITE_AUTHR_COOKIE_DOMAIN as string,
+  oauthHost: import.meta.env.VITE_AUTHR_OAUTH_HOST as string,
 }
 
 // const ThemeProvider = ({

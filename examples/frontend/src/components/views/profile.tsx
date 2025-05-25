@@ -1,6 +1,6 @@
 import { useQuery } from "@tanstack/react-query"
 
-import { useAuthr } from "@blebbit/authr-react";
+import { useAuthr } from "@blebbit/authr-react-tanstack";
 import { OAuthInfo, type OAuthInfoType } from "@/components/widgets/oauth-info";
 import { AtprotoInfo } from "@/components/widgets/atproto-info";
 import { BskyProfile } from "@/components/widgets/bsky-profile";

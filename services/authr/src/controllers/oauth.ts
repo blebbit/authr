@@ -100,7 +100,7 @@ export const login = async (c: Context) => {
 
 // GET
 export const callback = async (c: Context) => {
-  console.log("oauth.callback.query:", c.req.query())
+  // console.log("oauth.callback.query:", c.req.query())
 
   const at = await getClient()
 
@@ -162,15 +162,15 @@ export const callback = async (c: Context) => {
 
   c.res.headers.append('Location', loc)
 
-  console.log("callback.res.headers.2:", c.res.headers)
-  console.log("callback.redirect:", loc, userinfo.redirect, config.oauth.defaultRedirect)
+  // console.log("callback.res.headers.2:", c.res.headers)
+  // console.log("callback.redirect:", loc, userinfo.redirect, config.oauth.defaultRedirect)
   return c.redirect(loc, 303)
 
 };
 
 export const refresh = async (c: Context) => {
   // ...
-  console.log("oauth.refresh.query:", c.req.query())
+  // console.log("oauth.refresh.query:", c.req.query())
 
   const did = c.req.query('did')
 
