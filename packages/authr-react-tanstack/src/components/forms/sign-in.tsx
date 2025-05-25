@@ -54,7 +54,7 @@ export function AuthrSignInForm(props: any) {
         <span className="flex items-center text-xl font-light">
           Login with <AtProtocol at={true} className="px-1"/>
         </span>
-        <span className="text-center">an evolution in social media</span>
+        <span className="text-center">the evolution in social media</span>
       </div>
 
       <form

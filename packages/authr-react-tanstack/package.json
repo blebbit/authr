@@ -3,8 +3,7 @@
   "version": "0.0.1",
   "type": "module",
   "main": "./src/index.ts",
-  "module": "./src/index.ts",
-  "not-module": "./dist/index.es.js",
+  "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "files": [
     "dist"
@@ -19,6 +18,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "watch": "nodemon --exec 'pnpm run build' -e ts,tsx,css --watch src",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run"

@@ -4,6 +4,7 @@
   "description": "",
   "scripts": {
     "dev": "pnpm --filter website dev",
+    "watch:packages": "pnpm --parallel --filter \"./packages/**\" watch",
     "test:all": "pnpm -r test"
   },
   "keywords": [],

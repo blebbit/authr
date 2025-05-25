@@ -18,6 +18,7 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc -b && vite build",
+    "watch": "nodemon --exec 'pnpm run build' -e ts,tsx,css --watch src",
     "lint": "eslint .",
     "preview": "vite preview",
     "test": "vitest run"
@@ -49,6 +50,7 @@
     "globals": "^16.0.0",
     "jsdom": "^26.1.0",
     "lucide-react": "^0.503.0",
+    "nodemon": "^3.1.10",
     "postcss": "^8.5.3",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
