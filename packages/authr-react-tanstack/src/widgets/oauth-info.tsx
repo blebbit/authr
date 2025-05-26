@@ -1,9 +1,9 @@
 import { z } from 'zod';
 import { RotateCw } from 'lucide-react';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import * as jose from 'jose';
-import { useCookies } from 'react-cookie';
-import { cn } from '@/lib/utils';
+// import * as jose from 'jose';
+import { cn } from '../lib/utils';
+import { useAuthr } from '../provider';
 
 export const OAuthInfoTypeSchema = z.object({
   aud: z.string(),
@@ -32,18 +32,17 @@ export interface OAuthInfoType {
 }
 
 // AI wrote this tailwind, it's not very good
-export const OAuthInfo = ({ session }: { session: any }) => {
+export const OAuthInfo = () => {
   const queryClient = useQueryClient();
-  const [cookies] = useCookies();
-  // console.log("OAuthInfo.session", session, cookies)
+  const authr = useAuthr();
 
   const oauthInfo = useQuery({
-    queryKey: [session?.did, 'acct', 'oauthInfo'],
+    queryKey: [authr.session?.did, 'acct', 'oauthInfo'],
     queryFn: async () => {
-      const claims = await jose.decodeJwt(session.cookie)
+      // const claims = await jose.decodeJwt(authr.session?.cookie)
       // console.log("oauthInfo.queryFn", session.did, claims, cookies)
 
-      const r = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/info`, {
+      const r = await fetch(`${authr.options.oauthHost}/oauth/info`, {
         credentials: 'include',
       })
 
@@ -53,14 +52,14 @@ export const OAuthInfo = ({ session }: { session: any }) => {
       // console.log("oauthInfo.queryFn.data", data)
       return data
     },
-    enabled: !!(session?.did)
+    enabled: !!(authr.session?.did)
   })
 
 
   const refreshOauthInfo = useMutation({
     mutationFn: async () => {
       // console.log("refreshOauthInfo.mutate", session.did)
-      const response = await fetch(`${import.meta.env.VITE_AUTHR_OAUTH_HOST}/oauth/refresh?did=${session.did}`, {
+      const response = await fetch(`${authr.options.oauthHost}/oauth/refresh?did=${authr.session.did}`, {
         method: "POST",
         credentials: 'include',
         headers: {
@@ -73,8 +72,8 @@ export const OAuthInfo = ({ session }: { session: any }) => {
       return await response.json();
     },
     onSuccess: () => {
-      console.log("invalidating queries", session.did, 'oauthInfo')
-      queryClient.invalidateQueries({ queryKey: [session.did, 'acct'] });
+      console.log("invalidating queries", authr.session.did, 'oauthInfo')
+      queryClient.invalidateQueries({ queryKey: [authr.session.did, 'acct'] });
     },
   })
 
@@ -89,13 +88,11 @@ export const OAuthInfo = ({ session }: { session: any }) => {
   // console.log("OAuthInfo.data", data)
 
   return (
-    <div className="bg-white shadow-md rounded-lg p-4 border border-gray-200 overflow-hidden">
+    <div className="overflow-hidden flex flex-col gap-2">
 
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-start items-center gap-2">
         <h2 className="text-2xl font-light text-gray-700">OAuth Information</h2>
-        <div>
-        </div>
-        <span className="border rounded-md py-1 px-2 cursor-pointer hover:bg-gray-200" onClick={() => refreshOauthInfo.mutate()}>
+        <span className="rounded-md py-1 px-2 cursor-pointer hover:bg-gray-200" onClick={() => refreshOauthInfo.mutate()}>
           { refreshOauthInfo.isPending ?
             <div role="status">
               <svg aria-hidden="true" className="w-6 h-6 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -114,7 +111,7 @@ export const OAuthInfo = ({ session }: { session: any }) => {
       </div>
 
       {oauthInfo && (
-        <dl className="flex flex-col gap-x-4 gap-y-2">
+        <dl className="flex flex-col gap-x-4 gap-y-2 pl-2">
           {/* chanded the above to flex */}
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Audience (aud):</dt>
@@ -168,7 +165,7 @@ export const OAuthInfo = ({ session }: { session: any }) => {
 
           <div className="col-span-1 md:col-span-1 flex items-end">
             <dt className="font-medium text-gray-500">Authr Cookie:</dt>
-            <dd className="ml-2 font-light text-gray-600 max-w-1/2">{session.cookie}</dd>
+            <dd className="ml-2 font-light text-gray-600 max-w-1/2">{authr.session.cookie}</dd>
           </div>
         </dl>
       )}

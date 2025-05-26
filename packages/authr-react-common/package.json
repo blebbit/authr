@@ -10,10 +10,11 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js",
-      "types": "./dist/index.d.ts"
-    }
+      "require": "./dist/index.umd.js"
+    },
+    "./style.css": "./dist/authr-react-common.css"
   },
   "scripts": {
     "dev": "vite",
@@ -36,7 +37,7 @@
   "devDependencies": {
     "@eslint/js": "^9.25.0",
     "@microsoft/api-extractor": "^7.52.8",
-    "@tailwindcss/postcss": "^4.1.7",
+    "@tailwindcss/vite": "^4.1.7",
     "@testing-library/jest-dom": "^6.6.3",
     "@testing-library/react": "^16.3.0",
     "@types/react": "^19.1.2",

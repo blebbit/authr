@@ -9,6 +9,7 @@ import * as jose from 'jose';
 export type AuthrContext = {
   session: any;
   sessions: any;
+  options: AuthrOptions;
   login: (value: AuthrLoginInput) => Promise<void>;
   switchAccount: (did: string) => void;
   // logout: (did: string) => void;
@@ -18,6 +19,7 @@ export type AuthrOptions = {
   cookieName: string;
   cookieDomain: string;
   oauthHost: string;
+  xrpcHost: string;
 }
 
 export type AuthrLoginInput = {
@@ -100,6 +102,7 @@ export const AuthrProvider: React.FC<{ options: AuthrOptions; children: React.Re
   const contextValue: AuthrContext = {
     session: sessions.current,
     sessions,
+    options,
     login: async (value: AuthrLoginInput) => {
       const b = JSON.stringify(value)
       const resp = await fetch(`${options.oauthHost}/oauth/login`, {

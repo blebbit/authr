@@ -1,14 +1,32 @@
 import { MegaphoneOff } from "lucide-react";
-import { useMutation } from "@tanstack/react-query";
+import { useQuery, useMutation } from "@tanstack/react-query";
 import { RespError } from "./resp-error";
 import { TID } from '@atproto/common-web'
-        // id: TID.nextStr(),
+import { useAuthr } from '../provider';
 
-export const BskyPreferences = ({ data }: { data: any }) => {
+export const BskyPreferences = () => {
+  const authr = useAuthr();
+
+  const bskyPreferences = useQuery({
+    queryKey: [authr.session?.did, 'acct', 'bskyPreferences'],
+    queryFn: async () => {
+
+      const r = await fetch(`${authr.options.xrpcHost}/xrpc/app.bsky.actor.getPreferences`, {
+        credentials: 'include',
+      })
+
+      return r.json()
+    },
+    enabled: !!(authr.session?.did)
+  })
+
   const mutation = useMutation({
     mutationFn: async (input: any) => {
+      if (false) {
+        console.log("M.input", input)
+      }
       // get current preferences
-      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.getPreferences`, {
+      const r = await fetch(`${authr.options.xrpcHost}/xrpc/app.bsky.actor.getPreferences`, {
         credentials: 'include',
         headers: {
           // 'atproto-proxy': "did:web:api.bsky.app#bsky_appview"
@@ -32,7 +50,7 @@ export const BskyPreferences = ({ data }: { data: any }) => {
 
       console.log("M.post", curr)
 
-      return fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.bsky.actor.putPreferences`, {
+      return fetch(`${authr.options.xrpcHost}/xrpc/app.bsky.actor.putPreferences`, {
         credentials: 'include',
         method: 'POST',
         headers: {
@@ -44,18 +62,24 @@ export const BskyPreferences = ({ data }: { data: any }) => {
     },
   })
 
+  if (bskyPreferences.isLoading) {
+    return <div className="flex flex-col gap-2">
+      <h2 className="font-light text-2xl">Loading Bsky Preferences...</h2>
+    </div>
+  }
+
   return (
-    <div className="flex flex-col gap-2 p-4 border rounded-md bg-white shadow-sm">
-      { data.error ? <RespError error={data.error} /> : null }
+    <div className="flex flex-col gap-2">
+      { bskyPreferences.error ? <RespError error={bskyPreferences.error} /> : null }
       <span className="flex gap-2 justify-between items-center">
         <h2 className="font-light text-2xl">Preferences</h2>
         <span className="p-1 border rounded-md hover:cursor-pointer" onClick={() => {
-          mutation.mutate({ id: TID.nextStr(), text: 'Hello World' })
+          mutation.mutate({ text: 'Hello World' })
         }}>
           <MegaphoneOff className="text-red-500" />
         </span>
       </span>
-      { data.preferences ? <BskyPreferenceItems bskyPreferences={data.preferences} /> : null }
+      { bskyPreferences.data?.preferences ? <BskyPreferenceItems bskyPreferences={bskyPreferences.data.preferences} /> : null }
     </div>
   );
 }

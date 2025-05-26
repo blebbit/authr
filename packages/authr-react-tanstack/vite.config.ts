@@ -3,12 +3,13 @@ import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 import react from '@vitejs/plugin-react-swc'
 import dts from 'vite-plugin-dts'
-// import tailwindcss from "tailwindcss";
+import tailwindcss from "@tailwindcss/vite";
 
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [
     react(),
+    tailwindcss(),
     tsconfigPaths(),
     dts({
       include: ['src'],
@@ -32,6 +33,7 @@ export default defineConfig({
         "@tanstack/react-router",
         "@tanstack/react-form",
         "react-cookie",
+        "radix-ui",
       ],
       output: {
         globals: {
@@ -44,9 +46,4 @@ export default defineConfig({
     sourcemap: true,
     emptyOutDir: true,
   },
-  css: {
-    // postcss: {
-    //   plugins: [tailwindcss],
-    // },
-  }
 })

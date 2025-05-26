@@ -1,9 +1,9 @@
 import { createFileRoute } from '@tanstack/react-router'
 
-import ProfileView from '@/components/views/profile';
+import { AccountPortal } from '@blebbit/authr-react-tanstack';
+// import { Tabs } from "radix-ui";
 
-
-// import { AccountPortal } from '@blebbit/authr-react';
+const tabClass = "p-1 data-[state=active]:bg-blue-500 data-[state=active]:text-white  bg-secondary border rounded"
 
 export const Route = createFileRoute('/account/')({
   component: RouteComponent,
@@ -13,14 +13,7 @@ function RouteComponent() {
 
   return (
     <div className="flex flex-col gap-4 p-4">
-
-      <div className="flex gap-4 m-2 justify-between items-center">
-        <h1 className="text-4xl font-light">Profile</h1>
-      </div>
-
-      {/* <AccountPortal /> */}
-      <ProfileView />
-
+      <AccountPortal />
     </div>
   )
 }

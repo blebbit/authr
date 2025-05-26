@@ -10,6 +10,7 @@ const options: AuthrOptions = {
   cookieName: import.meta.env.VITE_AUTHR_COOKIE_NAME as string,
   cookieDomain: import.meta.env.VITE_AUTHR_COOKIE_DOMAIN as string,
   oauthHost: import.meta.env.VITE_AUTHR_OAUTH_HOST as string,
+  xrpcHost: import.meta.env.VITE_XRPC_HOST as string,
 }
 
 // const ThemeProvider = ({

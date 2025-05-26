@@ -4,7 +4,7 @@ import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuLabel,
+  // DropdownMenuLabel,
   DropdownMenuPortal,
   DropdownMenuSeparator,
   DropdownMenuTrigger,
@@ -40,10 +40,13 @@ export const AuthrButton = () => {
         <DropdownMenuContent
           className="w-56 bg-white text-black"
         >
-          <DropdownMenuLabel>
+          {/* <DropdownMenuLabel>
+            hello
           </DropdownMenuLabel>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator /> */}
+
           <DropdownMenuItem onSelect={() => navigate({ to: "/account" })}>Account</DropdownMenuItem>
+
           <DropdownMenuSub>
             <DropdownMenuSubTrigger>Switch account...</DropdownMenuSubTrigger>
             <DropdownMenuPortal>
@@ -62,9 +65,11 @@ export const AuthrButton = () => {
               </DropdownMenuSubContent>
             </DropdownMenuPortal>
           </DropdownMenuSub>
+
           <DropdownMenuItem>Billing</DropdownMenuItem>
           <DropdownMenuItem>Team</DropdownMenuItem>
           <DropdownMenuItem>Subscription</DropdownMenuItem>
+
         </DropdownMenuContent>
       </DropdownMenu>
     );

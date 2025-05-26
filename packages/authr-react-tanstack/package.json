@@ -10,10 +10,11 @@
   ],
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/index.es.js",
-      "require": "./dist/index.umd.js",
-      "types": "./dist/index.d.ts"
-    }
+      "require": "./dist/index.umd.js"
+    },
+    "./style.css": "./dist/authr-react-tanstack.css"
   },
   "scripts": {
     "dev": "vite",
@@ -34,6 +35,7 @@
     "clsx": "^2.1.1",
     "jose": "^6.0.11",
     "lucide-react": "^0.503.0",
+    "radix-ui": "^1.4.2",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",
@@ -43,11 +45,12 @@
     "zod": "^3.25.28"
   },
   "devDependencies": {
+    "@atproto/common-web": "^0.4.2",
     "@blebbit/authr-react-common": "workspace:*",
     "@eslint/js": "^9.25.0",
     "@microsoft/api-extractor": "^7.52.8",
     "@radix-ui/react-dropdown-menu": "^2.1.15",
-    "@tailwindcss/postcss": "^4.1.7",
+    "@tailwindcss/vite": "^4.1.7",
     "@tanstack/react-form": "^1.11.3",
     "@tanstack/react-query": "^5.76.1",
     "@tanstack/react-router": "^1.120.5",
@@ -67,7 +70,9 @@
     "jose": "^6.0.11",
     "jsdom": "^26.1.0",
     "lucide-react": "^0.503.0",
+    "nodemon": "^3.1.10",
     "postcss": "^8.5.3",
+    "radix-ui": "^1.4.2",
     "react": "^19.1.0",
     "react-cookie": "^8.0.1",
     "react-dom": "^19.1.0",

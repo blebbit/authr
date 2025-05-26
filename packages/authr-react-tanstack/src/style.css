@@ -1,7 +1,21 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@import "@blebbit/authr-react-common/style.css";
 
 @custom-variant dark (&:is(.dark *));
+
+@variant dark (&:is(.dark *));
+
+@theme inline {
+  --color-brat-green: #8ACE00;
+  --shadow-brat-green: 0 0 2px 2px #8ACE0044;
+
+  --color-atproto-blue: var(--color-blue-500); /* #2b7fff | #155dfc */
+  --color-atproto-zinc: var(--color-zinc-700); /* #3f3f46 | | #e4e4e7 */
+
+  --color-bluesky-blue: var(--color-blue-500);
+  --shadow-bluesky-blue: 0 0 2px 2px #1083FE44;
+}
 
 :root {
   --background: oklch(1 0 0);
