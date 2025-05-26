@@ -58,11 +58,6 @@ export const AuthrProvider: React.FC<{ options: AuthrOptions; children: React.Re
 
   const [cookies, setCookies] = useCookies()
   const [sessions, setSessions] = useLocalStorage<AuthrSessions>("blebbit/sessions", { current: undefined, accounts: [] });
-  
-  // console.log("AuthrProvider.sessions.pre", sessions)
-  console.log("AuthrProvider cookieName", options.cookieName)
-  console.log("AuthrProvider cookieDomain", options.cookieDomain)
-  console.log("AuthrProvider.cookies.all", cookies)
 
   React.useEffect(() => { 
     // if we have an Authr cookie, lets see if we need to add it
@@ -94,7 +89,6 @@ export const AuthrProvider: React.FC<{ options: AuthrOptions; children: React.Re
 
       // finalize
       setSessions({ current: session, accounts: sessions.accounts })
-      console.log("AuthrProvider.sessions.post", sessions)
     }
   }, [cookies])
 
@@ -113,7 +107,6 @@ export const AuthrProvider: React.FC<{ options: AuthrOptions; children: React.Re
         body: b
       })
       const data: any = await resp.json()
-      console.log("data:", data)
       if (data.error) {
         // TODO, update form or page...
         alert(data.error)
@@ -127,11 +120,9 @@ export const AuthrProvider: React.FC<{ options: AuthrOptions; children: React.Re
     },
     switchAccount: (did: string) => {
       const newSession = sessions.accounts.find(s => s.did === did);
-      console.log("AuthrProvider.switchAccount", did, newSession)
       if (newSession) {
         // this should trigger changing the current session
         // @not-ts-ignore (double check this)
-        console.log("AuthrProvider.switchAccount", newSession)
         setSessions({ current: newSession, accounts: sessions.accounts })
         setCookies(options.cookieName, newSession.cookie, {
           path: '/',
@@ -141,7 +132,6 @@ export const AuthrProvider: React.FC<{ options: AuthrOptions; children: React.Re
       }
     }
   }
-  console.log("AuthrContext.value", contextValue)
 
   return (
     <AuthrContext.Provider value={contextValue}>

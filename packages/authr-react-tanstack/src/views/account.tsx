@@ -5,7 +5,7 @@ import { OAuthInfo } from "../widgets/oauth-info";
 import { BskyPreferences } from "../widgets/bsky-preferences";
 import { BskyProfile } from "../widgets/bsky-profile";
 
-const tabClass = "py-1 px-2 data-[state=active]:bg-blue-500 data-[state=active]:text-white  bg-secondary border rounded"
+const tabClass = "py-1 px-2 min-w-32 font-light data-[state=active]:bg-blue-500 data-[state=active]:text-white bg-slate-200 border rounded"
 const valClass = "ml-4 p-4 border w-full overflow-hidden"
 
 export const AccountPortal = () => {
