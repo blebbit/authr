@@ -16,7 +16,7 @@ const Layout: React.FC<{ }> = ({  }) => {
         </div>
       </Navbar>
       <main
-        className='flex-grow p-4'
+        className='flex flex-col flex-grow p-4'
       ><Outlet /></main>
       <footer className='bg-gray-800 text-white p-4 w-full justify-center flex'>
         <p>&copy; 2025 blebbit.app</p>

@@ -2,6 +2,10 @@
 @import "tw-animate-css";
 @import "@blebbit/authr-react-common/style.css";
 
+@source "./";
+@source inline("min-w-{32,40}");
+@source inline("bg-slate-200");
+
 @custom-variant dark (&:is(.dark *));
 
 @variant dark (&:is(.dark *));

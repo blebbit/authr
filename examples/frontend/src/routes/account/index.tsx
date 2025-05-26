@@ -12,7 +12,7 @@ export const Route = createFileRoute('/account/')({
 function RouteComponent() {
 
   return (
-    <div className="flex flex-col gap-4 p-4">
+    <div className="w-full h-full flex flex-col flex-grow">
       <AccountPortal />
     </div>
   )
