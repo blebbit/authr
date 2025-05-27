@@ -3,8 +3,9 @@ import { v1 as spice } from '@authzed/authzed-node';
 import config from '@/config';
 
 const { promises } = spice.NewClient(config.spicedb.token, config.spicedb.host, spice.ClientSecurity.INSECURE_LOCALHOST_ALLOWED)
+export { promises as client };
 
-function createObjectReference(objectType: string) {
+export function createObjectReference(objectType: string) {
     const [objectTypeName, objectId] = objectType.split(":");
     return spice.ObjectReference.create({
         objectType: objectTypeName,
@@ -12,7 +13,7 @@ function createObjectReference(objectType: string) {
     });
 }
 
-function createSubjectReference(subjectType: string) {
+export function createSubjectReference(subjectType: string) {
   const [subjectTypeName, subjectId] = subjectType.split(":");
   return spice.SubjectReference.create({
     object: spice.ObjectReference.create({
@@ -22,7 +23,7 @@ function createSubjectReference(subjectType: string) {
   });
 }
 
-function createSubjectFilter(subjectType: string) {
+export function createSubjectFilter(subjectType: string) {
   const [subjectTypeName, subjectId] = subjectType.split(":");
   return spice.SubjectFilter.create({
     subjectType: subjectTypeName,
@@ -30,7 +31,7 @@ function createSubjectFilter(subjectType: string) {
   });
 }
 
-function createCheckPermissionRequest(objectType: string, permission: string, subjectType: string) {
+export function createCheckPermissionRequest(objectType: string, permission: string, subjectType: string) {
   const resource = createObjectReference(objectType);
   const subject = createSubjectReference(subjectType);
   return spice.CheckPermissionRequest.create({
@@ -40,7 +41,7 @@ function createCheckPermissionRequest(objectType: string, permission: string, su
   });
 }
 
-async function createRelationship(objectType: string, relation: string, subjectType: string) {
+export async function createRelationship(objectType: string, relation: string, subjectType: string) {
   const resource = createObjectReference(objectType);
   const subject = createSubjectReference(subjectType);
   const request = spice.WriteRelationshipsRequest.create({
@@ -56,20 +57,62 @@ async function createRelationship(objectType: string, relation: string, subjectT
   return promises.writeRelationships(request);
 }
 
-async function getRelationship(objectType: string, relation?: string, subjectType?: string) {
+export async function lookupResources(subjectType: string, permission?: string, objectType?: string) {
 
-  const request = spice.ReadRelationshipsRequest.create({
-    relationshipFilter: {
-      resourceType: objectType,
-      optionalRelation: relation || undefined,
-      optionalSubjectFilter: subjectType ? createSubjectFilter(subjectType) : undefined, 
-    }
+  const request = spice.LookupResourcesRequest.create({
+    subject: createSubjectReference(subjectType),
+    permission,
+    resourceObjectType: objectType,
   })
+
+  return promises.lookupResources(request);
+}
+
+export async function lookupSubjects(objectType: string, permission?: string, subjectType?: string) {
+
+  const payload: spice.LookupSubjectsRequest = {
+    resource: createObjectReference(objectType),
+  }
+
+  if (permission) {
+    payload.permission = permission;
+  }
+  if (subjectType) {
+    payload.subjectObjectType = subjectType.split(":")[0];
+  }
+
+  console.log("lookupSubjects.payload", payload);
+
+  const request = spice.LookupSubjectsRequest.create(payload)
+
+  return promises.lookupSubjects(request);
+}
+
+export async function getRelationship(objectType?: string, relation?: string, subjectType?: string) {
+
+  const payload: spice.ReadRelationshipsRequest = {
+    relationshipFilter: {}
+  }
+
+  if (objectType) {
+    const parts = objectType.split(":");
+    payload.relationshipFilter.resourceType = parts[0];
+    payload.relationshipFilter.optionalResourceId = parts[1] || undefined;
+  }
+  if (relation) {
+    payload.relationshipFilter.optionalRelation = relation;
+  }
+  if (subjectType) {
+    payload.relationshipFilter.optionalSubjectFilter = createSubjectFilter(subjectType);
+  }
+  console.log("getRelationship.payload", payload);
+
+  const request = spice.ReadRelationshipsRequest.create(payload)
 
   return promises.readRelationships(request);
 }
 
-async function checkPermission(objectType: string, permission: string, subjectType: string) {
+export async function checkPermission(objectType: string, permission: string, subjectType: string) {
   const checkPermissionRequest = createCheckPermissionRequest(objectType, permission, subjectType);
   const response = await promises.checkPermission(checkPermissionRequest);
   if (response?.permissionship === spice.CheckPermissionResponse_Permissionship.HAS_PERMISSION) {
@@ -90,7 +133,7 @@ async function checkPermission(objectType: string, permission: string, subjectTy
   }
 }
 
-function createBulkReference(objectTypes: string[], permission: string, subjectType: string) {
+export function createBulkReference(objectTypes: string[], permission: string, subjectType: string) {
   const subject = createSubjectReference(subjectType);
   return objectTypes.map((objectType) => {
     const [objectTypeName, objectId] = objectType.split(":");
@@ -106,7 +149,7 @@ function createBulkReference(objectTypes: string[], permission: string, subjectT
   });
 }
 
-function createBulkCheckPermissionRequest(objectTypes: string[], permission: string, subjectType: string) {
+export function createBulkCheckPermissionRequest(objectTypes: string[], permission: string, subjectType: string) {
   const subject = createSubjectReference(subjectType);
   return spice.BulkCheckPermissionRequest.create({
     items: createBulkReference(objectTypes, permission, subjectType),
@@ -114,7 +157,7 @@ function createBulkCheckPermissionRequest(objectTypes: string[], permission: str
 }
 
 
-async function checkBulkPermission(objectTypes: string[], permission: string, subjectType: string) {
+export async function checkBulkPermission(objectTypes: string[], permission: string, subjectType: string) {
   const checkPermissionRequest = createBulkCheckPermissionRequest(objectTypes, permission, subjectType);
   const response = await promises.bulkCheckPermission(checkPermissionRequest);
   console.log("checkBulkPermission", response);
@@ -136,14 +179,3 @@ async function checkBulkPermission(objectTypes: string[], permission: string, su
   //   return { allowed: "unknown" };
   // }
 }
-
-export {
-  promises as client,
-  getRelationship,
-  createRelationship,
-  checkPermission,
-  checkBulkPermission,
-  createObjectReference,
-  createSubjectReference,
-  createCheckPermissionRequest,
-};

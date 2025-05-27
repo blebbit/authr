@@ -1,6 +1,13 @@
 import { Hono, Context } from 'hono'
 
-import { createRelationship, checkPermission, checkBulkPermissions, getRelationship } from '@/lib/authz'
+import { 
+  createRelationship,
+  checkPermission,
+  checkBulkPermissions,
+  getRelationship,
+  lookupSubjects,
+  lookupResources,
+} from '@/lib/authz'
 
 import { xrpcProxy } from './proxy'
 import { createRecord } from '@/lib/storage'
@@ -21,12 +28,43 @@ export function addRoutes(app: Hono) {
 }
 
 async function getGroup(c: Context) {
-  console.log("getGroup.start", c.get("authrSession"))
+  const authrSession = c.get("authrSession")
+  const pdsSession = c.get("pdsSession")
 
+  var did =  pdsSession?.iss || authrSession?.did || undefined
+  var gid = c.req.query('id') || c.req.query('groupId') || undefined
+
+  const result =
+    await c.env.DB
+    .prepare('SELECT * FROM records WHERE nsid = ? AND id = ?')
+    .bind(GROUP_COLLECTION, gid)
+    .all()
+
+  var groups = result.results as any[]
+  console.log("getGroups.groups", groups)
+
+  if (did) {
+    const objs = groups.map((group) => {
+      return "blog/group:" + group.id
+    })
+    const permCheck = await checkBulkPermissions(c.env, objs, "read", "blog/user:" + did.replaceAll(":", "_")) as { pairs: any[] }
+    console.log("getGroups.permCheck", JSON.stringify(permCheck, null, 2))
+
+    groups = groups.filter((group, index) => {
+      const perm = permCheck.pairs[index]
+      // TODO, ensure we have the same id for each item
+      return group.public || perm?.response?.item?.permissionship === 2
+    })
+
+  }
+
+  const groupSubjects = await lookupSubjects(c.env, `blog/group:${gid}`, 'read', "blog/user")
+  const groupRelations = await getRelationship(c.env, `blog/group:${gid}`, undefined, undefined)
   return c.json({
-    error: 'Not implemented',
-    // payload,
-  }, 501)
+    groups,
+    groupSubjects,
+    groupRelations,
+  })
 }
 
 

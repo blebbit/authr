@@ -58,7 +58,7 @@ const PostsView = () => {
 }
 
 const PostView = ({ post }: { post: any }) => {
-  const acctInfo = useQuery({
+  const acctInfo: any = useQuery({
     queryKey: [post.acct, 'info'],
     queryFn: async () => {
 

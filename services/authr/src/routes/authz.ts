@@ -1,28 +1,32 @@
 import { Hono } from 'hono';
 
 import {
-  getSchema,
-  putSchema,
-  getRelationship,
-  createRelationship,
-  checkPermission,
-  checkBulkPermissions,
-  // getPermission,
-  // createPermission,
-  // updatePermission,
-  // deletePermission,
+  handleGetSchema,
+  handlePutSchema,
+  handleGetRelationship,
+  handleCreateRelationship,
+  handleCheckPermission,
+  handleCheckBulkPermissions,
+  handleLookupResources,
+  handleLookupSubjects,
 } from '@/controllers/authz';
 
 const router = new Hono();
 
 // schema
-router.get('/schema', getSchema);
-router.post('/schema', putSchema);
-router.post('/relationship', createRelationship);
-router.post('/relationship/query', getRelationship);
-router.post('/check', checkPermission);
-router.post('/check-bulk', checkBulkPermissions);
+router.get('/schema', handleGetSchema);
+router.post('/schema', handlePutSchema);
 
-// permissions
+// relationships
+router.post('/relationship', handleCreateRelationship);
+router.post('/relationship/query', handleGetRelationship);
+
+// lookups
+router.post('/lookup/resources', handleLookupResources);
+router.post('/lookup/subjects', handleLookupSubjects);
+
+// checking permissions
+router.post('/check', handleCheckPermission);
+router.post('/check-bulk', handleCheckBulkPermissions);
 
 export default router;

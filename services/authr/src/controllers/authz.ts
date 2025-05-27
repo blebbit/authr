@@ -3,10 +3,12 @@ import { HTTPException } from 'hono/http-exception'
 
 import {
   client,
-  getRelationship as get,
-  createRelationship as create,
-  checkPermission as check,
-  checkBulkPermission as checkBulk
+  lookupResources,
+  lookupSubjects,
+  getRelationship,
+  createRelationship,
+  checkPermission,
+  checkBulkPermission
 } from '@/lib/spicedb';
 
 import config from '@/config';
@@ -34,7 +36,7 @@ export const hasAuthzApikey = async (c: Context) => {
   // }
 }
 
-export const getSchema = async (c: Context, next: Next) => {
+export const handleGetSchema = async (c: Context, next: Next) => {
   const hasApikey = await hasAuthzApikey(c);
 
   if (!hasApikey) {
@@ -48,7 +50,7 @@ export const getSchema = async (c: Context, next: Next) => {
   return c.json(schema);
 };
 
-export const putSchema = async (c: Context) => {
+export const handlePutSchema = async (c: Context) => {
   const hasApikey = await hasAuthzApikey(c);
 
   if (!hasApikey) {
@@ -67,7 +69,49 @@ export const putSchema = async (c: Context) => {
 
 
 
-export const getRelationship = async (c: Context) => {
+export const handleLookupResources = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const data: any = await c.req.json()
+  console.log("lookupResources.data", data)
+  const r: any = await lookupResources(data.resource, data.permission, data.subject)
+  console.log("lookupResources.r", r)
+
+  return c.json(r)
+}
+
+export const handleLookupSubjects = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+  const data: any = await c.req.json()
+  console.log("lookupSubjects.data", data)
+  const r: any = await lookupSubjects(data.resource, data.permission, data.subject)
+  console.log("lookupSubjects.r", r)
+  return c.json(r)
+}
+
+export const handleGetRelationship = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const data: any = await c.req.json()
+  console.log("getRelationship.data", data)
+  const r: any = await getRelationship(data.resource, data.relation, data.subject)
+  console.log("getRelationship.r", r)
+
+  return c.json(r)
+}
+
+export const handleCreateRelationship = async (c: Context) => {
   const hasApikey = await hasAuthzApikey(c);
 
   if (!hasApikey) {
@@ -76,13 +120,13 @@ export const getRelationship = async (c: Context) => {
 
   const data: any = await c.req.json()
   console.log("createRelationship.data", data)
-  const r: any = await get(data.resource, data.relation, data.subject)
+  const r: any = await createRelationship(data.resource, data.relation, data.subject)
   console.log("createRelationship.r", r)
 
   return c.json(r)
 }
 
-export const createRelationship = async (c: Context) => {
+export const handleCheckPermission = async (c: Context) => {
   const hasApikey = await hasAuthzApikey(c);
 
   if (!hasApikey) {
@@ -90,29 +134,14 @@ export const createRelationship = async (c: Context) => {
   }
 
   const data: any = await c.req.json()
-  console.log("createRelationship.data", data)
-  const r: any = await create(data.resource, data.relation, data.subject)
-  console.log("createRelationship.r", r)
+  console.log("checkPermission.data", data)
+  const r: any = await checkPermission(data.resource, data.permission, data.subject)
+  console.log("checkPermission.r", r)
 
   return c.json(r)
 }
 
-export const checkPermission = async (c: Context) => {
-  const hasApikey = await hasAuthzApikey(c);
-
-  if (!hasApikey) {
-    return c.json({ message: "Unauthorized" }, { status: 401 });
-  }
-
-  const data: any = await c.req.json()
-  console.log("checkBulkPermission.data", data)
-  const r: any = await check(data.resource, data.permission, data.subject)
-  console.log("checkBulkPermission.r", r)
-
-  return c.json(r)
-}
-
-export const checkBulkPermissions = async (c: Context) => {
+export const handleCheckBulkPermissions = async (c: Context) => {
   const hasApikey = await hasAuthzApikey(c);
 
   if (!hasApikey) {
@@ -121,7 +150,7 @@ export const checkBulkPermissions = async (c: Context) => {
 
   const data: any = await c.req.json()
   console.log("checkBulkPermissions.data", data)
-  const r: any = await checkBulk(data.resources, data.permission, data.subject)
+  const r: any = await checkBulkPermission(data.resources, data.permission, data.subject)
   console.log("checkBulkPermissions.r", r)
 
   return c.json(r)

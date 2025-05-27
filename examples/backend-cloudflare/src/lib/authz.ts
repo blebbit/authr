@@ -38,11 +38,67 @@ async function callAuthz(
   return resp
 }
 
+export async function lookupSubjects(
+  env: any,
+  resource: string,
+  permission?: string,
+  subject?: string,
+) {
+  const response = await callAuthz(env, {
+    method: "POST",
+    path: "/authz/lookup/subjects",
+    data: {
+      resource,
+      permission,
+      subject,
+    }
+  });
+
+  if (!response.ok) {
+    console.error("authz.lookupSubjects.error", response.statusText);
+    return false;
+  }
+
+  const data = await response.json();
+
+  console.log("authz.lookupSubjects.data", data);
+
+  return data
+}
+
+export async function lookupResources(
+  env: any,
+  subject: string,
+  permission?: string,
+  resource?: string,
+) {
+  const response = await callAuthz(env, {
+    method: "POST",
+    path: "/authz/lookup/resources",
+    data: {
+      resource,
+      permission,
+      subject,
+    }
+  });
+
+  if (!response.ok) {
+    console.error("authz.lookupResources.error", response.statusText);
+    return false;
+  }
+
+  const data = await response.json();
+
+  console.log("authz.lookupResources.data", data);
+
+  return data
+}
+
 export async function getRelationship(
   env: any,
   resource: string,
-  relation: string,
-  subject: string,
+  relation?: string,
+  subject?: string,
 ) {
   const response = await callAuthz(env, {
     method: "POST",

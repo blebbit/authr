@@ -1,4 +1,5 @@
 import { useQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
 import { useAuthr } from "@blebbit/authr-react-tanstack";
 
 export const GroupsList = () => {
@@ -66,7 +67,10 @@ const GroupListItem = ({ group, perms }: { group: any, perms: any[] }) => {
 
   return (
     <div className="border-b py-4">
-      { value.name || value.title } ({ perm ? perm.relationship.relation : "no relation" })
+      <Link to={`/groups/${group.id}`} className="hover:underline">
+        { value.name || value.title }
+      </Link>
+      ({ perm ? perm.relationship.relation : "no relation" })
     </div>
   )
 }

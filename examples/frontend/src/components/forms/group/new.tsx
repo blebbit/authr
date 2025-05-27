@@ -10,7 +10,7 @@ const formSchema = z.object({
   }),
 })
 
-export function HandleForm() {
+export function NewGroupForm() {
 
   // 1. Define your form.
   const form = useForm({
