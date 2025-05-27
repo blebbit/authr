@@ -14,8 +14,10 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SignInImport } from './routes/sign-in'
 import { Route as IndexImport } from './routes/index'
 import { Route as PostsIndexImport } from './routes/posts/index'
+import { Route as GroupsIndexImport } from './routes/groups/index'
 import { Route as AccountIndexImport } from './routes/account/index'
 import { Route as PostsNewImport } from './routes/posts/new'
+import { Route as GroupsNewImport } from './routes/groups/new'
 
 // Create/Update Routes
 
@@ -37,6 +39,12 @@ const PostsIndexRoute = PostsIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const GroupsIndexRoute = GroupsIndexImport.update({
+  id: '/groups/',
+  path: '/groups/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const AccountIndexRoute = AccountIndexImport.update({
   id: '/account/',
   path: '/account/',
@@ -46,6 +54,12 @@ const AccountIndexRoute = AccountIndexImport.update({
 const PostsNewRoute = PostsNewImport.update({
   id: '/posts/new',
   path: '/posts/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const GroupsNewRoute = GroupsNewImport.update({
+  id: '/groups/new',
+  path: '/groups/new',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -67,6 +81,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SignInImport
       parentRoute: typeof rootRoute
     }
+    '/groups/new': {
+      id: '/groups/new'
+      path: '/groups/new'
+      fullPath: '/groups/new'
+      preLoaderRoute: typeof GroupsNewImport
+      parentRoute: typeof rootRoute
+    }
     '/posts/new': {
       id: '/posts/new'
       path: '/posts/new'
@@ -79,6 +100,13 @@ declare module '@tanstack/react-router' {
       path: '/account'
       fullPath: '/account'
       preLoaderRoute: typeof AccountIndexImport
+      parentRoute: typeof rootRoute
+    }
+    '/groups/': {
+      id: '/groups/'
+      path: '/groups'
+      fullPath: '/groups'
+      preLoaderRoute: typeof GroupsIndexImport
       parentRoute: typeof rootRoute
     }
     '/posts/': {
@@ -96,16 +124,20 @@ declare module '@tanstack/react-router' {
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
+  '/groups/new': typeof GroupsNewRoute
   '/posts/new': typeof PostsNewRoute
   '/account': typeof AccountIndexRoute
+  '/groups': typeof GroupsIndexRoute
   '/posts': typeof PostsIndexRoute
 }
 
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
+  '/groups/new': typeof GroupsNewRoute
   '/posts/new': typeof PostsNewRoute
   '/account': typeof AccountIndexRoute
+  '/groups': typeof GroupsIndexRoute
   '/posts': typeof PostsIndexRoute
 }
 
@@ -113,33 +145,61 @@ export interface FileRoutesById {
   __root__: typeof rootRoute
   '/': typeof IndexRoute
   '/sign-in': typeof SignInRoute
+  '/groups/new': typeof GroupsNewRoute
   '/posts/new': typeof PostsNewRoute
   '/account/': typeof AccountIndexRoute
+  '/groups/': typeof GroupsIndexRoute
   '/posts/': typeof PostsIndexRoute
 }
 
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/sign-in' | '/posts/new' | '/account' | '/posts'
+  fullPaths:
+    | '/'
+    | '/sign-in'
+    | '/groups/new'
+    | '/posts/new'
+    | '/account'
+    | '/groups'
+    | '/posts'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/sign-in' | '/posts/new' | '/account' | '/posts'
-  id: '__root__' | '/' | '/sign-in' | '/posts/new' | '/account/' | '/posts/'
+  to:
+    | '/'
+    | '/sign-in'
+    | '/groups/new'
+    | '/posts/new'
+    | '/account'
+    | '/groups'
+    | '/posts'
+  id:
+    | '__root__'
+    | '/'
+    | '/sign-in'
+    | '/groups/new'
+    | '/posts/new'
+    | '/account/'
+    | '/groups/'
+    | '/posts/'
   fileRoutesById: FileRoutesById
 }
 
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   SignInRoute: typeof SignInRoute
+  GroupsNewRoute: typeof GroupsNewRoute
   PostsNewRoute: typeof PostsNewRoute
   AccountIndexRoute: typeof AccountIndexRoute
+  GroupsIndexRoute: typeof GroupsIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   SignInRoute: SignInRoute,
+  GroupsNewRoute: GroupsNewRoute,
   PostsNewRoute: PostsNewRoute,
   AccountIndexRoute: AccountIndexRoute,
+  GroupsIndexRoute: GroupsIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
 }
 
@@ -155,8 +215,10 @@ export const routeTree = rootRoute
       "children": [
         "/",
         "/sign-in",
+        "/groups/new",
         "/posts/new",
         "/account/",
+        "/groups/",
         "/posts/"
       ]
     },
@@ -166,11 +228,17 @@ export const routeTree = rootRoute
     "/sign-in": {
       "filePath": "sign-in.tsx"
     },
+    "/groups/new": {
+      "filePath": "groups/new.tsx"
+    },
     "/posts/new": {
       "filePath": "posts/new.tsx"
     },
     "/account/": {
       "filePath": "account/index.tsx"
+    },
+    "/groups/": {
+      "filePath": "groups/index.tsx"
     },
     "/posts/": {
       "filePath": "posts/index.tsx"

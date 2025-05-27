@@ -3,6 +3,7 @@ import { HTTPException } from 'hono/http-exception'
 
 import {
   client,
+  getRelationship as get,
   createRelationship as create,
   checkPermission as check,
   checkBulkPermission as checkBulk
@@ -63,6 +64,23 @@ export const putSchema = async (c: Context) => {
     ]
   });
 };
+
+
+
+export const getRelationship = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const data: any = await c.req.json()
+  console.log("createRelationship.data", data)
+  const r: any = await get(data.resource, data.relation, data.subject)
+  console.log("createRelationship.r", r)
+
+  return c.json(r)
+}
 
 export const createRelationship = async (c: Context) => {
   const hasApikey = await hasAuthzApikey(c);

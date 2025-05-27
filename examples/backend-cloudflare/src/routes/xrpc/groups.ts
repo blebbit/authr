@@ -1,26 +1,27 @@
 import { Hono, Context } from 'hono'
 
-import { createRelationship, checkPermission, checkBulkPermissions } from '@/lib/authz'
+import { createRelationship, checkPermission, checkBulkPermissions, getRelationship } from '@/lib/authz'
 
 import { xrpcProxy } from './proxy'
 import { createRecord } from '@/lib/storage'
 
 import { createId } from '@paralleldrive/cuid2'
 import { create } from '@atproto/common-web/dist/check'
+import { get } from 'http'
 
-const POST_COLLECTION = 'app.blebbit.authr.post'
+const GROUP_COLLECTION = 'app.blebbit.authr.group'
 
 // only export
 export function addRoutes(app: Hono) {
-  app.get('/xrpc/app.blebbit.authr.getPost', getPost)
-  app.get('/xrpc/app.blebbit.authr.getPosts', getPosts)
-  app.post('/xrpc/app.blebbit.authr.createPost', createPost)
-  app.post('/xrpc/app.blebbit.authr.updatePost', updatePost)
-  app.post('/xrpc/app.blebbit.authr.deletePost', deletePost)
+  app.get('/xrpc/app.blebbit.authr.getGroup', getGroup)
+  app.get('/xrpc/app.blebbit.authr.getGroups', getGroups)
+  app.post('/xrpc/app.blebbit.authr.createGroup', createGroup)
+  app.post('/xrpc/app.blebbit.authr.updateGroup', updateGroup)
+  app.post('/xrpc/app.blebbit.authr.deleteGroup', deleteGroup)
 }
 
-async function getPost(c: Context) {
-  console.log("getPost.start", c.get("authrSession"))
+async function getGroup(c: Context) {
+  console.log("getGroup.start", c.get("authrSession"))
 
   return c.json({
     error: 'Not implemented',
@@ -29,7 +30,7 @@ async function getPost(c: Context) {
 }
 
 
-async function getPosts(c: Context) {
+async function getGroups(c: Context) {
   const authrSession = c.get("authrSession")
   const pdsSession = c.get("pdsSession")
   // console.log("getPosts.authrSession", authrSession)
@@ -40,65 +41,68 @@ async function getPosts(c: Context) {
   // our own api through the user's pds
   const proxy = c.req.header('x-authr-recursive-proxy')
   if (proxy) {
-    console.log("getPosts.recursive-proxy", proxy)
+    console.log("getGroups.recursive-proxy", proxy)
     return xrpcProxy(c)
   }
 
-  // console.log("getPosts.our-handler", "incoming request is from the user's PDS")
+  // console.log("getGroups.our-handler", "incoming request is from the user's PDS")
 
 
   // see if we have something to put permissions on
   var did =  pdsSession?.iss || authrSession?.did || undefined
   // todo
   // - check our auth and pds-proxy auth
-  // - implement actual getPosts
+  // - implement actual getGroups
 
   const result =
     await c.env.DB
     .prepare('SELECT * FROM records WHERE nsid = ?')
-    .bind(POST_COLLECTION)
+    .bind(GROUP_COLLECTION)
     .all()
 
-  var posts = result.results as any[]
-  console.log("getPosts.posts", posts)
+  var groups = result.results as any[]
+  console.log("getGroups.groups", groups)
 
   // authzed has something about providing a fetch bulk records where they will handle the logic
   //   for getting more results until the page size is met, based on permissions
   // https://authzed.com/docs/spicedb/modeling/protecting-a-list-endpoint#checking-with-checkbulkpermissions
   if (did) {
-    const objs = posts.map((post) => {
-      return "blog/post:" + post.id
+    const objs = groups.map((group) => {
+      return "blog/group:" + group.id
     })
     const permCheck = await checkBulkPermissions(c.env, objs, "read", "blog/user:" + did.replaceAll(":", "_")) as { pairs: any[] }
-    console.log("getPosts.permCheck", JSON.stringify(permCheck, null, 2))
+    console.log("getGroups.permCheck", JSON.stringify(permCheck, null, 2))
 
-    posts = posts.filter((post, index) => {
+    groups = groups.filter((group, index) => {
       const perm = permCheck.pairs[index]
       // TODO, ensure we have the same id for each item
-      return post.public || perm?.response?.item?.permissionship === 2
+      return group.public || perm?.response?.item?.permissionship === 2
     })
+
   }
 
+  const groupPerms = await getRelationship(c.env, "blog/group", undefined, "blog/user:" + did.replaceAll(":", "_"))
   return c.json({
-    posts,
+    groups,
+    groupPerms,
   })
 }
 
-async function createPost(c: Context) { 
+async function createGroup(c: Context) {
 
   const authrSession = c.get("authrSession")
   const pdsSession = c.get("pdsSession")
 
   const payload = await c.req.json()
-  console.log("createPost.payload", payload)
+  console.log("createGroup.payload", payload)
 
   // DUAL+ Write Problem
   // https://authzed.com/blog/the-dual-write-problem
   // https://www.youtube.com/watch?v=6lDkXrFjuhc
 
-  // who's creating this post?
+  // who's creating this group?
   var did =  pdsSession?.iss || authrSession?.did || undefined
-  console.log("createPost.did", did)
+  console.log("createGroup.did", did)
 
   // must be authenticated to perform writes of any kind
   if (!did) {
@@ -108,32 +112,30 @@ async function createPost(c: Context) {
   }
 
   const cid = createId()
-  console.log("createPost.cid", cid)
+  console.log("createGroup.cid", cid)
   // write resource and assign owner to creator
-  const perm = await createRelationship(c.env, "blog/post:" + cid, "owner", "blog/user:" + did.replaceAll(":", "_"))
-  console.log("createPost.perm", perm)
+  const perm = await createRelationship(c.env, "blog/group:" + cid, "owner", "blog/user:" + did.replaceAll(":", "_"))
+  console.log("createGroup.perm", perm)
 
   // write to application database
-  const result = await createRecord(c, cid, did, POST_COLLECTION, {
-    draft: payload.record.draft,
-    title: payload.record.title,
-    content: payload.record.content,
+  const result = await createRecord(c, cid, did, GROUP_COLLECTION, {
+    name: payload.record.name,
   }, payload.public)
-  console.log("createPost.result", result)
+  console.log("createGroup.result", result)
 
   // write to account's PDS
 
   return c.json(result)
 }
 
-async function updatePost(c: Context) {
+async function updateGroup(c: Context) {
 
   return c.json({
     error: 'Not implemented',
   }, 501)
 }
 
-async function deletePost(c: Context) {
+async function deleteGroup(c: Context) {
 
   return c.json({
     error: 'Not implemented',

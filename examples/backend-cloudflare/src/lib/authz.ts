@@ -38,6 +38,34 @@ async function callAuthz(
   return resp
 }
 
+export async function getRelationship(
+  env: any,
+  resource: string,
+  relation: string,
+  subject: string,
+) {
+  const response = await callAuthz(env, {
+    method: "POST",
+    path: "/authz/relationship/query",
+    data: {
+      resource,
+      relation,
+      subject,
+    }
+  });
+
+  if (!response.ok) {
+    console.error("authz.getRelationship.error", response.statusText);
+    return false;
+  }
+
+  const data = await response.json();
+
+  console.log("authz.getRelationship.data", data);
+
+  return data
+}
+
 export async function createRelationship(
   env: any,
   resource: string,

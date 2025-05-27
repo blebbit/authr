@@ -14,7 +14,7 @@ import {
 } from "./ui/dropdown-menu"
 import { useAuthr } from "../provider/authr";
 
-export const AuthrButton = () => {
+export const AuthrButton = ({ children }: { children?: React.ReactNode }) => {
   
   const navigate = useNavigate();
   const authr = useAuthr();
@@ -66,9 +66,9 @@ export const AuthrButton = () => {
             </DropdownMenuPortal>
           </DropdownMenuSub>
 
-          <DropdownMenuItem>Billing</DropdownMenuItem>
-          <DropdownMenuItem>Team</DropdownMenuItem>
-          <DropdownMenuItem>Subscription</DropdownMenuItem>
+          { children ? <DropdownMenuSeparator /> : null }
+
+          { children }
 
         </DropdownMenuContent>
       </DropdownMenu>

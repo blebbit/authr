@@ -8,10 +8,10 @@ definition blog/group {
 }
 
 definition post {
-  relation owner: blog/user | blog/group#member
-  relation editor: blog/user | blog/group#member
-  relation commenter: blog/user | blog/group#member
-  relation reader: blog/user | blog/group#member
+  relation owner: blog/user | blog/group#owner | blog/group#member
+  relation editor: blog/user | blog/group#owner | blog/group#member
+  relation commenter: blog/user | blog/group#owner | blog/group#member
+  relation reader: blog/user | blog/group#owner | blog/group#member
 
   // owner like things
   permission write = owner

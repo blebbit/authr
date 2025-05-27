@@ -22,6 +22,14 @@ function createSubjectReference(subjectType: string) {
   });
 }
 
+function createSubjectFilter(subjectType: string) {
+  const [subjectTypeName, subjectId] = subjectType.split(":");
+  return spice.SubjectFilter.create({
+    subjectType: subjectTypeName,
+    optionalSubjectId: subjectId || undefined,
+  });
+}
+
 function createCheckPermissionRequest(objectType: string, permission: string, subjectType: string) {
   const resource = createObjectReference(objectType);
   const subject = createSubjectReference(subjectType);
@@ -46,6 +54,19 @@ async function createRelationship(objectType: string, relation: string, subjectT
     }]
   });
   return promises.writeRelationships(request);
+}
+
+async function getRelationship(objectType: string, relation?: string, subjectType?: string) {
+
+  const request = spice.ReadRelationshipsRequest.create({
+    relationshipFilter: {
+      resourceType: objectType,
+      optionalRelation: relation || undefined,
+      optionalSubjectFilter: subjectType ? createSubjectFilter(subjectType) : undefined, 
+    }
+  })
+
+  return promises.readRelationships(request);
 }
 
 async function checkPermission(objectType: string, permission: string, subjectType: string) {
@@ -118,6 +139,7 @@ async function checkBulkPermission(objectTypes: string[], permission: string, su
 
 export {
   promises as client,
+  getRelationship,
   createRelationship,
   checkPermission,
   checkBulkPermission,

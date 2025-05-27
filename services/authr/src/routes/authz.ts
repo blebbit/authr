@@ -3,6 +3,7 @@ import { Hono } from 'hono';
 import {
   getSchema,
   putSchema,
+  getRelationship,
   createRelationship,
   checkPermission,
   checkBulkPermissions,
@@ -18,6 +19,7 @@ const router = new Hono();
 router.get('/schema', getSchema);
 router.post('/schema', putSchema);
 router.post('/relationship', createRelationship);
+router.post('/relationship/query', getRelationship);
 router.post('/check', checkPermission);
 router.post('/check-bulk', checkBulkPermissions);
 

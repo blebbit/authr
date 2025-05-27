@@ -1,4 +1,3 @@
-
 import { useQuery } from "@tanstack/react-query"
 import { useAuthr } from "@blebbit/authr-react-tanstack";
 
@@ -50,24 +49,46 @@ const PostsView = () => {
   return (
     <div className="flex flex-col gap-4">
       {data?.posts ? data.posts.map(post => {
-        const record = JSON.parse(post.value)
         return (
-          <div key={post.id} className="border-b py-4">
-            <span className="flex flex-row gap-2">
-              <h2 className="text-xl font-semibold">{record.title}</h2>
-              { record.draft ? <span className="text-sm text-gray-500">(draft)</span> : null }
-              { post.public ?
-                <span className="rounded px-1 py-0 text-[.6rem] text-white bg-green-500 inline-block align-middle max-h-4">public</span>
-                : 
-                <span className="rounded px-1 py-0 text-[.6rem] text-white bg-red-500 inline-block align-middle max-h-4">private</span>
-              }
-            </span>
-            <p className="text-gray-600">{record.content}</p>
-          </div>
+          <PostView key={post.id} post={post} />
         )
       }) : null}
     </div>
   );
+}
+
+const PostView = ({ post }: { post: any }) => {
+  const acctInfo = useQuery({
+    queryKey: [post.acct, 'info'],
+    queryFn: async () => {
+
+      const r = await fetch(`https://plc.blebbit.dev/info/${post.acct}`)
+
+      return r.json()
+    },
+    enabled: !!(post?.acct)
+  })
+
+  console.log("PostView", post, acctInfo.data)
+
+  const record = JSON.parse(post.value)
+  return (
+    <div className="border-b py-4">
+      <span className="flex flex-row gap-2">
+        <h2 className="text-xl font-semibold">{record.title}</h2>
+        { record.draft ? <span className="text-sm text-gray-500">(draft)</span> : null }
+        { post.public ?
+          <span className="rounded px-1 py-0 text-[.6rem] text-white bg-green-500 inline-block align-middle max-h-4">public</span>
+          : 
+          <span className="rounded px-1 py-0 text-[.6rem] text-white bg-red-500 inline-block align-middle max-h-4">private</span>
+        }
+        <span className="text-sm text-gray-500">
+          @{acctInfo.isLoading ? "loading..." : acctInfo.data?.handle || post.acct}
+        </span>
+      </span>
+      <p className="text-gray-600">{record.content}</p>
+    </div>
+  )
 }
 
 export default PostsView;
