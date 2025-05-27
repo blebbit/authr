@@ -1,4 +1,5 @@
 import { type Context, type Next } from 'hono'
+import { HTTPException } from 'hono/http-exception'
 
 import {
   client,
@@ -7,12 +8,37 @@ import {
   checkBulkPermission as checkBulk
 } from '@/lib/spicedb';
 
-export const getSchema = async (c: Context, next: Next) => {
-  const session = c.get('session')
+import config from '@/config';
+
+export const hasAuthzApikey = async (c: Context) => {
+  const apikey = c.req.header('x-authr-apikey');
+  console.log("hasAuthzApikey.apikey", apikey, config.spicedb.adminApikey);
+
+  if (!apikey || apikey !== config.spicedb.adminApikey) {
+    return false
+  }
+
+  return true
+
+  /*
+   * Should also support using sessions and spicedb to determine if the user has access
+   * to the spicedb meta resources and endpoints.
+   */
+
+
+  // const session = c.get('session')
 
   // if (!session) {
-  //   return c.json({ message: "Unauthorized" }, { status: 401 });
+  //   throw new HTTPException(401, { message: "Unauthorized" })
   // }
+}
+
+export const getSchema = async (c: Context, next: Next) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
 
   // check that user can read the schema
   const schema = await client.readSchema({});
@@ -22,9 +48,9 @@ export const getSchema = async (c: Context, next: Next) => {
 };
 
 export const putSchema = async (c: Context) => {
-  const session = c.get('session')
+  const hasApikey = await hasAuthzApikey(c);
 
-  if (!session) {
+  if (!hasApikey) {
     return c.json({ message: "Unauthorized" }, { status: 401 });
   }
 
@@ -39,6 +65,12 @@ export const putSchema = async (c: Context) => {
 };
 
 export const createRelationship = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
   const data: any = await c.req.json()
   console.log("createRelationship.data", data)
   const r: any = await create(data.resource, data.relation, data.subject)
@@ -48,6 +80,12 @@ export const createRelationship = async (c: Context) => {
 }
 
 export const checkPermission = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
   const data: any = await c.req.json()
   console.log("checkBulkPermission.data", data)
   const r: any = await check(data.resource, data.permission, data.subject)
@@ -57,6 +95,12 @@ export const checkPermission = async (c: Context) => {
 }
 
 export const checkBulkPermissions = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
   const data: any = await c.req.json()
   console.log("checkBulkPermissions.data", data)
   const r: any = await checkBulk(data.resources, data.permission, data.subject)

@@ -15,8 +15,8 @@ const PostsView = () => {
       {
           credentials: 'include',
           headers: {
-            'x-authr-recursive-proxy': 'true',
-            'atproto-proxy': "did:web:api.blebbit.org#authr_appview"
+            // 'x-authr-recursive-proxy': 'true',
+            // 'atproto-proxy': "did:web:api.authr.blebbit.dev#authr_appview"
           }
         }
       )
@@ -34,8 +34,8 @@ const PostsView = () => {
     )
   }
 
-  console.log("authrPosts", authrPosts)
-  console.log("authrPosts.data", authrPosts.data)
+  // console.log("authrPosts", authrPosts)
+  // console.log("authrPosts.data", authrPosts.data)
 
   const data = authrPosts.data as any
 
@@ -50,7 +50,7 @@ const PostsView = () => {
   return (
     <div className="flex flex-col gap-4">
       {data?.posts ? data.posts.map(post => {
-        const record = JSON.parse(post.record)
+        const record = JSON.parse(post.value)
         return (
           <div key={post.id} className="border-b py-4">
             <span className="flex flex-row gap-2">

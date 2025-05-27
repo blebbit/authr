@@ -99,7 +99,7 @@ export function HandleForm() {
                 <em
                   className="m-1 text-red-500"
                   role="alert"
-                >{field.state.meta.errors.map((e) => e.message).join(', ')}</em>
+                >{field.state.meta.errors.map((e: any) => e.message).join(', ')}</em>
               }
               {/* <pre>{JSON.stringify(field.state.meta, null, 2)}</pre> */}
             </div>
@@ -130,7 +130,7 @@ export function HandleForm() {
                 <em
                   className="m-1 text-red-500"
                   role="alert"
-                >{field.state.meta.errors.map((e) => e.message).join(', ')}</em>
+                >{field.state.meta.errors.map((e: any) => e.message).join(', ')}</em>
               }
               {/* <pre>{JSON.stringify(field.state.meta, null, 2)}</pre> */}
             </div>

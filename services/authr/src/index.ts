@@ -19,6 +19,14 @@ const origins: any = {
 
 const app = new Hono()
 
+app.use(logger())
+
+app.use(async (c, next) => {
+  // console.log("Request:", c.req.method, c.req.path, c.req.header())
+  await next()
+  c.header('X-slug', 'love')
+})
+
 app.use('*', cors({
   origin: (origin: string, c: Context) => {  
     // console.log("CORS.origin:", origin, config.authrEnv, origins[config.authrEnv], origins)
@@ -36,8 +44,6 @@ app.use('*', cors({
   maxAge: 600,
   credentials: true,
 }))
-
-app.use(logger())
 
 app.use(sessions)
 

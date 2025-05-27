@@ -45,7 +45,6 @@ interface Config {
 
   authz: {
     host: string;
-    port: string;
     secret: string;
   }
 }
@@ -85,8 +84,7 @@ export function getConfig(env: any): Config {
     },
 
     authz: {
-      host: env.AUTHZ_HOST || 'localhost',
-      port: env.AUTHZ_PORT || '3333',
+      host: env.AUTHZ_HOST || 'http://localhost:3333',
       secret: env.AUTHZ_SECRET || 'authr-example-backend-cloudflare',
     }
   }

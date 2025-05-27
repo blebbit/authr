@@ -4,7 +4,7 @@ import { TID } from "@atproto/common-web";
 
 // TODO, make more of these crud functions
 
-export function createRecord(c: Context, cuid: string, did: string, nsid: string, record: any, pub: boolean = false) {
+export async function createRecord(c: Context, cuid: string, did: string, nsid: string, value: any, pub: boolean = false) {
 
   // write to PDS if public
   //   rkey|cid would come from there if so
@@ -12,15 +12,21 @@ export function createRecord(c: Context, cuid: string, did: string, nsid: string
   const rkey = TID.nextStr() // standard rkey from ATProto
   const cid = null;
 
-  c.env.DB.prepare('INSERT INTO records (id, public, acct, nsid, rkey, cid, record) VALUES (?, ?, ?, ?, ?, ?, ?)')
-    .bind(cuid, pub, did, nsid, rkey, cid, JSON.stringify(record))
+  // SPIKE, investigate the d1 query builder (https://workers-qb.massadas.com/)
+  const stmt = `INSERT INTO records (id, public, acct, nsid, rkey, cid, value) VALUES (?, ?, ?, ?, ?, ?, ?)`;
+
+  const dbret = await c.env.DB
+    .prepare(stmt)
+    .bind(cuid, pub, did, nsid, rkey, cid, JSON.stringify(value))
     .run()
+
+  console.log("createRecord.dbret", dbret);
 
   // calculate a cid (hash) of the record (this is signed by the user's key on the PDS, so...)
 
   return {
     aturi: `at://${did}/${nsid}/${rkey}`,
     public: pub,
-    record,
+    value,
   }
 }

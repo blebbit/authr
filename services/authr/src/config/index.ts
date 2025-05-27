@@ -78,6 +78,7 @@ interface Config {
   spicedb: {
     host: string;
     token: string;
+    adminApikey: string;
   }
 }
 
@@ -142,6 +143,7 @@ const config: Config = {
   spicedb: {
     host: process.env.SPICEDB_HOST || 'localhost:50081',
     token: process.env.SPICEDB_TOKEN || 'blebbit-spicedb',
+    adminApikey: process.env.SPICEDB_ADMIN_APIKEY || 'authr-example-backend-cloudflare',
   }
 
 };

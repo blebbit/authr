@@ -1,17 +1,17 @@
-definition user {}
-definition group {
-  relation owner: user
-  relation member: user
+definition blog/user {}
+definition blog/group {
+  relation owner: blog/user
+  relation member: blog/user
 
   permission write = owner
   permission read = member + write
 }
 
 definition post {
-  relation owner: user | group#member
-  relation editor: user | group#member
-  relation commenter: user | group#member
-  relation reader: user | group#member
+  relation owner: blog/user | blog/group#member
+  relation editor: blog/user | blog/group#member
+  relation commenter: blog/user | blog/group#member
+  relation reader: blog/user | blog/group#member
 
   // owner like things
   permission write = owner

@@ -71,7 +71,7 @@ async function getPosts(c: Context) {
       return "blog/post:" + post.id
     })
     const permCheck = await checkBulkPermissions(c.env, objs, "read", "blog/user:" + did.replaceAll(":", "_")) as { pairs: any[] }
-    // console.log("getPosts.checkSession", JSON.stringify(permCheck, null, 2))
+    console.log("getPosts.permCheck", JSON.stringify(permCheck, null, 2))
 
     posts = posts.filter((post, index) => {
       const perm = permCheck.pairs[index]
