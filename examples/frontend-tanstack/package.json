@@ -1,5 +1,5 @@
 {
-  "name": "authr-example-frontend",
+  "name": "authr-example-frontend-tanstack",
   "private": true,
   "type": "module",
   "scripts": {

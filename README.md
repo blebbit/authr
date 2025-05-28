@@ -41,7 +41,7 @@ zed apply .... perms/posts.zed
 pnpm run dev
 
 # app.domain.com
-cd examples/frontend
+cd examples/frontend-tanstack
 pnpm i
 (edit .env)
 pnpm run dev
