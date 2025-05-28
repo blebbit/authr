@@ -26,6 +26,7 @@ import {
 type GroupRow = {
   id: string
   name: string
+  public: any
   role: "owner" | "member"
   extra?: any
 }
@@ -55,6 +56,27 @@ export const columns: ColumnDef<GroupRow>[] = [{
       >
         {g.name}
       </Link>
+    )
+  }
+},{
+  accessorKey: "public",
+  header: ({ column }) => {
+    return (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Public
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    )
+  },
+  cell: ({ row }) => {
+    const g = row.original
+    return (
+      <span>
+        {g.public ? "Yes" : "No"}
+      </span>
     )
   }
 },{
@@ -162,6 +184,7 @@ export const GroupsList = () => {
     return {
       id: group.id,
       name: value.name || value.title,
+      public: group.public,
       role: rel?.relationship.relation || "n/a",
       extra: {
         group,
