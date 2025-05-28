@@ -1,5 +1,5 @@
 import { useAuthr } from "@blebbit/authr-react-tanstack";
-import { useQuery } from "@tanstack/react-query"
+import { useQuery, useMutation } from "@tanstack/react-query"
 import { Link } from "@tanstack/react-router"
 
 import { type ColumnDef } from "@tanstack/react-table"
@@ -27,7 +27,7 @@ type GroupRow = {
   id: string
   name: string
   public: any
-  role: "owner" | "member"
+  role: "owner" | "member" | "n/a"
   extra?: any
 }
 
@@ -94,12 +94,8 @@ export const columns: ColumnDef<GroupRow>[] = [{
   },
 },{
   id: "actions",
-  cell: ({ row }) => {
+  cell: ({ row, table }) => {
     const g = row.original
-
-    const leaveGroup = async () => {
-      console.log("leave", g.name, g.id) 
-    }
 
     return (
       <DropdownMenu>
@@ -111,11 +107,44 @@ export const columns: ColumnDef<GroupRow>[] = [{
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuItem
-            onClick={() => leaveGroup()}
-          >
-            Leave Group
-          </DropdownMenuItem>
+          {
+            g.public && g.role === "n/a"
+            ? (
+              <DropdownMenuItem
+                onClick={async () => {
+                  console.log("join", g.name, g.id, table.options.meta)
+                  await table.options.meta.joinPublicGroup.mutate(g.id)
+                }}
+              >
+                Join Group
+              </DropdownMenuItem>
+            ): null
+          }
+          {
+            g.public && g.role === "member"
+            ? (
+              <DropdownMenuItem
+                onClick={async () => {
+                  console.log("leave", g.name, g.id)
+                  await table.options.meta.leavePublicGroup.mutate(g.id)
+                }}
+              >
+                Leave Group
+              </DropdownMenuItem>
+            ): null
+          }
+          {
+            g.role === "owner"
+            ? (
+              <DropdownMenuItem
+                onClick={async () => {
+                  console.log("edit", g.name, g.id)
+                }}
+              >
+                Edit Group
+              </DropdownMenuItem>
+            ): null
+          }
         </DropdownMenuContent>
       </DropdownMenu>
     )
@@ -130,22 +159,56 @@ export const GroupsList = () => {
   const authrGroups = useQuery({
     queryKey: [session?.handle, 'authrGroups'],
     queryFn: async () => {
-
-      const r = await fetch(
-        `${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.getGroups`,
-      {
-          credentials: 'include',
-          headers: {
-            // 'x-authr-recursive-proxy': 'true',
-            // 'atproto-proxy': "did:web:api.authr.blebbit.dev#authr_appview"
-          }
-        }
-      )
-
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.getGroups`, { credentials: 'include' })
       return r.json()
     },
     enabled: !!(session?.did)
   })
+
+  const joinPublicGroup = useMutation({
+    mutationFn: async (groupId) => {
+      console.log("joinPublicGroup", groupId, session?.did)
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.addGroupMember`, { 
+        method: 'POST',
+        credentials: 'include', 
+        body: JSON.stringify({
+          groupId,
+          role: "member",
+          did: session?.did,
+        }),
+      })
+      const data = await r.json()
+      console.log("joinPublicGroup.response", data)
+      return data
+    },
+  })
+
+  const leavePublicGroup = useMutation({
+    mutationFn: async (groupId) => {
+      console.log("leavePublicGroup", groupId, session?.did)
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.removeGroupMember`, { 
+        method: 'POST',
+        credentials: 'include', 
+        body: JSON.stringify({
+          groupId,
+          role: "member",
+          did: session?.did,
+        }),
+      })
+      const data = await r.json()
+      console.log("leavePublicGroup.response", data)
+      return data
+    },
+  })
+
+
+  const meta = {
+    joinPublicGroup,
+    leavePublicGroup,
+    slug: "love",
+  }
+
+
 
   if (authrGroups.isLoading) {
     return (
@@ -189,6 +252,7 @@ export const GroupsList = () => {
       extra: {
         group,
         value,
+        currDid: session?.did,
       }
     }
   })
@@ -197,25 +261,8 @@ export const GroupsList = () => {
   return (
     <div className="flex flex-col gap-4">
       <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={groups} />
+        <DataTable columns={columns} data={groups} meta={meta}/>
       </div>
     </div>
   );
-}
-
-const GroupListItem = ({ group, perms }: { group: any, perms: any[] }) => {
-  console.log("GroupListItem", group)
-
-  var perm = perms.find((p: any) => p.relationship.resource.objectId === group.id)
-
-  const value = JSON.parse(group.value)
-
-  return (
-    <div className="border-b py-4">
-      <Link to={`/groups/${group.id}`} className="hover:underline">
-        { value.name || value.title }
-      </Link>
-      ({ perm ? perm.relationship.relation : "no relation" })
-    </div>
-  )
 }
