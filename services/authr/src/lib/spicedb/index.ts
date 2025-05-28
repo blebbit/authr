@@ -90,9 +90,9 @@ export async function lookupSubjects(objectType: string, permission?: string, su
 
 export async function getRelationship(objectType?: string, relation?: string, subjectType?: string) {
 
-  const filter = createRelationshipFilter(objectType, relation, subjectType);
-
-  const request = spice.ReadRelationshipsRequest.create(filter)
+  const request = spice.ReadRelationshipsRequest.create({
+    relationshipFilter: createRelationshipFilter(objectType, relation, subjectType)
+  })
 
   return promises.readRelationships(request);
 }

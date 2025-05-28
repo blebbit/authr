@@ -2,6 +2,8 @@ import { Hono, Context } from 'hono'
 
 import { 
   createRelationship,
+  updateRelationship,
+  deleteRelationship,
   checkPermission,
   checkBulkPermissions,
   getRelationship,
@@ -23,8 +25,11 @@ export function addRoutes(app: Hono) {
   app.get('/xrpc/app.blebbit.authr.getGroup', getGroup)
   app.get('/xrpc/app.blebbit.authr.getGroups', getGroups)
   app.post('/xrpc/app.blebbit.authr.createGroup', createGroup)
-  app.post('/xrpc/app.blebbit.authr.updateGroup', updateGroup)
   app.post('/xrpc/app.blebbit.authr.deleteGroup', deleteGroup)
+
+  app.post('/xrpc/app.blebbit.authr.addGroupMember', addGroupMember)
+  app.post('/xrpc/app.blebbit.authr.setGroupMember', setGroupMember)
+  app.post('/xrpc/app.blebbit.authr.rmvGroupMember', rmvGroupMember)
 }
 
 async function getGroup(c: Context) {
@@ -166,14 +171,88 @@ async function createGroup(c: Context) {
   return c.json(result)
 }
 
-async function updateGroup(c: Context) {
 
-  return c.json({
-    error: 'Not implemented',
-  }, 501)
+async function checkIfOwner(c: Context) {
+  const authrSession = c.get("authrSession")
+  const pdsSession = c.get("pdsSession")
+
+  const payload = await c.req.json()
+  console.log("createGroup.payload", payload)
+  const { groupId, role, did: newDid } = payload
+
+  // who's writing this group?
+  var did =  pdsSession?.iss || authrSession?.did || undefined
+  console.log("createGroup.did", did)
+
+  // must be authenticated to perform writes of any kind
+  if (!did) {
+    return c.json({
+      error: 'Not authenticated',
+    }, 401)
+  }
+
+  // must be a group owner to add members
+  const check = await checkPermission(c.env, `blog/group:${groupId}`, "owner", `blog/user:${did.replaceAll(":", "_")}`)
+
+  console.log("addGroupMember.check", check)
+
+  if (!check || !check.response || check.response.item?.permissionship !== 2) {
+    return c.json({
+      error: 'Not authorized',
+    }, 403)
+  }
+
+  return payload
+
+}
+
+async function addGroupMember(c: Context) {
+  const result = await checkIfOwner(c)
+  if (result instanceof Response) {
+    return result // if we got a response, return it
+  }
+
+  const { groupId, role, did: newDid } = result
+  // add the member to the group
+  const perm = await createRelationship(c.env, `blog/group:${groupId}`, role, `blog/user:${newDid.replaceAll(":", "_")}`)
+  console.log("addGroupMember.perm", perm)
+
+  return c.json(perm.response, 201)
+}
+
+async function setGroupMember(c: Context) {
+  const result = await checkIfOwner(c)
+  if (result instanceof Response) {
+    return result // if we got a response, return it
+  }
+
+  const { groupId, role, did: newDid } = result
+  // add the member to the group
+  const perm = await updateRelationship(c.env, `blog/group:${groupId}`, role, `blog/user:${newDid.replaceAll(":", "_")}`)
+  console.log("addGroupMember.perm", perm)
+
+  return c.json(perm.response, 200)
+}
+
+async function rmvGroupMember(c: Context) {
+  const result = await checkIfOwner(c)
+  if (result instanceof Response) {
+    return result // if we got a response, return it
+  }
+
+  const { groupId, role, did: newDid } = result
+  // add the member to the group
+  const perm = await deleteRelationship(c.env, `blog/group:${groupId}`, role, `blog/user:${newDid.replaceAll(":", "_")}`)
+  console.log("addGroupMember.perm", perm)
+
+  return c.json(perm.response, 200)
 }
 
 async function deleteGroup(c: Context) {
+  const result = await checkIfOwner(c)
+  if (result instanceof Response) {
+    return result // if we got a response, return it
+  }
 
   return c.json({
     error: 'Not implemented',

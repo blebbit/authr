@@ -20,7 +20,7 @@ router.get('/schema', handleGetSchema);
 router.post('/schema', handlePutSchema);
 
 // relationships
-router.get('/relationship', handleGetRelationship);
+router.post('/relationship/query', handleGetRelationship);
 router.post('/relationship', handleCreateRelationship);
 router.put('/relationship', handleUpdateRelationship);
 router.delete('/relationship', handleDeleteRelationship);
