@@ -7,6 +7,8 @@ import {
   lookupSubjects,
   getRelationship,
   createRelationship,
+  updateRelationship,
+  deleteRelationship,
   checkPermission,
   checkBulkPermission
 } from '@/lib/spicedb';
@@ -57,14 +59,18 @@ export const handlePutSchema = async (c: Context) => {
     return c.json({ message: "Unauthorized" }, { status: 401 });
   }
 
-  // check that user can write the schema
+  const schema = await c.req.text();
+  console.log("putSchema:", schema);
 
-  return c.json({
-    permissions: [
-      'read:posts',
-      'write:posts',
-    ]
-  });
+  try {
+    const response = await client.writeSchema({ schema });
+    console.log("putSchema.response", response);
+    return c.json({ message: "Schema updated successfully" });
+  } catch (error) {
+    console.error("Error updating schema:", error);
+    return c.json({ message: "Error updating schema", error: error.message }, { status: 500 });
+  }
+
 };
 
 
@@ -121,6 +127,36 @@ export const handleCreateRelationship = async (c: Context) => {
   const data: any = await c.req.json()
   console.log("createRelationship.data", data)
   const r: any = await createRelationship(data.resource, data.relation, data.subject)
+  console.log("createRelationship.r", r)
+
+  return c.json(r)
+}
+
+export const handleUpdateRelationship = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const data: any = await c.req.json()
+  console.log("createRelationship.data", data)
+  const r: any = await updateRelationship(data.resource, data.relation, data.subject)
+  console.log("createRelationship.r", r)
+
+  return c.json(r)
+}
+
+export const handleDeleteRelationship = async (c: Context) => {
+  const hasApikey = await hasAuthzApikey(c);
+
+  if (!hasApikey) {
+    return c.json({ message: "Unauthorized" }, { status: 401 });
+  }
+
+  const data: any = await c.req.json()
+  console.log("createRelationship.data", data)
+  const r: any = await deleteRelationship(data.resource, data.relation, data.subject)
   console.log("createRelationship.r", r)
 
   return c.json(r)

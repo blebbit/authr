@@ -5,6 +5,8 @@ import {
   handlePutSchema,
   handleGetRelationship,
   handleCreateRelationship,
+  handleUpdateRelationship,
+  handleDeleteRelationship,
   handleCheckPermission,
   handleCheckBulkPermissions,
   handleLookupResources,
@@ -18,8 +20,10 @@ router.get('/schema', handleGetSchema);
 router.post('/schema', handlePutSchema);
 
 // relationships
+router.get('/relationship', handleGetRelationship);
 router.post('/relationship', handleCreateRelationship);
-router.post('/relationship/query', handleGetRelationship);
+router.put('/relationship', handleUpdateRelationship);
+router.delete('/relationship', handleDeleteRelationship);
 
 // lookups
 router.post('/lookup/resources', handleLookupResources);

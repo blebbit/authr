@@ -41,21 +41,21 @@ export function createCheckPermissionRequest(objectType: string, permission: str
   });
 }
 
-export async function createRelationship(objectType: string, relation: string, subjectType: string) {
-  const resource = createObjectReference(objectType);
-  const subject = createSubjectReference(subjectType);
-  const request = spice.WriteRelationshipsRequest.create({
-    updates: [{
-      operation: spice.RelationshipUpdate_Operation.CREATE,
-      relationship: {
-        resource,
-        relation,
-        subject,
-      }
-    }]
-  });
-  return promises.writeRelationships(request);
-}
+export function createRelationshipFilter(objectType?: string, relation?: string, subjectType?: string) {
+  const filter: spice.RelationshipFilter = {};
+  if (objectType) {
+    const parts = objectType.split(":");
+    filter.resourceType = parts[0];
+    filter.optionalResourceId = parts[1] || undefined;
+  }
+  if (relation) {
+    filter.optionalRelation = relation;
+  }
+  if (subjectType) {
+    filter.optionalSubjectFilter = createSubjectFilter(subjectType);
+  }
+  return filter;
+} 
 
 export async function lookupResources(subjectType: string, permission?: string, objectType?: string) {
 
@@ -90,26 +90,41 @@ export async function lookupSubjects(objectType: string, permission?: string, su
 
 export async function getRelationship(objectType?: string, relation?: string, subjectType?: string) {
 
-  const payload: spice.ReadRelationshipsRequest = {
-    relationshipFilter: {}
-  }
+  const filter = createRelationshipFilter(objectType, relation, subjectType);
 
-  if (objectType) {
-    const parts = objectType.split(":");
-    payload.relationshipFilter.resourceType = parts[0];
-    payload.relationshipFilter.optionalResourceId = parts[1] || undefined;
-  }
-  if (relation) {
-    payload.relationshipFilter.optionalRelation = relation;
-  }
-  if (subjectType) {
-    payload.relationshipFilter.optionalSubjectFilter = createSubjectFilter(subjectType);
-  }
-  console.log("getRelationship.payload", payload);
-
-  const request = spice.ReadRelationshipsRequest.create(payload)
+  const request = spice.ReadRelationshipsRequest.create(filter)
 
   return promises.readRelationships(request);
+}
+
+export async function createRelationship(objectType: string, relation: string, subjectType: string) {
+  const resource = createObjectReference(objectType);
+  const subject = createSubjectReference(subjectType);
+  const request = spice.WriteRelationshipsRequest.create({
+    updates: [{
+      operation: spice.RelationshipUpdate_Operation.CREATE,
+      relationship: {
+        resource,
+        relation,
+        subject,
+      }
+    }]
+  });
+  return promises.writeRelationships(request);
+}
+
+export async function updateRelationship(objectType: string, relation: string, subjectType: string) {
+  // delete any existing relationship first, assume only one relationship exists for the given objectType, relation, and subjectType
+  await deleteRelationship(objectType, undefined, subjectType);
+  return createRelationship(objectType, relation, subjectType);
+}
+
+export async function deleteRelationship(objectType?: string, relation?: string, subjectType?: string) {
+  const filter = createRelationshipFilter(objectType, relation, subjectType);
+  const request = spice.DeleteRelationshipsRequest.create({
+    relationshipFilter: filter,
+  });
+  return promises.deleteRelationships(request);
 }
 
 export async function checkPermission(objectType: string, permission: string, subjectType: string) {
