@@ -1,12 +1,132 @@
 import { useAuthr } from "@blebbit/authr-react-tanstack";
-import { useQuery } from "@tanstack/react-query"
+import { Link } from "@tanstack/react-router"
+import { useQuery, useQueries } from "@tanstack/react-query"
 
+import { type ColumnDef } from "@tanstack/react-table"
+import { DataTable } from "@/components/widgets/data-table"
+
+import { 
+  ArrowLeft,
+  ArrowUpDown,
+  MoreHorizontal,
+} from "lucide-react"
+import { Button } from "@/components/ui/button"
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+  DropdownMenuPortal,
+  DropdownMenuSub,
+  DropdownMenuSubContent,
+  DropdownMenuSubTrigger,
+} from "@/components/ui/dropdown-menu"
+
+type GroupRow = {
+  did: string
+  handle: string
+  role: "owner" | "member"
+  extra?: any
+}
+
+export const columns: ColumnDef<GroupRow>[] = [{
+  accessorKey: "role",
+  header: ({ column }) => {
+    return (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Role 
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    )
+  },
+},{
+  accessorKey: "handle",
+  header: ({ column }) => {
+    return (
+      <Button
+        variant="ghost"
+        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+      >
+        Handle 
+        <ArrowUpDown className="ml-2 h-4 w-4" />
+      </Button>
+    )
+  },
+  cell: ({ row }) => {
+    const handle: string = row.getValue("handle")
+    const url = `https://blebbit.app/at/${handle}`
+
+    return (
+      <Link
+        to={url}
+        className="text-blue-500 hover:underline"
+      >
+        {handle}
+      </Link>
+    )
+  }
+},{
+  accessorKey: "did",
+  header: "DID",
+},{
+  id: "actions",
+  cell: ({ row }) => {
+    const acctInfo = row.original
+
+    const setRole = async (role: string) => {
+      console.log("setRole", role, acctInfo.extra.relation.relationship.subject.object.objectId)
+    }
+
+    const removeAcct = async () => {
+      console.log("removeAcct", acctInfo.extra.relation.relationship.subject.object.objectId) 
+    }
+
+    return (
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <Button variant="ghost" className="h-8 w-8 p-0">
+            <span className="sr-only">menu</span>
+            <MoreHorizontal className="h-4 w-4" />
+          </Button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end">
+          <DropdownMenuLabel>Actions</DropdownMenuLabel>
+          <DropdownMenuSub>
+            <DropdownMenuSubTrigger>Set Role</DropdownMenuSubTrigger>
+            <DropdownMenuPortal>
+              <DropdownMenuSubContent>
+                <DropdownMenuItem onSelect={() => setRole("owner")}>Owner</DropdownMenuItem>
+                <DropdownMenuItem onSelect={() => setRole("member")}>Member</DropdownMenuItem>
+              </DropdownMenuSubContent>
+            </DropdownMenuPortal>
+          </DropdownMenuSub>
+          <DropdownMenuItem
+            onClick={() => removeAcct()}
+          >
+            Remove
+          </DropdownMenuItem>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem className="p-0">
+            <Link to={`https://blebbit.app/at/${acctInfo.did}`}
+              className="py-1.5 w-full text-center"
+            >View on Blebbit</Link>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
+    )
+  },
+}]
 
 export const GroupView = ({ id }: { id: string }) => {
   const authr = useAuthr();
   const session = authr.session
 
-  const authrGroup = useQuery({
+  const authrGroup: any = useQuery({
     queryKey: ['authrGroups', id],
     queryFn: async () => {
 
@@ -26,7 +146,21 @@ export const GroupView = ({ id }: { id: string }) => {
     enabled: !!(session?.did)
   })
 
-  if (authrGroup.isLoading) {
+  const acctInfos: any[] = useQueries({
+    queries: (authrGroup.data?.groupRelations || []).map((relation: any) => ({
+      queryKey: [relation.relationship.subject.object.objectId, 'info'],
+      queryFn: async () => {
+        const did = relation.relationship.subject.object.objectId.replaceAll("_", ":")
+        const r = await fetch(`https://plc.blebbit.dev/info/${did}`)
+
+        return r.json()
+      },
+      // enabled: !!(relation.relationship.subject.object.objectId)
+    }))
+  })
+
+
+  if (authrGroup.isLoading || acctInfos.some(info => info.isLoading)) {
     return (
       <div className="flex flex-col gap-4">
         <p>Loading...</p>
@@ -50,45 +184,38 @@ export const GroupView = ({ id }: { id: string }) => {
     )
   }
 
-  return (
-    <div>
-      <span className="text-3xl font-light">{value.name || value.title}</span>
+  var relations: GroupRow[] = []
+  if (data.groupRelations && data.groupRelations.length > 0) {
+    relations = data.groupRelations.map((relation: any) => {
+      const did = relation.relationship.subject.object.objectId.replaceAll("_", ":")
+      const info = acctInfos.find(info => info.data?.did === did)
 
-      { data.groupRelations && data.groupRelations.length > 0 && (
-        <div className="flex flex-col gap-2">
-          <h3 className="text-xl font-semibold">Members</h3>
-          { data.groupRelations.map((member: any) => (
-             <MemberView key={member.relationship.subject.object.objectId} data={member} /> 
-          ))}
-        </div>
-      )}
-    </div>
-  )
-}
-
-const MemberView = ({ data}: { data: any }) => {
-  console.log("MemberView.data", data)
-  const did = data.relationship.subject.object.objectId.replaceAll("_", ":")
-  const rel = data.relationship.relation
-
-  const acctInfo: any = useQuery({
-    queryKey: [did, 'info'],
-    queryFn: async () => {
-
-      const r = await fetch(`https://plc.blebbit.dev/info/${did}`)
-
-      return r.json()
-    },
-    enabled: !!(did)
+      return {
+        did,
+        handle: info.data?.handle,
+        role: relation.relationship.relation,
+        extra: {
+          relation,
+          info,
+        }
+      }
   })
-
-  console.log("MemberView.acctInfo", acctInfo.data)
+  }
 
   return (
-    <div>
-        <span className="text-sm text-gray-500">
-          @{acctInfo.isLoading ? "loading..." : acctInfo.data?.handle || did} ({rel})
-        </span>
+    <div className="flex flex-col gap-4 p-4">
+      <div className="flex flex-row gap-2 items-center">
+        <Link
+          to="/groups"
+          className="text-blue-500 hover:underline"
+        >
+          <ArrowLeft className="h-6 w-6" />
+        </Link>
+        <span className="text-3xl font-light">{value.name || value.title}</span>
+      </div>
+      <div className="container mx-auto py-10">
+        <DataTable columns={columns} data={relations} />
+      </div>
     </div>
   )
 }
