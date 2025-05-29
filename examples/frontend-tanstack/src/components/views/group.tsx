@@ -186,7 +186,7 @@ export const GroupView = ({ id }: { id: string }) => {
       setTimeout(() => {
         console.log("addMember.onSuccess.invalidateQueries", id)
         queryClient.invalidateQueries({ queryKey:['authrGroups', id]})
-      }, 6000)
+      }, 3000)
     }
   })
 
@@ -242,7 +242,7 @@ export const GroupView = ({ id }: { id: string }) => {
       setTimeout(() => {
         console.log("removeMember.onSuccess.invalidateQueries", id)
         queryClient.invalidateQueries({ queryKey:['authrGroups', id]})
-      }, 6000)
+      }, 3000)
     }
   })
 
