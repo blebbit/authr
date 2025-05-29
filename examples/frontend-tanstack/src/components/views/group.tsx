@@ -1,8 +1,9 @@
 import { useAuthr } from "@blebbit/authr-react-tanstack";
 import { Link } from "@tanstack/react-router"
-import { useQuery, useQueries } from "@tanstack/react-query"
+import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { type ColumnDef } from "@tanstack/react-table"
+import { UserSearch } from "@/components/widgets/user-search";
 import { DataTable } from "@/components/widgets/data-table"
 
 import { 
@@ -75,16 +76,9 @@ export const columns: ColumnDef<GroupRow>[] = [{
   header: "DID",
 },{
   id: "actions",
-  cell: ({ row }) => {
+  cell: ({ row, table }) => {
+    const meta = table.options.meta as any
     const acctInfo = row.original
-
-    const setRole = async (role: string) => {
-      console.log("setRole", role, acctInfo.extra.relation.relationship.subject.object.objectId)
-    }
-
-    const removeAcct = async () => {
-      console.log("removeAcct", acctInfo.extra.relation.relationship.subject.object.objectId) 
-    }
 
     return (
       <DropdownMenu>
@@ -95,22 +89,28 @@ export const columns: ColumnDef<GroupRow>[] = [{
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuLabel>Actions</DropdownMenuLabel>
-          <DropdownMenuSub>
-            <DropdownMenuSubTrigger>Set Role</DropdownMenuSubTrigger>
-            <DropdownMenuPortal>
-              <DropdownMenuSubContent>
-                <DropdownMenuItem onSelect={() => setRole("owner")}>Owner</DropdownMenuItem>
-                <DropdownMenuItem onSelect={() => setRole("member")}>Member</DropdownMenuItem>
-              </DropdownMenuSubContent>
-            </DropdownMenuPortal>
-          </DropdownMenuSub>
-          <DropdownMenuItem
-            onClick={() => removeAcct()}
-          >
-            Remove
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
+
+          { meta.isOwner && (
+            <>
+              <DropdownMenuLabel>Actions</DropdownMenuLabel>
+              <DropdownMenuSub>
+                <DropdownMenuSubTrigger>Set Role</DropdownMenuSubTrigger>
+                <DropdownMenuPortal>
+                  <DropdownMenuSubContent>
+                    <DropdownMenuItem onSelect={() => meta.setRole({ did: acctInfo.did, role: "owner" })}>Owner</DropdownMenuItem>
+                    <DropdownMenuItem onSelect={() => meta.setRole({ did: acctInfo.did, role: "member" })}>Member</DropdownMenuItem>
+                  </DropdownMenuSubContent>
+                </DropdownMenuPortal>
+              </DropdownMenuSub>
+              <DropdownMenuItem
+                onClick={() => meta.removeMember(acctInfo.did)}
+              >
+                Remove
+              </DropdownMenuItem>
+              <DropdownMenuSeparator />
+            </>
+          )}
+
           <DropdownMenuItem className="p-0">
             <Link to={`https://blebbit.app/at/${acctInfo.did}`}
               className="py-1.5 w-full text-center"
@@ -123,6 +123,7 @@ export const columns: ColumnDef<GroupRow>[] = [{
 }]
 
 export const GroupView = ({ id }: { id: string }) => {
+  const queryClient = useQueryClient();
   const authr = useAuthr();
   const session = authr.session
 
@@ -143,7 +144,7 @@ export const GroupView = ({ id }: { id: string }) => {
 
       return r.json()
     },
-    enabled: !!(session?.did)
+    // enabled: !!(session?.did)
   })
 
   const acctInfos: any[] = useQueries({
@@ -159,6 +160,93 @@ export const GroupView = ({ id }: { id: string }) => {
     }))
   })
 
+  const addMember = useMutation({
+    mutationFn: async (did) => {
+      console.log("addMember", id, did)
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.addGroupMember`, { 
+        method: 'POST',
+        credentials: 'include', 
+        body: JSON.stringify({
+          groupId: id,
+          role: "member",
+          did,
+        }),
+      })
+      return {
+        groupId: id,
+        role: 'member',
+        did,
+      }
+      // const data = await r.json()
+      // console.log("addMember.response", data)
+      // return data
+    },
+    onSuccess: (data) => {
+      console.log("addMember.onSuccess", data)
+      setTimeout(() => {
+        console.log("addMember.onSuccess.invalidateQueries", id)
+        queryClient.invalidateQueries({ queryKey:['authrGroups', id]})
+      }, 6000)
+    }
+  })
+
+  const setRole = useMutation({
+    mutationFn: async ({did, role}: any) => {
+      console.log("setRole", id, did, role)
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.setGroupMember`, { 
+        method: 'POST',
+        credentials: 'include', 
+        body: JSON.stringify({
+          groupId: id,
+          role,
+          did,
+        }),
+      })
+      console.log("setRole.response", r)
+      // const data = await r.json()
+      return {
+        did,
+        role,
+      }
+    },
+    onSuccess: (data) => {
+      console.log("setRole.onSuccess", data)
+      setTimeout(() => {
+        console.log("setRole.onSuccess.invalidateQueries", id)
+        queryClient.invalidateQueries({ queryKey:['authrGroups', id]})
+      }, 2000)
+    }
+  })
+
+  const removeMember = useMutation({
+    mutationFn: async (did) => {
+      console.log("removeMember", id, did)
+      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.removeGroupMember`, { 
+        method: 'POST',
+        credentials: 'include', 
+        body: JSON.stringify({
+          groupId: id,
+          role: "member",
+          did,
+        }),
+      })
+      // const data = await r.json()
+      // console.log("removeMember.response", data)
+      return {
+        id,
+        did,
+      }
+    },
+    onSuccess: (data) => {
+      console.log("removeMember.onSuccess", data)
+      setTimeout(() => {
+        console.log("removeMember.onSuccess.invalidateQueries", id)
+        queryClient.invalidateQueries({ queryKey:['authrGroups', id]})
+      }, 6000)
+    }
+  })
+
+
 
   if (authrGroup.isLoading || acctInfos.some(info => info.isLoading)) {
     return (
@@ -168,12 +256,12 @@ export const GroupView = ({ id }: { id: string }) => {
     )
   }
 
-  console.log("authrGroup", authrGroup)
-  console.log("authrGroup.data", authrGroup.data)
+  // console.log("authrGroup", authrGroup)
+  // console.log("authrGroup.data", authrGroup.data)
 
   const data = authrGroup.data as any
   const group = data?.groups?.[0] || null
-  console.log("authrGroup.group", group)
+  // console.log("authrGroup.group", group)
   const value = JSON.parse(group?.value || '{}')
 
   if (data?.error) {
@@ -185,8 +273,8 @@ export const GroupView = ({ id }: { id: string }) => {
   }
 
   var relations: GroupRow[] = []
-  if (data.groupRelations && data.groupRelations.length > 0) {
-    relations = data.groupRelations.map((relation: any) => {
+  if (data?.groupRelations && data?.groupRelations.length > 0) {
+    relations = data.groupRelations.map( (relation: any) => {
       const did = relation.relationship.subject.object.objectId.replaceAll("_", ":")
       const info = acctInfos.find(info => info.data?.did === did)
 
@@ -199,8 +287,30 @@ export const GroupView = ({ id }: { id: string }) => {
           info,
         }
       }
-  })
+    })
   }
+
+  console.log("relations", relations)
+
+  const meta = {
+    setRole: setRole.mutate,
+    addMember: addMember.mutate,
+    removeMember: removeMember.mutate,
+    slug: "love",
+    isOwner: data?.groupRelations.some((relation: any) =>
+      relation.relationship.subject.object.objectId.replaceAll("_", ":") === session?.did &&
+      relation.relationship.relation === "owner"
+    ),
+    group,
+    groupId: group?.id,
+  }
+
+  const filters = [{
+    name: "Handle",
+    key: "handle",
+    placeholder: "Filter by handle",
+  }]
+
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -212,9 +322,18 @@ export const GroupView = ({ id }: { id: string }) => {
           <ArrowLeft className="h-6 w-6" />
         </Link>
         <span className="text-3xl font-light">{value.name || value.title}</span>
+        { group.public ?
+          <span className="rounded px-1 py-0 text-[.6rem] text-white bg-green-500 inline-block align-middle max-h-4">public</span>
+          : 
+          <span className="rounded px-1 py-0 text-[.6rem] text-white bg-red-500 inline-block align-middle max-h-4">private</span>
+        }
+
+        <UserSearch 
+          addMember={addMember.mutate}
+        />
       </div>
-      <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={relations} />
+      <div className="container mx-auto">
+        <DataTable columns={columns} data={relations} meta={meta} filters={filters}/>
       </div>
     </div>
   )

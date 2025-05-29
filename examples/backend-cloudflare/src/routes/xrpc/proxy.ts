@@ -14,8 +14,11 @@ export async function xrpcProxy(c: Context) {
 
  // Get authr session details
   const authrSession = c.get("authrSession")
+  const pdsSession = c.get("pdsSession")
   const atSession = c.get("atSession")
-
+  // console.log("xrpcProxy.authrSession", authrSession)
+  // console.log("xrpcProxy.pdsSession", pdsSession)
+  // console.log("xrpcProxy.atSession:", atSession)
 
   // TODO, this is where we need to handle permissions too, if enabled
   // TODO, we only want to use the session pds if the request is for the current user repo...
@@ -24,7 +27,7 @@ export async function xrpcProxy(c: Context) {
   // construct our proxied URL
   const url = new URL(c.req.url)
   let proxyUrl = `${authrSession.pds}${url.pathname}${url.search}`
-  // console.log("xrpcProxy.proxyUrl:", proxyUrl)
+  console.log("xrpProxy.proxyUrl:", proxyUrl)
 
   // setup common headers
   const commonHeaders: any = {
@@ -55,6 +58,7 @@ export async function xrpcProxy(c: Context) {
   if (c.req.method === 'POST') {
     payload1.body = await c.req.text()
   }
+  console.log("xrpcProxy.payload1:", payload1)
 
   // send request, likely to fail with 401 because we need a DPoP nonce
   const resp = await fetch(proxyUrl, payload1)
@@ -77,7 +81,7 @@ export async function xrpcProxy(c: Context) {
           'DPoP': dpop_jwt,
         },
       }
-      console.log("xrpcProxy.payload:", payload2)
+      console.log("xrpcProxy.payload2:", payload2)
       if (c.req.method === 'POST') {
         payload2.body = await c.req.text()
       }
