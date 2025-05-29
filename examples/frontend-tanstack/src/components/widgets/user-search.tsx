@@ -10,7 +10,7 @@ import { cn } from "@/lib/utils";
 export const UserSearch = ({
   addMember,
 }: {
-  addMember?: (did: string) => void;
+  addMember?: any;
 }) => {
   const authr = useAuthr();
   const [searchValue, setSearchValue] = useState<string>("");
