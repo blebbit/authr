@@ -6,7 +6,6 @@ import { xrpcProxy } from './proxy'
 import { createRecord } from '@/lib/storage'
 
 import { createId } from '@paralleldrive/cuid2'
-import { create } from '@atproto/common-web/dist/check'
 
 const POST_COLLECTION = 'app.blebbit.authr.post'
 
@@ -60,7 +59,7 @@ async function getPosts(c: Context) {
     .all()
 
   var posts = result.results as any[]
-  console.log("getPosts.posts", posts)
+  // console.log("getPosts.posts", posts)
 
   // authzed has something about providing a fetch bulk records where they will handle the logic
   //   for getting more results until the page size is met, based on permissions
@@ -70,7 +69,7 @@ async function getPosts(c: Context) {
       return "blog/post:" + post.id
     })
     const permCheck = await checkBulkPermissions(c.env, objs, "read", "blog/user:" + did.replaceAll(":", "_")) as { pairs: any[] }
-    console.log("getPosts.permCheck", JSON.stringify(permCheck, null, 2))
+    // console.log("getPosts.permCheck", JSON.stringify(permCheck, null, 2))
 
     posts = posts.filter((post, index) => {
       const perm = permCheck.pairs[index]

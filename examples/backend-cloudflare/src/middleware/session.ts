@@ -38,6 +38,10 @@ export const sessions = (options: { required: boolean } = { required: false }) =
       }, 401)
     }
 
+    if (pdsSession) {
+      c.set("pdsSession", pdsSession)
+    }
+
     if (authrSession) {
       c.set("authrSession", authrSession)
 
@@ -131,7 +135,6 @@ export async function getPdsSession(c: Context): Promise<any | null> {
     // TODO, store the payload.jti for some TTL so we can ensure not used again
 
     // console.log("getPdsSession.payload", payload)
-    c.set("pdsSession", payload)
     return payload
   }
   return null

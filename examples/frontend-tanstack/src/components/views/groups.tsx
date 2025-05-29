@@ -31,7 +31,7 @@ type GroupRow = {
   extra?: any
 }
 
-export const columns: ColumnDef<GroupRow>[] = [{
+const columns: ColumnDef<GroupRow>[] = [{
   accessorKey: "name",
   header: ({ column }) => {
     return (
@@ -85,7 +85,10 @@ export const columns: ColumnDef<GroupRow>[] = [{
     return (
       <Button
         variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
+        onClick={() => {
+          console.log("toggleSorting", column.getIsSorted())
+          column.toggleSorting(column.getIsSorted() === "asc")
+        }}
       >
         Role 
         <ArrowUpDown className="ml-2 h-4 w-4" />
@@ -113,6 +116,7 @@ export const columns: ColumnDef<GroupRow>[] = [{
               <DropdownMenuItem
                 onClick={async () => {
                   console.log("join", g.name, g.id, table.options.meta)
+                  // @ts-ignore
                   await table.options.meta.joinPublicGroup.mutate(g.id)
                 }}
               >
@@ -121,11 +125,12 @@ export const columns: ColumnDef<GroupRow>[] = [{
             ): null
           }
           {
-            g.public && g.role === "member"
+            g.role === "member"
             ? (
               <DropdownMenuItem
                 onClick={async () => {
                   console.log("leave", g.name, g.id)
+                  // @ts-ignore
                   await table.options.meta.leavePublicGroup.mutate(g.id)
                 }}
               >
@@ -257,11 +262,16 @@ export const GroupsList = () => {
     }
   })
 
+  const filters = [{
+    name: "Name",
+    key: "name",
+    placeholder: "Filter by name",
+  }]
 
   return (
     <div className="flex flex-col gap-4">
       <div className="container mx-auto py-10">
-        <DataTable columns={columns} data={groups} meta={meta}/>
+        <DataTable columns={columns} data={groups} meta={meta} filters={filters}/>
       </div>
     </div>
   );

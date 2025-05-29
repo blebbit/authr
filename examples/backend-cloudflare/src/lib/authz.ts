@@ -15,7 +15,7 @@ async function callAuthz(
   }
 ) {
   const config = getConfig(env);
-  console.log("authz.callAuthz.config", config);
+  // console.log("authz.callAuthz.config", config);
 
   const url = `${config.authz.host}${opts.path}`;
   const fopts: any = {
@@ -31,11 +31,11 @@ async function callAuthz(
     fopts.headers["Content-Type"] = "application/json";
   }
 
-  console.log("authz.callAuthz.url", url);
-  console.log("authz.callAuthz.fopts", fopts);
+  // console.log("authz.callAuthz.url", url);
+  // console.log("authz.callAuthz.fopts", fopts);
 
   const resp = await fetch(url, fopts);
-  console.log("authz.callAuthz.response", resp.status, resp.statusText, resp.headers.get('Location'));
+  // console.log("authz.callAuthz.response", resp.status, resp.statusText, resp.headers.get('Location'));
   return resp
 }
 
@@ -62,7 +62,7 @@ export async function lookupSubjects(
 
   const data = await response.json();
 
-  console.log("authz.lookupSubjects.data", data);
+  // console.log("authz.lookupSubjects.data", data);
 
   return data
 }
@@ -90,7 +90,7 @@ export async function lookupResources(
 
   const data = await response.json();
 
-  console.log("authz.lookupResources.data", data);
+  // console.log("authz.lookupResources.data", data);
 
   return data
 }
@@ -118,7 +118,7 @@ export async function getRelationship(
 
   const data = await response.json();
 
-  console.log("authz.getRelationship.data", data);
+  // console.log("authz.getRelationship.data", data);
 
   return data
 }
@@ -146,7 +146,7 @@ export async function createRelationship(
 
   const data = await response.json();
 
-  console.log("authz.createRelationship.data", data);
+  // console.log("authz.createRelationship.data", data);
 
   return data
 }
@@ -174,7 +174,7 @@ export async function updateRelationship(
 
   const data = await response.json();
 
-  console.log("authz.createRelationship.data", data);
+  // console.log("authz.createRelationship.data", data);
 
   return data
 }
@@ -202,7 +202,7 @@ export async function deleteRelationship(
 
   const data = await response.json();
 
-  console.log("authz.createRelationship.data", data);
+  // console.log("authz.createRelationship.data", data);
 
   return data
 }
@@ -235,7 +235,7 @@ export async function checkPermission(
 
   const data = await response.json();
 
-  console.log("authz.checkPermission.data", data);
+  // console.log("authz.checkPermission.data", data);
 
   return data
 }
@@ -268,7 +268,7 @@ export async function checkBulkPermissions (
 
   const data = await response.json();
 
-  console.log("authz.checkBulkPermissions.data", data);
+  // console.log("authz.checkBulkPermissions.data", data);
 
   return data
 }

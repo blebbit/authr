@@ -187,7 +187,7 @@ async function canWriteMember(c: Context, group: any, role: string, newDid: stri
 
     console.log("canWriteMember.ownerCheck", check)
 
-    if (check && check.response && check.response.item?.permissionship === 2) {
+    if (check?.allowed === "yes") {
       canMod = true
     }
   }
