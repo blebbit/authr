@@ -1,2 +1,2 @@
-import "./entities.zed"
+import "./subjects.zed"
 import "./resources.zed"

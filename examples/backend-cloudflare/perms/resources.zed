@@ -1,4 +1,4 @@
-definition folder {
+partial common {
   // recursive folders
 	relation parent: folder
 
@@ -25,29 +25,10 @@ definition folder {
   permission read = reader + comment + parent->read
 }
 
+definition folder {
+  ...common
+}
+
 definition page {
-  // belongs to a folder
-  relation parent: folder
-
-  // role assignments
-  relation owner: user | group#member
-  relation editor: user | group#member
-  relation reviewer: user | group#member
-  relation commenter: user | group#member
-  relation reader: user | group#member
-
-  // owner like things
-  permission admin = owner + parent->admin
-
-  // editor like things
-  permission write = editor + admin + parent->write
-
-  // reviewer like things
-  permission feedback = reviewer + write + parent->feedback
-
-  // limit who can comment
-  permission comment = commenter + feedback + parent->comment
-
-  // read only
-  permission read = reader + comment + parent->read
+  ...common
 }
