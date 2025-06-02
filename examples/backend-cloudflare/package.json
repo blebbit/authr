@@ -8,6 +8,11 @@
     "db:mig:list:remote": "wrangler d1 migrations list --remote authr-example",
     "db:mig:apply:local": "wrangler d1 migrations apply --local authr-example",
     "db:mig:apply:remote": "wrangler d1 migrations apply --remote authr-example",
+    "perms:preview": "zed preview schema compile perms/index.zed",
+    "perms:test": "cue export perms/tests.cue -f -o perms/tests.yaml && zed validate perms/tests.yaml",
+    "perms:compile": "zed preview schema compile perms/index.zed --out compiled.zed",
+    "perms:write": "zed --endpoint localhost:50051 --token blebbit-spicedb --insecure schema write compiled.zed",
+    "perms:apply": "pnpm perms:compile && pnpm perms:write && rm compiled.zed",
     "deploy": "wrangler deploy --minify",
     "genkey": "tsx ./scripts/gen-service-key.ts"
   },
