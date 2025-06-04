@@ -2,6 +2,7 @@ import { Tabs } from "radix-ui";
 
 import { AtprotoInfo } from "../widgets/atproto-info";
 import { OAuthInfo } from "../widgets/oauth-info";
+import { OauthSession } from "../widgets/oauth-session";
 import { BskyPreferences } from "../widgets/bsky-preferences";
 import { BskyProfile } from "../widgets/bsky-profile";
 
@@ -15,9 +16,12 @@ export const AccountPortal = () => {
         <Tabs.Trigger value="atproto"
           className={tabClass}
         >@ATProto</Tabs.Trigger>
-        <Tabs.Trigger value="oauth"
+        <Tabs.Trigger value="oauth-info"
           className={tabClass}
-        >OAuth</Tabs.Trigger>
+        >OAuth Info</Tabs.Trigger>
+        <Tabs.Trigger value="oauth-session"
+          className={tabClass}
+        >OAuth Session</Tabs.Trigger>
         <Tabs.Trigger value="bsky-profile"
           className={tabClass}
         >Bsky Profile</Tabs.Trigger>
@@ -30,10 +34,15 @@ export const AccountPortal = () => {
       >
         <AtprotoInfo />
       </Tabs.Content>
-      <Tabs.Content value="oauth"
+      <Tabs.Content value="oauth-info"
         className={valClass}
       >
         <OAuthInfo />
+      </Tabs.Content>
+      <Tabs.Content value="oauth-session"
+        className={valClass}
+      >
+        <OauthSession />
       </Tabs.Content>
       <Tabs.Content value="bsky-profile"
         className={valClass}
