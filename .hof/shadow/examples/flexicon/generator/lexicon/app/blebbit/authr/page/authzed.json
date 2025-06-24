@@ -1,0 +1,41 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.authzed",
+  "revision": 1,
+  "description": "Relations and permissions available on pages for the Authr Example",
+  "$authzed": {
+    "relations": {
+      "parent": [
+        "folder"
+      ],
+      "owner": [
+        "user",
+        "group#member"
+      ],
+      "editor": [
+        "user",
+        "group#member"
+      ],
+      "reviewer": [
+        "user",
+        "group#member"
+      ],
+      "commenter": [
+        "user",
+        "group#member"
+      ],
+      "reader": [
+        "user",
+        "group#member"
+      ]
+    },
+    "permissions": {
+      "admin": "owner + parent->admin",
+      "write": "editor + admin + parent->write",
+      "feedback": "reviewer + write + parent->feedback",
+      "comment": "commenter + feedback + parent->comment",
+      "read": "reader + comment + parent->read"
+    }
+  },
+  "defs": {}
+}

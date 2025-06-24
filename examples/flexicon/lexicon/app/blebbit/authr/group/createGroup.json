@@ -1,0 +1,65 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.createGroup",
+  "revision": 1,
+  "description": "create a group",
+  "$flexicon": {
+    "lname": "group",
+    "lplural": "groups"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "admin",
+      "$flexicon": {
+        "action": "create"
+      },
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "display": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          },
+          "required": [
+            "name"
+          ]
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "cuid": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "display": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

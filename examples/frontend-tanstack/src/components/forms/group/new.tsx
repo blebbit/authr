@@ -26,12 +26,10 @@ export function NewGroupForm() {
       console.log(`onSubmit:`, value)
       const b = JSON.stringify({
         public: value.public,
-        record: {
-          name: value.name,
-        }
+        name: value.name,
       })
 
-      const resp = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.createGroup`, {
+      const resp = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.group.createGroup`, {
         method: "POST",
         credentials: "include",
         headers: {
@@ -46,6 +44,13 @@ export function NewGroupForm() {
         alert(data.error)
         return
       }
+      if (resp.status >= 400) {
+        // TODO, update form or page...
+        alert("Failed to create group")
+        return
+      }
+
+      window.location.href = "/groups/" + data.cuid
     },
   })
 

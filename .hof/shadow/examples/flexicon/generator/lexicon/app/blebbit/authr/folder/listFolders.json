@@ -1,0 +1,55 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.folder.listFolders",
+  "revision": 1,
+  "description": "get a folder list",
+  "$flexicon": {
+    "lname": "folder",
+    "lplural": "folders"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "read",
+      "$flexicon": {
+        "action": "list"
+      },
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "folders": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cuid": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

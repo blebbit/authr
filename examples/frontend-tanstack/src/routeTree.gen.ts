@@ -14,9 +14,11 @@ import { Route as rootRoute } from './routes/__root'
 import { Route as SignInImport } from './routes/sign-in'
 import { Route as IndexImport } from './routes/index'
 import { Route as PostsIndexImport } from './routes/posts/index'
+import { Route as PagesIndexImport } from './routes/pages/index'
 import { Route as GroupsIndexImport } from './routes/groups/index'
 import { Route as AccountIndexImport } from './routes/account/index'
 import { Route as PostsNewImport } from './routes/posts/new'
+import { Route as PagesNewImport } from './routes/pages/new'
 import { Route as GroupsNewImport } from './routes/groups/new'
 import { Route as GroupsIdImport } from './routes/groups/$id'
 
@@ -40,6 +42,12 @@ const PostsIndexRoute = PostsIndexImport.update({
   getParentRoute: () => rootRoute,
 } as any)
 
+const PagesIndexRoute = PagesIndexImport.update({
+  id: '/pages/',
+  path: '/pages/',
+  getParentRoute: () => rootRoute,
+} as any)
+
 const GroupsIndexRoute = GroupsIndexImport.update({
   id: '/groups/',
   path: '/groups/',
@@ -55,6 +63,12 @@ const AccountIndexRoute = AccountIndexImport.update({
 const PostsNewRoute = PostsNewImport.update({
   id: '/posts/new',
   path: '/posts/new',
+  getParentRoute: () => rootRoute,
+} as any)
+
+const PagesNewRoute = PagesNewImport.update({
+  id: '/pages/new',
+  path: '/pages/new',
   getParentRoute: () => rootRoute,
 } as any)
 
@@ -102,6 +116,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsNewImport
       parentRoute: typeof rootRoute
     }
+    '/pages/new': {
+      id: '/pages/new'
+      path: '/pages/new'
+      fullPath: '/pages/new'
+      preLoaderRoute: typeof PagesNewImport
+      parentRoute: typeof rootRoute
+    }
     '/posts/new': {
       id: '/posts/new'
       path: '/posts/new'
@@ -123,6 +144,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof GroupsIndexImport
       parentRoute: typeof rootRoute
     }
+    '/pages/': {
+      id: '/pages/'
+      path: '/pages'
+      fullPath: '/pages'
+      preLoaderRoute: typeof PagesIndexImport
+      parentRoute: typeof rootRoute
+    }
     '/posts/': {
       id: '/posts/'
       path: '/posts'
@@ -140,9 +168,11 @@ export interface FileRoutesByFullPath {
   '/sign-in': typeof SignInRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
+  '/pages/new': typeof PagesNewRoute
   '/posts/new': typeof PostsNewRoute
   '/account': typeof AccountIndexRoute
   '/groups': typeof GroupsIndexRoute
+  '/pages': typeof PagesIndexRoute
   '/posts': typeof PostsIndexRoute
 }
 
@@ -151,9 +181,11 @@ export interface FileRoutesByTo {
   '/sign-in': typeof SignInRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
+  '/pages/new': typeof PagesNewRoute
   '/posts/new': typeof PostsNewRoute
   '/account': typeof AccountIndexRoute
   '/groups': typeof GroupsIndexRoute
+  '/pages': typeof PagesIndexRoute
   '/posts': typeof PostsIndexRoute
 }
 
@@ -163,9 +195,11 @@ export interface FileRoutesById {
   '/sign-in': typeof SignInRoute
   '/groups/$id': typeof GroupsIdRoute
   '/groups/new': typeof GroupsNewRoute
+  '/pages/new': typeof PagesNewRoute
   '/posts/new': typeof PostsNewRoute
   '/account/': typeof AccountIndexRoute
   '/groups/': typeof GroupsIndexRoute
+  '/pages/': typeof PagesIndexRoute
   '/posts/': typeof PostsIndexRoute
 }
 
@@ -176,9 +210,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/groups/$id'
     | '/groups/new'
+    | '/pages/new'
     | '/posts/new'
     | '/account'
     | '/groups'
+    | '/pages'
     | '/posts'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -186,9 +222,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/groups/$id'
     | '/groups/new'
+    | '/pages/new'
     | '/posts/new'
     | '/account'
     | '/groups'
+    | '/pages'
     | '/posts'
   id:
     | '__root__'
@@ -196,9 +234,11 @@ export interface FileRouteTypes {
     | '/sign-in'
     | '/groups/$id'
     | '/groups/new'
+    | '/pages/new'
     | '/posts/new'
     | '/account/'
     | '/groups/'
+    | '/pages/'
     | '/posts/'
   fileRoutesById: FileRoutesById
 }
@@ -208,9 +248,11 @@ export interface RootRouteChildren {
   SignInRoute: typeof SignInRoute
   GroupsIdRoute: typeof GroupsIdRoute
   GroupsNewRoute: typeof GroupsNewRoute
+  PagesNewRoute: typeof PagesNewRoute
   PostsNewRoute: typeof PostsNewRoute
   AccountIndexRoute: typeof AccountIndexRoute
   GroupsIndexRoute: typeof GroupsIndexRoute
+  PagesIndexRoute: typeof PagesIndexRoute
   PostsIndexRoute: typeof PostsIndexRoute
 }
 
@@ -219,9 +261,11 @@ const rootRouteChildren: RootRouteChildren = {
   SignInRoute: SignInRoute,
   GroupsIdRoute: GroupsIdRoute,
   GroupsNewRoute: GroupsNewRoute,
+  PagesNewRoute: PagesNewRoute,
   PostsNewRoute: PostsNewRoute,
   AccountIndexRoute: AccountIndexRoute,
   GroupsIndexRoute: GroupsIndexRoute,
+  PagesIndexRoute: PagesIndexRoute,
   PostsIndexRoute: PostsIndexRoute,
 }
 
@@ -239,9 +283,11 @@ export const routeTree = rootRoute
         "/sign-in",
         "/groups/$id",
         "/groups/new",
+        "/pages/new",
         "/posts/new",
         "/account/",
         "/groups/",
+        "/pages/",
         "/posts/"
       ]
     },
@@ -257,6 +303,9 @@ export const routeTree = rootRoute
     "/groups/new": {
       "filePath": "groups/new.tsx"
     },
+    "/pages/new": {
+      "filePath": "pages/new.tsx"
+    },
     "/posts/new": {
       "filePath": "posts/new.tsx"
     },
@@ -265,6 +314,9 @@ export const routeTree = rootRoute
     },
     "/groups/": {
       "filePath": "groups/index.tsx"
+    },
+    "/pages/": {
+      "filePath": "pages/index.tsx"
     },
     "/posts/": {
       "filePath": "posts/index.tsx"

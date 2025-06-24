@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.createPage",
+  "revision": 1,
+  "description": "create a page",
+  "$flexicon": {
+    "lname": "page",
+    "lplural": "pages"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "admin",
+      "$flexicon": {
+        "action": "create"
+      },
+      "type": "procedure",
+      "input": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "cuid": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            },
+            "content": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

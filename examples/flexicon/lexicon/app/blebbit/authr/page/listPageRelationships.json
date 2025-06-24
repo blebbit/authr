@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.listPageRelationships",
+  "revision": 1,
+  "description": "get a list of relationships for a page",
+  "$flexicon": {
+    "lname": "page",
+    "lplural": "pages"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "admin",
+      "$flexicon": {
+        "action": "rel-list"
+      },
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "pages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "subject": {
+                    "type": "string"
+                  },
+                  "relation": {
+                    "type": "string"
+                  },
+                  "resource": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

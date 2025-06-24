@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.folder.deleteFolder",
+  "revision": 1,
+  "description": "delete a folder",
+  "$flexicon": {
+    "lname": "folder",
+    "lplural": "folders"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "admin",
+      "$flexicon": {
+        "action": "delete"
+      },
+      "type": "procedure",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

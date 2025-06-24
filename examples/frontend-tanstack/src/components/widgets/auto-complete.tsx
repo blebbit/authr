@@ -33,7 +33,7 @@ export function AutoComplete<T extends string>({
   onSearchValueChange,
   items,
   isLoading,
-  emptyMessage = "No accounts",
+  emptyMessage = "No accounts or groups",
   placeholder = "Search...",
   disabled = false,
 }: Props<T>) {

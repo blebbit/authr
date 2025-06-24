@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.deleteGroup",
+  "revision": 1,
+  "description": "delete a group",
+  "$flexicon": {
+    "lname": "group",
+    "lplural": "groups"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "admin",
+      "$flexicon": {
+        "action": "delete"
+      },
+      "type": "procedure",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

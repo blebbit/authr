@@ -1,0 +1,32 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.authzed",
+  "revision": 1,
+  "description": "Relations and permissions available on groups for the Authr Example",
+  "$authzed": {
+    "relations": {
+      "parent": [
+        "group"
+      ],
+      "owner": [
+        "user",
+        "group#member"
+      ],
+      "editor": [
+        "user",
+        "group#member"
+      ],
+      "reader": [
+        "user",
+        "group#member"
+      ]
+    },
+    "permissions": {
+      "member": "owner + editor + reader",
+      "admin": "owner + parent->admin",
+      "write": "editor + admin + parent->write",
+      "read": "reader + write + parent->read"
+    }
+  },
+  "defs": {}
+}

@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 import { cn } from "@/lib/utils";
 
-export const UserSearch = ({
+export const AcctSearch = ({
   addMember,
 }: {
   addMember?: any;
@@ -16,13 +16,17 @@ export const UserSearch = ({
   const [searchValue, setSearchValue] = useState<string>("");
   const [selectedValue, setSelectedValue] = useState<string>("");
 
+  // TODO, two queries, one for users, one for groups
   const { data, isLoading } = useQuery({
     queryKey: ["userSearch", searchValue],
     queryFn: async (searchValue) => {
       console.log("autocomplete searchValue", searchValue);
-      const [_, value = ""] = searchValue.queryKey;
+      var [_, value = ""] = searchValue.queryKey;
       if (!value || value.trim() === "") {
         return
+      }
+      if (value.startsWith("@")) {
+        value = value.slice(1); // Remove leading '@' if present
       }
       const r = await fetch(`https://public.api.bsky.app/xrpc/app.bsky.actor.searchActorsTypeahead?q=${value}&limit=8`)
       const data: any = await r.json()
@@ -37,7 +41,7 @@ export const UserSearch = ({
     enabled: !!searchValue && searchValue.trim() !== "",
   });
 
-  const addUser = useMutation({
+  const addMutation = useMutation({
     mutationFn: async () => {
       if (!selectedValue) {
         console.warn("No user selected to add.");
@@ -45,7 +49,7 @@ export const UserSearch = ({
       }
       console.log("Adding user:", selectedValue);
       if (addMember) {
-        addMember(selectedValue);
+        const ret = await addMember(selectedValue);
       } else {
         console.warn("No addMember function provided.");
       }
@@ -54,17 +58,19 @@ export const UserSearch = ({
 
   // console.log("UserSearch.data", isLoading, data);
 
+  // sort groups before users, probably need a way to display what account the group is associated with
+
   const disabled = !selectedValue || isLoading;
 
   return (
-    <div className="flex flex-grow gap-2 justify-end">
+    <>
       <Button
         variant="outline"
         className={cn(
           disabled ? "" : "hover:bg-primary hover:text-primary-foreground",
         )}
         disabled={disabled}
-        onClick={() => addUser.mutate()}
+        onClick={() => addMutation.mutate()}
       >
         Add
       </Button>
@@ -79,9 +85,9 @@ export const UserSearch = ({
         isLoading={isLoading}
         disabled={!authr?.session}
         emptyMessage="No accounts found."
-        placeholder="Handle or DID"
+        placeholder="@handle, @group, or DID"
       />
-    </div>
+    </>
   );
 
 }

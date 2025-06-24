@@ -16,10 +16,11 @@ CREATE TABLE records (
     -- record value
     "value" TEXT NOT NULL, -- JSON
 
-    -- extended ATPRroto stuff, version format still tbd
+    -- extended ATPProto stuff, version format still tbd
+    parent VARCHAR,        -- parent record (if has heirarchy, when != null) (CUID?)
     rver VARCHAR,          -- record version (if has history, when != null) (CUID?)
     lver VARCHAR           -- lexicon version (if the nsid has versioning enabled) (SEMVER?)
 );
 
 -- same constraint as ATProto
-CREATE UNIQUE INDEX "record_main_idx" ON "records"("acct", "nsid", "rkey", "rver");
+CREATE UNIQUE INDEX "record_main_idx" ON "records"("acct", "nsid", "rkey", "rver", "parent");

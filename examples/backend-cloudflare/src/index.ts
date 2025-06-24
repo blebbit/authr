@@ -4,6 +4,7 @@ import { logger } from 'hono/logger'
 import { showRoutes } from 'hono/dev'
 
 import { sessions as authrMiddleware } from './middleware/session'
+import { clients as authrClients } from './middleware/clients'
 import { addRoutes } from './routes'
 import { getDidDoc } from './routes/.well-known/diddoc'
 
@@ -45,6 +46,7 @@ app.use('*', cors({
   credentials: true,
 }))
 
+app.use(authrClients())
 app.use(authrMiddleware(authrConfig))
 // authrRoutes(app)
 

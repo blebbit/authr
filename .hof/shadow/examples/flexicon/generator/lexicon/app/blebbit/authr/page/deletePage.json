@@ -1,0 +1,27 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.deletePage",
+  "revision": 1,
+  "description": "delete a page",
+  "$flexicon": {
+    "lname": "page",
+    "lplural": "pages"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "admin",
+      "$flexicon": {
+        "action": "delete"
+      },
+      "type": "procedure",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

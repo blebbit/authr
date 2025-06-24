@@ -23,11 +23,18 @@ import {
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu"
 
+import {
+  appBlebbitAuthrGroupListGroups,
+  appBlebbitAuthrGroupCreateGroupRelationship,
+  appBlebbitAuthrGroupUpdateGroupRelationship,
+  appBlebbitAuthrGroupDeleteGroupRelationship,
+} from 'authr-example-flexicon/client-ts'
+
 type GroupRow = {
   id: string
   name: string
   public: any
-  role: "owner" | "member" | "n/a"
+  role: "owner" | "editor" | "writer" | "reader" | "n/a"
   extra?: any
 }
 
@@ -125,7 +132,7 @@ const columns: ColumnDef<GroupRow>[] = [{
             ): null
           }
           {
-            g.role === "member"
+            g.role !== "n/a"
             ? (
               <DropdownMenuItem
                 onClick={async () => {
@@ -164,45 +171,28 @@ export const GroupsList = () => {
   const authrGroups = useQuery({
     queryKey: [session?.handle, 'authrGroups'],
     queryFn: async () => {
-      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.getGroups`, { credentials: 'include' })
-      return r.json()
+      return appBlebbitAuthrGroupListGroups({})
     },
     enabled: !!(session?.did)
   })
 
   const joinPublicGroup = useMutation({
-    mutationFn: async (groupId) => {
-      console.log("joinPublicGroup", groupId, session?.did)
-      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.addGroupMember`, { 
-        method: 'POST',
-        credentials: 'include', 
-        body: JSON.stringify({
-          groupId,
-          role: "member",
-          did: session?.did,
-        }),
+    mutationFn: async (groupId: string) => {
+      return appBlebbitAuthrGroupCreateGroupRelationship({
+        resource: groupId,
+        relation: "reader",
+        subject: session?.did,
       })
-      const data = await r.json()
-      console.log("joinPublicGroup.response", data)
-      return data
     },
   })
 
   const leavePublicGroup = useMutation({
-    mutationFn: async (groupId) => {
+    mutationFn: async (groupId: string) => {
       console.log("leavePublicGroup", groupId, session?.did)
-      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.removeGroupMember`, { 
-        method: 'POST',
-        credentials: 'include', 
-        body: JSON.stringify({
-          groupId,
-          role: "member",
-          did: session?.did,
-        }),
+      return appBlebbitAuthrGroupDeleteGroupRelationship({
+        resource: groupId,
+        subject: session?.did,
       })
-      const data = await r.json()
-      console.log("leavePublicGroup.response", data)
-      return data
     },
   })
 

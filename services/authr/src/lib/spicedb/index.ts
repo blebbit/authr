@@ -81,7 +81,7 @@ export async function lookupSubjects(objectType: string, permission?: string, su
     payload.subjectObjectType = subjectType.split(":")[0];
   }
 
-  console.log("lookupSubjects.payload", payload);
+  // console.log("lookupSubjects.payload", payload);
 
   const request = spice.LookupSubjectsRequest.create(payload)
 
@@ -131,24 +131,25 @@ export async function checkPermission(objectType: string, permission: string, su
   const checkPermissionRequest = createCheckPermissionRequest(objectType, permission, subjectType);
   const response = await promises.checkPermission(checkPermissionRequest);
   if (response?.permissionship === spice.CheckPermissionResponse_Permissionship.HAS_PERMISSION) {
-    console.log("true");
+    // console.log("true");
     return { allowed: "yes" };
   } else if (response?.permissionship === spice.CheckPermissionResponse_Permissionship.NO_PERMISSION) {
-    console.log("false");
+    // console.log("false");
     return { allowed: "no" };
   } else if (response?.permissionship === spice.CheckPermissionResponse_Permissionship.CONDITIONAL_PERMISSION) {
-    console.log("conditional");
+    // console.log("conditional");
     return { allowed: "conditional" };
   } else if (response?.permissionship === spice.CheckPermissionResponse_Permissionship.UNSPECIFIED) {
-    console.log("unspecified");
+    // console.log("unspecified");
     return { allowed: "unspecified" };
   } else {
-    console.log("unknown");
+    // console.log("unknown");
     return { allowed: "unknown" };
   }
 }
 
 export function createBulkReference(objectTypes: string[], permission: string, subjectType: string) {
+  // console.log("createBulkReference", objectTypes, permission, subjectType);
   const subject = createSubjectReference(subjectType);
   return objectTypes.map((objectType) => {
     const [objectTypeName, objectId] = objectType.split(":");
@@ -175,7 +176,7 @@ export function createBulkCheckPermissionRequest(objectTypes: string[], permissi
 export async function checkBulkPermission(objectTypes: string[], permission: string, subjectType: string) {
   const checkPermissionRequest = createBulkCheckPermissionRequest(objectTypes, permission, subjectType);
   const response = await promises.bulkCheckPermission(checkPermissionRequest);
-  console.log("checkBulkPermission", response);
+  // console.log("checkBulkPermission", response);
   return response;
   // if (response?.permissionship === spice.CheckPermissionResponse_Permissionship.HAS_PERMISSION) {
   //   console.log("true");
