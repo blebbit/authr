@@ -28,9 +28,12 @@ importers:
       '@paralleldrive/cuid2':
         specifier: ^2.2.2
         version: 2.2.2
+      authr-example-flexicon:
+        specifier: workspace:*
+        version: link:../flexicon
       hono:
         specifier: ^4.7.8
-        version: 4.7.10
+        version: 4.7.11
       jose:
         specifier: ^6.0.11
         version: 6.0.11
@@ -43,10 +46,19 @@ importers:
       unenv:
         specifier: ^1.10.0
         version: 1.10.0
+      zod:
+        specifier: ^3.25.64
+        version: 3.25.64
     devDependencies:
+      '@atproto/api':
+        specifier: ^0.15.8
+        version: 0.15.14
       '@types/node':
         specifier: ^22.15.19
         version: 22.15.21
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
       tsx:
         specifier: ^4.19.4
         version: 4.19.4
@@ -57,144 +69,141 @@ importers:
         specifier: ~4.15
         version: 4.15.2
 
-  examples/frontend:
+  examples/flexicon:
     dependencies:
+      '@paralleldrive/cuid2':
+        specifier: ^2.2.2
+        version: 2.2.2
+      hono:
+        specifier: ^4.7.11
+        version: 4.7.11
+    devDependencies:
+      '@atproto/api':
+        specifier: ^0.15.14
+        version: 0.15.14
       '@atproto/common-web':
         specifier: ^0.4.2
         version: 0.4.2
       '@blebbit/authr-react-common':
         specifier: workspace:*
         version: link:../../packages/authr-react-common
-      '@blebbit/authr-react-tanstack':
-        specifier: workspace:*
-        version: link:../../packages/authr-react-tanstack
-      '@hookform/resolvers':
-        specifier: ^5.0.1
-        version: 5.0.1(react-hook-form@7.56.4(react@19.1.0))
+      '@eslint/js':
+        specifier: ^9.25.0
+        version: 9.27.0
+      '@microsoft/api-extractor':
+        specifier: ^7.52.8
+        version: 7.52.8(@types/node@22.15.21)
       '@radix-ui/react-dropdown-menu':
         specifier: ^2.1.15
         version: 2.1.15(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@radix-ui/react-label':
-        specifier: ^2.1.4
-        version: 2.1.7(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@radix-ui/react-slot':
-        specifier: ^1.2.0
-        version: 1.2.3(@types/react@19.1.5)(react@19.1.0)
-      '@radix-ui/react-switch':
-        specifier: ^1.2.4
-        version: 1.2.5(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tailwindcss/vite':
-        specifier: ^4.0.6
+        specifier: ^4.1.7
         version: 4.1.7(vite@6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4))
       '@tanstack/react-form':
-        specifier: ^1.11.1
+        specifier: ^1.11.3
         version: 1.11.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tanstack/react-query':
         specifier: ^5.76.1
         version: 5.76.2(react@19.1.0)
       '@tanstack/react-router':
-        specifier: ^1.119.0
+        specifier: ^1.120.5
         version: 1.120.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@tanstack/react-router-devtools':
-        specifier: ^1.114.3
-        version: 1.120.9(@tanstack/react-router@1.120.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(@tanstack/router-core@1.120.9)(csstype@3.1.3)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)(tiny-invariant@1.3.3)
-      '@tanstack/react-table':
-        specifier: ^8.21.3
-        version: 8.21.3(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@tanstack/router-plugin':
-        specifier: ^1.114.3
-        version: 1.120.9(@tanstack/react-router@1.120.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0))(vite@6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4))
+      '@testing-library/jest-dom':
+        specifier: ^6.6.3
+        version: 6.6.3
+      '@testing-library/react':
+        specifier: ^16.3.0
+        version: 16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@types/react':
+        specifier: ^19.1.2
+        version: 19.1.5
+      '@types/react-dom':
+        specifier: ^19.1.2
+        version: 19.1.5(@types/react@19.1.5)
       '@uidotdev/usehooks':
         specifier: ^2.4.1
         version: 2.4.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@vitejs/plugin-react-swc':
+        specifier: ^3.9.0
+        version: 3.10.0(vite@6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4))
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
       clsx:
         specifier: ^2.1.1
         version: 2.1.1
+      dotenv:
+        specifier: ^16.5.0
+        version: 16.5.0
+      eslint:
+        specifier: ^9.25.0
+        version: 9.27.0(jiti@2.4.2)
+      eslint-plugin-react-hooks:
+        specifier: ^5.2.0
+        version: 5.2.0(eslint@9.27.0(jiti@2.4.2))
+      eslint-plugin-react-refresh:
+        specifier: ^0.4.19
+        version: 0.4.20(eslint@9.27.0(jiti@2.4.2))
+      globals:
+        specifier: ^16.0.0
+        version: 16.1.0
       jose:
         specifier: ^6.0.11
         version: 6.0.11
-      lucide:
-        specifier: ^0.509.0
-        version: 0.509.0
+      jsdom:
+        specifier: ^26.1.0
+        version: 26.1.0
       lucide-react:
         specifier: ^0.503.0
         version: 0.503.0(react@19.1.0)
+      nodemon:
+        specifier: ^3.1.10
+        version: 3.1.10
+      postcss:
+        specifier: ^8.5.3
+        version: 8.5.3
       radix-ui:
         specifier: ^1.4.2
         version: 1.4.2(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       react:
-        specifier: ^19.0.0
+        specifier: ^19.1.0
         version: 19.1.0
       react-cookie:
         specifier: ^8.0.1
         version: 8.0.1(react@19.1.0)
       react-dom:
-        specifier: ^19.0.0
+        specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
-      react-hook-form:
-        specifier: ^7.56.1
-        version: 7.56.4(react@19.1.0)
       tailwind-merge:
-        specifier: ^3.2.0
+        specifier: ^3.3.0
         version: 3.3.0
       tailwindcss:
-        specifier: ^4.0.6
+        specifier: ^4.1.7
         version: 4.1.7
-      unenv:
-        specifier: ^1.10.0
-        version: 1.10.0
-      zod:
-        specifier: ^3.24.3
-        version: 3.25.28
-    devDependencies:
-      '@cloudflare/vite-plugin':
-        specifier: ^1.1.1
-        version: 1.2.4(rollup@4.40.2)(vite@6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4))(workerd@1.20250508.0)(wrangler@4.15.2)
-      '@tanstack/react-query-devtools':
-        specifier: ^5.75.0
-        version: 5.76.2(@tanstack/react-query@5.76.2(react@19.1.0))(react@19.1.0)
-      '@testing-library/dom':
-        specifier: ^10.4.0
-        version: 10.4.0
-      '@testing-library/react':
-        specifier: ^16.2.0
-        version: 16.3.0(@testing-library/dom@10.4.0)(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@types/node':
-        specifier: ^22.15.3
-        version: 22.15.21
-      '@types/react':
-        specifier: ^19.0.8
-        version: 19.1.5
-      '@types/react-dom':
-        specifier: ^19.0.3
-        version: 19.1.5(@types/react@19.1.5)
-      '@vitejs/plugin-react':
-        specifier: ^4.3.4
-        version: 4.5.0(vite@6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4))
-      jsdom:
-        specifier: ^26.0.0
-        version: 26.1.0
       tw-animate-css:
-        specifier: ^1.2.8
+        specifier: ^1.3.0
         version: 1.3.0
       typescript:
-        specifier: ^5.7.2
+        specifier: ~5.8.3
         version: 5.8.3
+      typescript-eslint:
+        specifier: ^8.30.1
+        version: 8.32.1(eslint@9.27.0(jiti@2.4.2))(typescript@5.8.3)
       vite:
         specifier: ^6.3.5
         version: 6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)
+      vite-plugin-dts:
+        specifier: ^4.5.4
+        version: 4.5.4(@types/node@22.15.21)(rollup@4.40.2)(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4))
+      vite-tsconfig-paths:
+        specifier: ^5.1.4
+        version: 5.1.4(typescript@5.8.3)(vite@6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4))
       vitest:
-        specifier: ^3.0.5
+        specifier: ^3.1.3
         version: 3.1.4(@types/node@22.15.21)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.19.4)
-      web-vitals:
-        specifier: ^4.2.4
-        version: 4.2.4
-      wrangler:
-        specifier: ~4.15
-        version: 4.15.2
+      zod:
+        specifier: ^3.25.28
+        version: 3.25.64
 
   examples/frontend-tanstack:
     dependencies:
@@ -210,9 +219,15 @@ importers:
       '@hookform/resolvers':
         specifier: ^5.0.1
         version: 5.0.1(react-hook-form@7.56.4(react@19.1.0))
+      '@radix-ui/react-accordion':
+        specifier: ^1.2.11
+        version: 1.2.11(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-avatar':
         specifier: ^1.1.10
         version: 1.1.10(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@radix-ui/react-collapsible':
+        specifier: ^1.1.11
+        version: 1.1.11(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-dialog':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -225,12 +240,18 @@ importers:
       '@radix-ui/react-popover':
         specifier: ^1.1.14
         version: 1.1.14(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@radix-ui/react-separator':
+        specifier: ^1.1.7
+        version: 1.1.7(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@radix-ui/react-slot':
-        specifier: ^1.2.0
+        specifier: ^1.2.3
         version: 1.2.3(@types/react@19.1.5)(react@19.1.0)
       '@radix-ui/react-switch':
         specifier: ^1.2.4
         version: 1.2.5(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      '@radix-ui/react-tooltip':
+        specifier: ^1.2.7
+        version: 1.2.7(@types/react-dom@19.1.5(@types/react@19.1.5))(@types/react@19.1.5)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@tailwindcss/vite':
         specifier: ^4.0.6
         version: 4.1.7(vite@6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4))
@@ -255,6 +276,9 @@ importers:
       '@uidotdev/usehooks':
         specifier: ^2.4.1
         version: 2.4.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
+      authr-example-flexicon:
+        specifier: workspace:*
+        version: link:../flexicon
       class-variance-authority:
         specifier: ^0.7.1
         version: 0.7.1
@@ -279,6 +303,9 @@ importers:
       react:
         specifier: ^19.0.0
         version: 19.1.0
+      react-complex-tree:
+        specifier: ^2.6.0
+        version: 2.6.0(react@19.1.0)
       react-cookie:
         specifier: ^8.0.1
         version: 8.0.1(react@19.1.0)
@@ -298,8 +325,8 @@ importers:
         specifier: ^1.10.0
         version: 1.10.0
       zod:
-        specifier: ^3.24.3
-        version: 3.25.28
+        specifier: ^3.25.64
+        version: 3.25.64
     devDependencies:
       '@cloudflare/vite-plugin':
         specifier: ^1.1.1
@@ -558,7 +585,7 @@ importers:
         version: 3.1.4(@types/node@22.15.21)(jiti@2.4.2)(jsdom@26.1.0)(lightningcss@1.30.1)(tsx@4.19.4)
       zod:
         specifier: ^3.25.28
-        version: 3.25.28
+        version: 3.25.64
 
   services/authr:
     dependencies:
@@ -570,7 +597,7 @@ importers:
         version: 0.2.0
       '@atproto/api':
         specifier: ^0.15.5
-        version: 0.15.8
+        version: 0.15.14
       '@atproto/jwk':
         specifier: ^0.1.5
         version: 0.1.5
@@ -597,13 +624,13 @@ importers:
         version: 0.0.5
       '@hono/node-server':
         specifier: ^1.14.2
-        version: 1.14.2(hono@4.7.10)
+        version: 1.14.2(hono@4.7.11)
       dotenv:
         specifier: ^16.5.0
         version: 16.5.0
       hono:
-        specifier: ^4.7.9
-        version: 4.7.10
+        specifier: ^4.7.11
+        version: 4.7.11
       jose:
         specifier: ^6.0.11
         version: 6.0.11
@@ -671,11 +698,11 @@ packages:
   '@atproto-labs/simple-store@0.2.0':
     resolution: {integrity: sha512-0bRbAlI8Ayh03wRwncAMEAyUKtZ+AuTS1jgPrfym1WVOAOiottI/ZmgccqLl6w5MbxVcClNQF7WYGKvGwGoIhA==}
 
+  '@atproto/api@0.15.14':
+    resolution: {integrity: sha512-FHEMAdscG+r2OFcZUIzPyTDpwzRAyinRsIIaTcuqe0MgZWF4CEGNAKPos0IbecBzMxTOzUHE18dQDKhoXMdgvg==}
+
   '@atproto/api@0.15.3':
     resolution: {integrity: sha512-HrNaKWHZoVv4pxrt5ITyqG/f1veEitm6Egrvs4ZaDS1FyYDLNVdgLDr4ccW76iFs8ja1xQuQtZNakHbgQUN92w==}
-
-  '@atproto/api@0.15.8':
-    resolution: {integrity: sha512-PsCgmV4zPjN8VuJMruxqauhn88PuS0b8t2Xsjl4617+bCPpY513jVlxgNH/XExxO7TSVvJM7EzdLY4o3fqh/xQ==}
 
   '@atproto/common-web@0.4.2':
     resolution: {integrity: sha512-vrXwGNoFGogodjQvJDxAeP3QbGtawgZute2ed1XdRO0wMixLk3qewtikZm06H259QDJVu6voKC5mubml+WgQUw==}
@@ -3432,8 +3459,8 @@ packages:
   hoist-non-react-statics@3.3.2:
     resolution: {integrity: sha512-/gGivxi8JPKWNm/W0jSmzcMPpfpPLc3dY/6GxhX2hQ9iGj3aDfklV4ET7NjKpSinLpJ5vafa9iiGIEZg10SfBw==}
 
-  hono@4.7.10:
-    resolution: {integrity: sha512-QkACju9MiN59CKSY5JsGZCYmPZkA6sIW6OFCUp7qDjZu6S6KHtJHhAc9Uy9mV9F8PJ1/HQ3ybZF2yjCa/73fvQ==}
+  hono@4.7.11:
+    resolution: {integrity: sha512-rv0JMwC0KALbbmwJDEnxvQCeJh+xbS3KEWW5PC9cMJ08Ur9xgatI0HmtgYZfOdOSOeYsp5LO2cOhdI8cLEbDEQ==}
     engines: {node: '>=16.9.0'}
 
   html-encoding-sniffer@4.0.0:
@@ -4119,6 +4146,11 @@ packages:
   raw-body@2.5.2:
     resolution: {integrity: sha512-8zGqypfENjCIqGhgXToC8aB2r7YrBX+AQAfIPs/Mlk+BtPTztOvTS01NRW/3Eh60J+a48lt8qsCzirQ6loCVfA==}
     engines: {node: '>= 0.8'}
+
+  react-complex-tree@2.6.0:
+    resolution: {integrity: sha512-kDDuWih5VUz9cXgTKGnDBnMMoM4lvbn3/yCPs2D0jI9Z724BNeraeA5yBqyKqbIRhESQOlCyAyYW9WUqljFP1Q==}
+    peerDependencies:
+      react: '>=16.0.0'
 
   react-cookie@8.0.1:
     resolution: {integrity: sha512-QNdAd0MLuAiDiLcDU/2s/eyKmmfMHtjPUKJ2dZ/5CcQ9QKUium4B3o61/haq6PQl/YWFqC5PO8GvxeHKhy3GFA==}
@@ -4851,8 +4883,8 @@ packages:
   zod@3.22.3:
     resolution: {integrity: sha512-EjIevzuJRiRPbVH4mGc8nApb/lVLKVpmUhAaR5R5doKGfAnGJ6Gr3CViAVjP+4FWSxCsybeWQdcgCtbX+7oZug==}
 
-  zod@3.25.28:
-    resolution: {integrity: sha512-/nt/67WYKnr5by3YS7LroZJbtcCBurDKKPBPWWzaxvVCGuG/NOsiKkrjoOhI8mJ+SQUXEbUzeB3S+6XDUEEj7Q==}
+  zod@3.25.64:
+    resolution: {integrity: sha512-hbP9FpSZf7pkS7hRVUrOjhwKJNyampPgtXKc3AN6DsWtoHsg2Sb4SQaS4Tcay380zSwd2VPo9G9180emBACp5g==}
 
 snapshots:
 
@@ -4878,7 +4910,7 @@ snapshots:
       '@atproto-labs/simple-store': 0.2.0
       '@atproto-labs/simple-store-memory': 0.1.3
       '@atproto/did': 0.1.5
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto-labs/fetch-node@0.1.9':
     dependencies:
@@ -4902,7 +4934,7 @@ snapshots:
       '@atproto-labs/simple-store': 0.2.0
       '@atproto-labs/simple-store-memory': 0.1.3
       '@atproto/did': 0.1.5
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto-labs/identity-resolver@0.1.17':
     dependencies:
@@ -4919,6 +4951,17 @@ snapshots:
 
   '@atproto-labs/simple-store@0.2.0': {}
 
+  '@atproto/api@0.15.14':
+    dependencies:
+      '@atproto/common-web': 0.4.2
+      '@atproto/lexicon': 0.4.11
+      '@atproto/syntax': 0.4.0
+      '@atproto/xrpc': 0.7.0
+      await-lock: 2.2.2
+      multiformats: 9.9.0
+      tlds: 1.258.0
+      zod: 3.25.64
+
   '@atproto/api@0.15.3':
     dependencies:
       '@atproto/common-web': 0.4.2
@@ -4928,25 +4971,14 @@ snapshots:
       await-lock: 2.2.2
       multiformats: 9.9.0
       tlds: 1.258.0
-      zod: 3.25.28
-
-  '@atproto/api@0.15.8':
-    dependencies:
-      '@atproto/common-web': 0.4.2
-      '@atproto/lexicon': 0.4.11
-      '@atproto/syntax': 0.4.0
-      '@atproto/xrpc': 0.7.0
-      await-lock: 2.2.2
-      multiformats: 9.9.0
-      tlds: 1.258.0
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/common-web@0.4.2':
     dependencies:
       graphemer: 1.4.0
       multiformats: 9.9.0
       uint8arrays: 3.0.0
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/common@0.4.11':
     dependencies:
@@ -4965,7 +4997,7 @@ snapshots:
 
   '@atproto/did@0.1.5':
     dependencies:
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/identity@0.4.8':
     dependencies:
@@ -4981,12 +5013,12 @@ snapshots:
     dependencies:
       '@atproto/jwk': 0.1.5
       '@atproto/jwk-jose': 0.1.6
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/jwk@0.1.5':
     dependencies:
       multiformats: 9.9.0
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/lexicon@0.4.11':
     dependencies:
@@ -4994,7 +5026,7 @@ snapshots:
       '@atproto/syntax': 0.4.0
       iso-datestring-validator: 2.2.2
       multiformats: 9.9.0
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/oauth-client@0.3.17':
     dependencies:
@@ -5009,12 +5041,12 @@ snapshots:
       '@atproto/oauth-types': 0.2.7
       '@atproto/xrpc': 0.7.0
       multiformats: 9.9.0
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/oauth-types@0.2.7':
     dependencies:
       '@atproto/jwk': 0.1.5
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/syntax@0.4.0': {}
 
@@ -5031,7 +5063,7 @@ snapshots:
       rate-limiter-flexible: 2.4.2
       uint8arrays: 3.0.0
       ws: 8.18.2
-      zod: 3.25.28
+      zod: 3.25.64
     transitivePeerDependencies:
       - bufferutil
       - supports-color
@@ -5040,12 +5072,12 @@ snapshots:
   '@atproto/xrpc@0.6.12':
     dependencies:
       '@atproto/lexicon': 0.4.11
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@atproto/xrpc@0.7.0':
     dependencies:
       '@atproto/lexicon': 0.4.11
-      zod: 3.25.28
+      zod: 3.25.64
 
   '@authzed/authzed-node@1.3.1':
     dependencies:
@@ -5427,9 +5459,9 @@ snapshots:
       protobufjs: 7.5.2
       yargs: 17.7.2
 
-  '@hono/node-server@1.14.2(hono@4.7.10)':
+  '@hono/node-server@1.14.2(hono@4.7.11)':
     dependencies:
-      hono: 4.7.10
+      hono: 4.7.11
 
   '@hookform/resolvers@5.0.1(react-hook-form@7.56.4(react@19.1.0))':
     dependencies:
@@ -6716,7 +6748,7 @@ snapshots:
       '@tanstack/virtual-file-routes': 1.115.0
       prettier: 3.5.3
       tsx: 4.19.4
-      zod: 3.25.28
+      zod: 3.25.64
     optionalDependencies:
       '@tanstack/react-router': 1.120.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
 
@@ -6738,7 +6770,7 @@ snapshots:
       babel-dead-code-elimination: 1.0.10
       chokidar: 3.6.0
       unplugin: 2.3.4
-      zod: 3.25.28
+      zod: 3.25.64
     optionalDependencies:
       '@tanstack/react-router': 1.120.9(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       vite: 6.3.5(@types/node@22.15.21)(jiti@2.4.2)(lightningcss@1.30.1)(tsx@4.19.4)
@@ -7754,7 +7786,7 @@ snapshots:
     dependencies:
       react-is: 16.13.1
 
-  hono@4.7.10: {}
+  hono@4.7.11: {}
 
   html-encoding-sniffer@4.0.0:
     dependencies:
@@ -8441,6 +8473,10 @@ snapshots:
       http-errors: 2.0.0
       iconv-lite: 0.4.24
       unpipe: 1.0.0
+
+  react-complex-tree@2.6.0(react@19.1.0):
+    dependencies:
+      react: 19.1.0
 
   react-cookie@8.0.1(react@19.1.0):
     dependencies:
@@ -9170,4 +9206,4 @@ snapshots:
 
   zod@3.22.3: {}
 
-  zod@3.25.28: {}
+  zod@3.25.64: {}

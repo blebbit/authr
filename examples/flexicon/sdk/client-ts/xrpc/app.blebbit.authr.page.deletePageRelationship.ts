@@ -1,0 +1,25 @@
+import { xrpcCall } from "./call";
+
+import {
+  type APP_BLEBBIT_AUTHR_PAGE_DELETE_PAGE_RELATIONSHIP_INPUT,
+  APP_BLEBBIT_AUTHR_PAGE_DELETE_PAGE_RELATIONSHIP_INPUT_SCHEMA,
+} from "../../common-ts";
+
+export async function appBlebbitAuthrPageDeletePageRelationship(
+  payload: APP_BLEBBIT_AUTHR_PAGE_DELETE_PAGE_RELATIONSHIP_INPUT,
+): Promise<any> {
+  // check payload
+  const payloadCheck =
+    APP_BLEBBIT_AUTHR_PAGE_DELETE_PAGE_RELATIONSHIP_INPUT_SCHEMA.safeParse(
+      payload,
+    );
+  if (!payloadCheck.success) {
+    return payloadCheck.error.issues;
+  }
+
+  return xrpcCall({
+    nsid: "app.blebbit.authr.page.deletePageRelationship",
+    method: "POST",
+    payload,
+  });
+}

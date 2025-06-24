@@ -3,7 +3,7 @@ import { Link } from "@tanstack/react-router"
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query"
 
 import { type ColumnDef } from "@tanstack/react-table"
-import { UserSearch } from "@/components/widgets/user-search";
+import { AcctSearch } from "@/components/widgets/acct-search";
 import { DataTable } from "@/components/widgets/data-table"
 
 import { 
@@ -24,6 +24,17 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu"
+
+import {
+  APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_DOC
+} from 'authr-example-flexicon/common-ts'
+
+import {
+  appBlebbitAuthrGroupGetGroup,
+  appBlebbitAuthrGroupCreateGroupRelationship,
+  appBlebbitAuthrGroupUpdateGroupRelationship,
+  appBlebbitAuthrGroupDeleteGroupRelationship,
+} from 'authr-example-flexicon/client-ts'
 
 type GroupRow = {
   did: string
@@ -80,6 +91,8 @@ export const columns: ColumnDef<GroupRow>[] = [{
     const meta = table.options.meta as any
     const acctInfo = row.original
 
+    const roles = ["owner", "editor", "reader"]
+
     return (
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
@@ -97,8 +110,14 @@ export const columns: ColumnDef<GroupRow>[] = [{
                 <DropdownMenuSubTrigger>Set Role</DropdownMenuSubTrigger>
                 <DropdownMenuPortal>
                   <DropdownMenuSubContent>
-                    <DropdownMenuItem onSelect={() => meta.setRole({ did: acctInfo.did, role: "owner" })}>Owner</DropdownMenuItem>
-                    <DropdownMenuItem onSelect={() => meta.setRole({ did: acctInfo.did, role: "member" })}>Member</DropdownMenuItem>
+                    {roles.map(role => (
+                      <DropdownMenuItem
+                        key={role}
+                        onSelect={() => meta.setRole({ did: acctInfo.did, role })}
+                      >
+                        {role.charAt(0).toUpperCase() + role.slice(1)}
+                      </DropdownMenuItem>
+                    ))}
                   </DropdownMenuSubContent>
                 </DropdownMenuPortal>
               </DropdownMenuSub>
@@ -128,58 +147,39 @@ export const GroupView = ({ id }: { id: string }) => {
   const session = authr.session
 
   const authrGroup: any = useQuery({
-    queryKey: ['authrGroups', id],
+    queryKey: [APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_DOC.id, id],
     queryFn: async () => {
-
-      const r = await fetch(
-        `${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.getGroup?id=${id}`,
-      {
-          credentials: 'include',
-          headers: {
-            // 'x-authr-recursive-proxy': 'true',
-            // 'atproto-proxy': "did:web:api.authr.blebbit.dev#authr_appview"
-          }
-        }
-      )
-
-      return r.json()
+      return appBlebbitAuthrGroupGetGroup({
+        id,
+      })
     },
     // enabled: !!(session?.did)
   })
 
   const acctInfos: any[] = useQueries({
-    queries: (authrGroup.data?.groupRelations || []).map((relation: any) => ({
-      queryKey: [relation.relationship.subject.object.objectId, 'info'],
-      queryFn: async () => {
-        const did = relation.relationship.subject.object.objectId.replaceAll("_", ":")
-        const r = await fetch(`https://plc.blebbit.dev/info/${did}`)
+    queries: (authrGroup.data?.groupRelations || []).map((relation: any) => {
+      const did = relation.relationship.subject.object.objectId.replaceAll("_", ":")
+      return ({
+        queryKey: [did, 'info'],
+        queryFn: async () => {
+          const r = await fetch(`https://plc.blebbit.dev/info/${did}`)
 
-        return r.json()
-      },
-      // enabled: !!(relation.relationship.subject.object.objectId)
-    }))
+          return r.json()
+        },
+        staleTime: 5 * 60 * 1000,
+        // enabled: !!(relation.relationship.subject.object.objectId)
+      })
+    })
   })
 
   const addMember = useMutation({
-    mutationFn: async (did) => {
+    mutationFn: async (did: string) => {
       console.log("addMember", id, did)
-      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.addGroupMember`, { 
-        method: 'POST',
-        credentials: 'include', 
-        body: JSON.stringify({
-          groupId: id,
-          role: "member",
-          did,
-        }),
+      return appBlebbitAuthrGroupCreateGroupRelationship({
+        resource: id,
+        relation: "reader",
+        subject: did,
       })
-      return {
-        groupId: id,
-        role: 'member',
-        did,
-      }
-      // const data = await r.json()
-      // console.log("addMember.response", data)
-      // return data
     },
     onSuccess: (data) => {
       console.log("addMember.onSuccess", data)
@@ -191,23 +191,13 @@ export const GroupView = ({ id }: { id: string }) => {
   })
 
   const setRole = useMutation({
-    mutationFn: async ({did, role}: any) => {
+    mutationFn: async ({did, role}: {did: string, role: string}) => {
       console.log("setRole", id, did, role)
-      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.setGroupMember`, { 
-        method: 'POST',
-        credentials: 'include', 
-        body: JSON.stringify({
-          groupId: id,
-          role,
-          did,
-        }),
+      return appBlebbitAuthrGroupUpdateGroupRelationship({
+        resource: id,
+        relation: role,
+        subject: did,
       })
-      console.log("setRole.response", r)
-      // const data = await r.json()
-      return {
-        did,
-        role,
-      }
     },
     onSuccess: (data) => {
       console.log("setRole.onSuccess", data)
@@ -219,23 +209,12 @@ export const GroupView = ({ id }: { id: string }) => {
   })
 
   const removeMember = useMutation({
-    mutationFn: async (did) => {
+    mutationFn: async (did: string) => {
       console.log("removeMember", id, did)
-      const r = await fetch(`${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.removeGroupMember`, { 
-        method: 'POST',
-        credentials: 'include', 
-        body: JSON.stringify({
-          groupId: id,
-          role: "member",
-          did,
-        }),
+      return appBlebbitAuthrGroupDeleteGroupRelationship({
+        resource: id,
+        subject: did,
       })
-      // const data = await r.json()
-      // console.log("removeMember.response", data)
-      return {
-        id,
-        did,
-      }
     },
     onSuccess: (data) => {
       console.log("removeMember.onSuccess", data)
@@ -260,9 +239,10 @@ export const GroupView = ({ id }: { id: string }) => {
   // console.log("authrGroup.data", authrGroup.data)
 
   const data = authrGroup.data as any
-  const group = data?.groups?.[0] || null
-  // console.log("authrGroup.group", group)
+  const group = data?.group || null
+  console.log("authrGroup.group", group)
   const value = JSON.parse(group?.value || '{}')
+  console.log("authrGroup.value", value)
 
   if (data?.error) {
     return (
@@ -328,9 +308,11 @@ export const GroupView = ({ id }: { id: string }) => {
           <span className="rounded px-1 py-0 text-[.6rem] text-white bg-red-500 inline-block align-middle max-h-4">private</span>
         }
 
-        <UserSearch 
-          addMember={addMember.mutate}
-        />
+        <div className="flex flex-grow gap-2 justify-end">
+          <AcctSearch 
+            addMember={addMember.mutate}
+          />
+        </div>
       </div>
       <div className="container mx-auto">
         <DataTable columns={columns} data={relations} meta={meta} filters={filters}/>

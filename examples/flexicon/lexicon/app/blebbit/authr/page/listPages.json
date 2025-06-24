@@ -1,0 +1,58 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.page.listPages",
+  "revision": 1,
+  "description": "get a page list",
+  "$flexicon": {
+    "lname": "page",
+    "lplural": "pages"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "read",
+      "$flexicon": {
+        "action": "list"
+      },
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "integer"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "pages": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cuid": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  },
+                  "content": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

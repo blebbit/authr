@@ -111,7 +111,7 @@ const config: Config = {
     clientName: process.env.OAUTH_CLIENT_NAME || 'blebbit',
     publicUrl: process.env.OAUTH_PUBLIC_URL || 'https://auth.blebbit.org',
     defaultRedirect: process.env.OAUTH_DEFAULT_REDIRECT || 'https://app.blebbit.org/me',
-    bskyScopes: process.env.OAUTH_SCOPES || 'atproto transition:generic',
+    bskyScopes: process.env.OAUTH_SCOPES || 'atproto transition:generic transition:email',
     jwks: [
       process.env.OAUTH_PRIVATE_KEY_1 || "dummy1",
       process.env.OAUTH_PRIVATE_KEY_2 || "dummy2",

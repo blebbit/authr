@@ -24,14 +24,13 @@ const GROUP_COLLECTION = 'app.blebbit.authr.group'
 export function addRoutes(app: Hono) {
   app.get('/xrpc/app.blebbit.authr.getGroup', getGroup)
   app.get('/xrpc/app.blebbit.authr.getGroups', getGroups)
-
   app.post('/xrpc/app.blebbit.authr.createGroup', createGroup)
-  // app.post('/xrpc/app.blebbit.authr.updateGroup', updateGroup)
+  app.post('/xrpc/app.blebbit.authr.updateGroup', updateGroup)
   app.post('/xrpc/app.blebbit.authr.deleteGroup', deleteGroup)
 
-  app.post('/xrpc/app.blebbit.authr.addGroupMember', addGroupMember)
-  app.post('/xrpc/app.blebbit.authr.setGroupMember', setGroupMember)
-  app.post('/xrpc/app.blebbit.authr.removeGroupMember', removeGroupMember)
+  app.post('/xrpc/app.blebbit.authr.createGroupMember', createGroupMember)
+  app.post('/xrpc/app.blebbit.authr.updateGroupMember', updateGroupMember)
+  app.post('/xrpc/app.blebbit.authr.deleteGroupMember', deleteGroupMember)
 }
 
 async function getGroup(c: Context) {
@@ -52,9 +51,9 @@ async function getGroup(c: Context) {
 
   if (did) {
     const objs = groups.map((group) => {
-      return "blog/group:" + group.id
+      return "group:" + group.id
     })
-    const permCheck = await checkBulkPermissions(c.env, objs, "read", "blog/user:" + did.replaceAll(":", "_")) as { pairs: any[] }
+    const permCheck = await checkBulkPermissions(c.env, objs, "read", "user:" + did.replaceAll(":", "_")) as { pairs: any[] }
     console.log("getGroups.permCheck", JSON.stringify(permCheck, null, 2))
 
     groups = groups.filter((group, index) => {
@@ -65,8 +64,8 @@ async function getGroup(c: Context) {
 
   }
 
-  const groupSubjects = await lookupSubjects(c.env, `blog/group:${gid}`, 'read', "blog/user")
-  const groupRelations = await getRelationship(c.env, `blog/group:${gid}`, undefined, undefined)
+  const groupSubjects = await lookupSubjects(c.env, `group:${gid}`, 'read', "user")
+  const groupRelations = await getRelationship(c.env, `group:${gid}`, undefined, undefined)
   return c.json({
     groups,
     groupSubjects,
@@ -81,17 +80,6 @@ async function getGroups(c: Context) {
   // console.log("getPosts.authrSession", authrSession)
   // console.log("getPosts.pdsSession", pdsSession)
   // console.log("getPosts.headers", c.req.header())
-
-  // this little trick allows us to proxy
-  // our own api through the user's pds
-  const proxy = c.req.header('x-authr-recursive-proxy')
-  if (proxy) {
-    console.log("getGroups.recursive-proxy", proxy)
-    return xrpcProxy(c)
-  }
-
-  // console.log("getGroups.our-handler", "incoming request is from the user's PDS")
-
 
   // see if we have something to put permissions on
   var did =  pdsSession?.iss || authrSession?.did || undefined
@@ -113,9 +101,9 @@ async function getGroups(c: Context) {
   // https://authzed.com/docs/spicedb/modeling/protecting-a-list-endpoint#checking-with-checkbulkpermissions
   if (did) {
     const objs = groups.map((group) => {
-      return "blog/group:" + group.id
+      return "group:" + group.id
     })
-    const permCheck = await checkBulkPermissions(c.env, objs, "read", "blog/user:" + did.replaceAll(":", "_")) as { pairs: any[] }
+    const permCheck = await checkBulkPermissions(c.env, objs, "read", "user:" + did.replaceAll(":", "_")) as { pairs: any[] }
     console.log("getGroups.permCheck", JSON.stringify(permCheck, null, 2))
 
     groups = groups.filter((group, index) => {
@@ -126,7 +114,7 @@ async function getGroups(c: Context) {
 
   }
 
-  const groupPerms = await getRelationship(c.env, "blog/group", undefined, "blog/user:" + did.replaceAll(":", "_"))
+  const groupPerms = await getRelationship(c.env, "group", undefined, "user:" + did.replaceAll(":", "_"))
   return c.json({
     groups,
     groupPerms,
@@ -139,6 +127,7 @@ async function createGroup(c: Context) {
   const pdsSession = c.get("pdsSession")
 
   const payload = await c.req.json()
+  // TODO, validate payload against lexicon doc
   console.log("createGroup.payload", payload)
 
   // DUAL+ Write Problem
@@ -156,21 +145,48 @@ async function createGroup(c: Context) {
     }, 401)
   }
 
-  const cid = createId()
-  console.log("createGroup.cid", cid)
-  // write resource and assign owner to creator
-  const perm = await createRelationship(c.env, "blog/group:" + cid, "owner", "blog/user:" + did.replaceAll(":", "_"))
-  console.log("createGroup.perm", perm)
+  const cuid = createId()
+  var result: any
+  var perm: any
+  // TODO, create cid hash of record
 
-  // write to application database
-  const result = await createRecord(c, cid, did, GROUP_COLLECTION, {
-    name: payload.record.name,
-  }, payload.public)
-  console.log("createGroup.result", result)
+  try {
+    console.log("createGroup.cuid", cuid)
+    // write resource and assign owner to creator
+    perm = await createRelationship(c.env, "group:" + cuid, "owner", "user:" + did.replaceAll(":", "_"))
+    console.log("createGroup.perm", perm)
+  } catch (err) {
+    console.error("createGroup.createRelationship", err)
+  }
 
-  // write to account's PDS
+  try {
+    // write to application database
+    result = await createRecord(c, cuid, did, GROUP_COLLECTION, payload.record, payload.public)
+    console.log("createGroup.result", result)
+  } catch (err) {
+    console.error("createGroup.createRecord", err)
+    // delete relationship
+  }
 
-  return c.json(result)
+  try {
+    // write to account's PDS
+  } catch (err) {
+    console.error("createGroup.writeToPDS", err)
+    // we have the record and permission, we should retry in the background (with pg-boss)
+  }
+
+  return c.json({
+    ...result,
+    cuid,
+    perm,
+  })
+}
+
+async function updateGroup(c: Context) {
+
+  return c.json({
+    error: 'Not implemented',
+  }, 501)
 }
 
 
@@ -183,7 +199,7 @@ async function canWriteMember(c: Context, group: any, role: string, newDid: stri
 
   if (!canMod) {
     // check if the requester is an owner of the group
-    const check = await checkPermission(c.env, `blog/group:${group.id}`, "owner", `blog/user:${reqDid.replaceAll(":", "_")}`)
+    const check = await checkPermission(c.env, `group:${group.id}`, "owner", `user:${reqDid.replaceAll(":", "_")}`)
 
     console.log("canWriteMember.ownerCheck", check)
 
@@ -250,42 +266,54 @@ async function commonGroupMemberChecks(c: Context) {
   }
 }
 
-async function addGroupMember(c: Context) {
+async function createGroupMember(c: Context) {
  const result = await commonGroupMemberChecks(c) as any
   if (result instanceof Response) {
     return result
   }
-  console.log("addGroupMember.payload", result)
+  console.log("createGroupMember.payload", result)
   const { groupId, role, newDid } = result
 
-  // add the member to the group
-  const perm = await createRelationship(c.env, `blog/group:${groupId}`, role, `blog/user:${newDid.replaceAll(":", "_")}`)
-  console.log("addGroupMember.perm", perm)
+  //
+  // TODO, enable both users and groups to be members
+  //
+  // (same for other cruds in this category)
 
-  return c.json(perm.response, 201)
+  // add the member to the group
+  const permission = await createRelationship(c.env, `group:${groupId}`, role, `user:${newDid.replaceAll(":", "_")}`)
+
+  console.log("createGroupMember.permission", permission)
+
+  return c.json({
+    ...result,
+    permission,
+  }, 200)
 }
 
-async function setGroupMember(c: Context) {
+async function updateGroupMember(c: Context) {
  const result = await commonGroupMemberChecks(c) as any
   if (result instanceof Response) {
     return result
   }
-  console.log("setGroupMember.payload", result)
+  console.log("updateGroupMember.payload", result)
   const { groupId, role, newDid } = result
 
   // update member of the group
-  const perm = await updateRelationship(c.env, `blog/group:${groupId}`, role, `blog/user:${newDid.replaceAll(":", "_")}`)
-  console.log("addGroupMember.perm", perm)
+  const perm = await updateRelationship(c.env, `group:${groupId}`, role, `user:${newDid.replaceAll(":", "_")}`)
+  console.log("updateGroupMember.perm", perm)
 
-  return c.json(perm.response, 200)
+  return c.json({
+    ...result,
+    permission: perm,
+  }, 200)
 }
 
-async function removeGroupMember(c: Context) {
+async function deleteGroupMember(c: Context) {
   const result = await commonGroupMemberChecks(c) as any
   if (result instanceof Response) {
     return result
   }
-  console.log("addGroupMember.payload", result)
+  console.log("deleteGroupMember.payload", result)
   const { groupId, role, newDid, reqDid } = result
 
   // todo, owner should not be able to remote thmeselves
@@ -296,10 +324,13 @@ async function removeGroupMember(c: Context) {
   }
 
   // remove member from the group
-  const perm = await deleteRelationship(c.env, `blog/group:${groupId}`, role, `blog/user:${newDid.replaceAll(":", "_")}`)
-  console.log("addGroupMember.perm", perm)
+  const perm = await deleteRelationship(c.env, `group:${groupId}`, role, `user:${newDid.replaceAll(":", "_")}`)
+  console.log("deleteGroupMember.perm", perm)
 
-  return c.json(perm.response, 200)
+  return c.json({
+    ...result,
+    permission: perm,
+  }, 200)
 }
 
 async function deleteGroup(c: Context) {
@@ -329,9 +360,8 @@ async function deleteGroup(c: Context) {
 
 
   // then remove permissions tied to the group
-  const perm = await deleteRelationship(c.env, `blog/group:${groupId}`, undefined, undefined)
+  const perm = await deleteRelationship(c.env, `group:${groupId}`, undefined, undefined)
 
-  c.status(204)
   return c.json({
     message: 'Group deleted successfully',
     perm,

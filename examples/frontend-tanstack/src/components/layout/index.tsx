@@ -10,13 +10,9 @@ import Navbar from '../navbar';
 const Layout: React.FC<{ }> = ({  }) => {
   return (
     <div className='flex flex-col min-h-screen'>
-      <Navbar>
-        <div className="flex flex-grow justify-center gap-4">
-          <Link to="/posts" className='text-white hover:underline'>Posts</Link>
-        </div>
-      </Navbar>
+      <Navbar/>
       <main
-        className='flex flex-col flex-grow p-4'
+        className='flex flex-col flex-grow'
       ><Outlet /></main>
       <footer className='bg-gray-800 text-white p-4 w-full justify-center flex'>
         <p>&copy; 2025 blebbit.app</p>

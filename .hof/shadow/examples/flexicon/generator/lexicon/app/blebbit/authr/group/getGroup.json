@@ -1,0 +1,53 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.getGroup",
+  "revision": 1,
+  "description": "get a group by id",
+  "$flexicon": {
+    "lname": "group",
+    "lplural": "groups"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "read",
+      "$flexicon": {
+        "action": "get"
+      },
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "id": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id"
+        ]
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "cuid": {
+              "type": "string"
+            },
+            "name": {
+              "type": "string"
+            },
+            "display": {
+              "type": "string"
+            },
+            "description": {
+              "type": "string"
+            },
+            "public": {
+              "type": "boolean"
+            }
+          }
+        }
+      }
+    }
+  }
+}

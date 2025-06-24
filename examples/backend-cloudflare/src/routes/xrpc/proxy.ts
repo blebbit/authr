@@ -1,6 +1,5 @@
 import { Hono, Context } from 'hono'
 
-import { getSession } from '../../lib/session'
 import { genDpopProof } from '../../lib/dpop'
 
 // only export
@@ -58,7 +57,7 @@ export async function xrpcProxy(c: Context) {
   if (c.req.method === 'POST') {
     payload1.body = await c.req.text()
   }
-  console.log("xrpcProxy.payload1:", payload1)
+  // console.log("xrpcProxy.payload1:", payload1)
 
   // send request, likely to fail with 401 because we need a DPoP nonce
   const resp = await fetch(proxyUrl, payload1)
@@ -81,7 +80,7 @@ export async function xrpcProxy(c: Context) {
           'DPoP': dpop_jwt,
         },
       }
-      console.log("xrpcProxy.payload2:", payload2)
+      // console.log("xrpcProxy.payload2:", payload2)
       if (c.req.method === 'POST') {
         payload2.body = await c.req.text()
       }
