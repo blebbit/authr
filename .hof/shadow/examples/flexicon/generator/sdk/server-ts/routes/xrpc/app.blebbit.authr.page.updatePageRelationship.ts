@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_PAGE_UPDATE_PAGE_RELATIONSHIP_INPUT,
@@ -42,16 +42,19 @@ export async function updatePageRelationship(c: Context) {
   const input: APP_BLEBBIT_AUTHR_PAGE_UPDATE_PAGE_RELATIONSHIP_INPUT =
     iResult.data;
 
-  const parent = input?.parent || reqDid;
-
   // rel-update body
 
   // unpack the payload
-  console.log("addGroupMember.input", input);
+  console.log("updatePageRelationship.input", input);
 
   const reqSubj = "user:" + reqDid.replaceAll(":", "_");
   const resource = `page:${input.resource}`;
-  const subject = `user:${input.subject.replaceAll(":", "_")}`;
+  var subject = "";
+  if (input.subject.startsWith("did:")) {
+    subject = `user:${input.subject.replaceAll(":", "_")}`;
+  } else {
+    subject = `group:${input.subject}#member`;
+  }
 
   // look for the page in the database
   const dbRet = await c.env.DB.prepare(
@@ -88,7 +91,7 @@ export async function updatePageRelationship(c: Context) {
     return c.json(
       {
         error:
-          "You do not have required permission (admin) to modify relationships",
+          "You do not have required permission (admin) to call updatePageRelationship",
       },
       403,
     );
@@ -96,6 +99,12 @@ export async function updatePageRelationship(c: Context) {
 
   // create the relationship
   try {
+    console.log(
+      "updatePageRelationship.permPayload",
+      resource,
+      input.relation,
+      subject,
+    );
     // write resource and assign owner to creator
     const perm = await authz.updateRelationship(
       resource,
@@ -108,10 +117,10 @@ export async function updatePageRelationship(c: Context) {
       perm,
     });
   } catch (err) {
-    console.error("updatePageRelationship.createRelationship", err);
+    console.error("updatePageRelationship.error", err);
     return c.json(
       {
-        error: "Failed to create relationship",
+        error: "Failed to update relationship",
       },
       500,
     );
@@ -124,35 +133,3 @@ export async function updatePageRelationship(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: page
-    lplural: pages
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: rel-update
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    relation:
-                        type: string
-                    resource:
-                        type: string
-                    subject:
-                        type: string
-                required:
-                    - subject
-                    - relation
-                    - resource
-                type: object
-        type: procedure
-description: update a relationship for page
-id: app.blebbit.authr.page.updatePageRelationship
-lexicon: 1
-revision: 1
-
-*/

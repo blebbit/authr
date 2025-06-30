@@ -13,7 +13,7 @@ let cspDirectives = {
   'style-src': "'self' 'unsafe-inline'",
   'img-src': "'self' data: cdn.bsky.app",
   'font-src': "'self' data:",
-  'connect-src': "'self' auth.authr.blebbit.dev api.authr.blebbit.dev plc.blebbit.dev cloudflareinsights.com",
+  'connect-src': "'self' auth.authr.blebbit.dev api.authr.blebbit.dev plc.blebbit.dev cloudflareinsights.com public.api.bsky.app",
 };
 
 let cspHeaderValue = Object.entries(cspDirectives)

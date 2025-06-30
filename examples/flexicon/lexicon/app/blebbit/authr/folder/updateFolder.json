@@ -5,7 +5,11 @@
   "description": "update a folder",
   "$flexicon": {
     "lname": "folder",
-    "lplural": "folders"
+    "lplural": "folders",
+    "parented": true,
+    "parent": "folder",
+    "permissioned": true,
+    "typeAhead": ""
   },
   "defs": {
     "main": {
@@ -19,8 +23,14 @@
         "properties": {
           "id": {
             "type": "string"
+          },
+          "replace": {
+            "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "id"
+        ]
       },
       "input": {
         "encoding": "application/json",
@@ -28,6 +38,9 @@
           "type": "object",
           "properties": {
             "name": {
+              "type": "string"
+            },
+            "parent": {
               "type": "string"
             },
             "public": {
@@ -45,6 +58,9 @@
               "type": "string"
             },
             "name": {
+              "type": "string"
+            },
+            "parent": {
               "type": "string"
             },
             "public": {

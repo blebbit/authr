@@ -5,7 +5,11 @@
   "description": "get a folder list",
   "$flexicon": {
     "lname": "folder",
-    "lplural": "folders"
+    "lplural": "folders",
+    "parented": true,
+    "parent": "folder",
+    "permissioned": true,
+    "typeAhead": ""
   },
   "defs": {
     "main": {
@@ -17,11 +21,17 @@
       "parameters": {
         "type": "params",
         "properties": {
+          "account": {
+            "type": "string"
+          },
           "cursor": {
             "type": "string"
           },
           "limit": {
-            "type": "integer"
+            "type": "string"
+          },
+          "parent": {
+            "type": "string"
           }
         }
       },
@@ -39,6 +49,9 @@
                     "type": "string"
                   },
                   "name": {
+                    "type": "string"
+                  },
+                  "parent": {
                     "type": "string"
                   },
                   "public": {

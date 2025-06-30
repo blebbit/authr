@@ -1,84 +1,54 @@
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query"
+import { useRef } from "react";
+import { useNavigate, Outlet } from "@tanstack/react-router";
 
 import { useAuthr } from "@blebbit/authr-react-tanstack";
 
-import { FolderTree } from "@/components/widgets/folder-tree";
+import FolderTree from "@/components/widgets/folder-tree";
+import { TreeMenu } from "@/components/widgets/folder-tree/menus";
 
-const PagesLayout = () => {
+const PagesLayout = ({
+  account,
+}: {
+  account?: string
+}) => {
 
-  const [currItem, setCurrItem] = useState<any>(null);
+  const basePath = account ? `/profile/${account}/pages` : `/pages`;
+
+  const dialogRef = useRef<any | null>(null);
+  const navigate = useNavigate({})
+  const authr = useAuthr();
 
   return (
     <div className="flex flex-row flex-grow items-stretch">
-      <div className="flex flex-col gap-4 w-64 p-1 border-r">
+      <div className="flex flex-col w-64 p-1 border-r">
+        <div className="flex flex-row gap-2 p-2 justify-between items-center">
+          {/* <Input placeholder="Search..." /> */}
+          <span
+            className="font-light text-xl cursor-pointer hover:underline overflow-hidden text-ellipsis whitespace-nowrap"
+            onClick={() => navigate({ to: basePath })}
+          >{account ? account : authr.session?.handle }</span>
+          <TreeMenu dialogRef={dialogRef} />
+        </div>
+
         <FolderTree 
           onSelectChange={(item) => {
-            console.log("onSelect", item)
-            setCurrItem(item)
+            // console.log("onSelect", item)
+            // setCurrItem(item)
+            navigate({ to: `${basePath}/${item.id}` })
+            // if (item.nsid === APP_BLEBBIT_AUTHR_PAGE_RECORD_DOC.id) {
+              // if it's a page, we want to navigate to the page view 
+            // }
           }}
+          dialogRef={dialogRef}
+          account={account}
         />
       </div>
-      <PageView page={currItem}/>
+      <Outlet />
+
     </div>
   );
 }
 
-const PageView = ({
-  page,
-}:{
-  page?: any
-}) => {
-  const authr = useAuthr();
-  const session = authr.session
 
-  const authrPosts = useQuery({
-    queryKey: [session?.handle, 'authrPages'],
-    queryFn: async () => {
-
-      const r = await fetch(
-        `${import.meta.env.VITE_XRPC_HOST}/xrpc/app.blebbit.authr.getPosts`,
-      {
-          credentials: 'include',
-          headers: {
-            // 'x-authr-recursive-proxy': 'true',
-            // 'atproto-proxy': "did:web:api.authr.blebbit.dev#authr_appview"
-          }
-        }
-      )
-
-      return r.json()
-    },
-    enabled: !!(session?.did)
-  })
-
-  if (authrPosts.isLoading) {
-    return (
-      <div className="flex flex-col gap-4">
-        <p>Loading...</p>
-      </div>
-    )
-  }
-
-  // console.log("authrPosts", authrPosts)
-  // console.log("authrPosts.data", authrPosts.data)
-
-  const data = authrPosts.data as any
-
-  if (data?.error) {
-    return (
-      <div className="flex flex-col gap-4">
-        <p>Error: {data.error}</p>
-      </div>
-    )
-  }
-
-  return (
-    <div className="flex flex-col gap-4 flex-grow p-1">
-      <span className="text-2xl font-semibold">Your Page: {page?.name}</span>
-      <pre>{page?.content}</pre>
-    </div>
-  );
-}
 
 export default PagesLayout;

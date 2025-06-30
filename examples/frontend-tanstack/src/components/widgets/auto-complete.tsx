@@ -59,7 +59,7 @@ export function AutoComplete<T extends string>({
       !e.relatedTarget?.hasAttribute("cmdk-list") &&
       labels[selectedValue] !== searchValue
     ) {
-      reset();
+      // reset();
     }
   };
 
@@ -103,7 +103,7 @@ export function AutoComplete<T extends string>({
                   >
                     <Avatar>
                       <AvatarImage src={selectedAccount.avatar} />
-                      <AvatarFallback>{selectedAccount.label.substring(0,2)}</AvatarFallback>
+                      <AvatarFallback>{selectedAccount.label.replace("@@", "").substring(0,2)}</AvatarFallback>
                     </Avatar>
                     <span className="text-sm text-muted-foreground">
                       {selectedAccount.label}
@@ -146,7 +146,7 @@ export function AutoComplete<T extends string>({
                     >
                       <Avatar>
                         <AvatarImage src={option.avatar} />
-                        <AvatarFallback>{option.label.substring(0,2)}</AvatarFallback>
+                        <AvatarFallback>{option.label.replace("@@", "").substring(0,2)}</AvatarFallback>
                       </Avatar>
                       {option.label}
                     </CommandItem>

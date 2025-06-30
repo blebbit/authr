@@ -25,7 +25,11 @@ import {
   DropdownMenuSubTrigger,
 } from "@/components/ui/dropdown-menu"
 
-import { createGroupMember, deleteGroupMember, updateGroupMember } from "@/lib/sdk/group";
+import {
+  appBlebbitAuthrGroupCreateGroupRelationship,
+  appBlebbitAuthrGroupUpdateGroupRelationship,
+  appBlebbitAuthrGroupDeleteGroupRelationship,
+} from "authr-example-flexicon/client-ts"
 
 type GroupRow = {
   did: string
@@ -173,7 +177,11 @@ export const GroupView = ({ id }: { id: string }) => {
   const addMember = useMutation({
     mutationFn: async (did: string) => {
       console.log("addMember", id, did)
-      return createGroupMember(id, did)
+      return appBlebbitAuthrGroupCreateGroupRelationship({
+        resource: id,
+        relation: "reader",
+        subject: did,
+      })
     },
     onSuccess: (data) => {
       console.log("addMember.onSuccess", data)
@@ -187,7 +195,11 @@ export const GroupView = ({ id }: { id: string }) => {
   const setRole = useMutation({
     mutationFn: async ({did, role}: {did: string, role: string}) => {
       console.log("setRole", id, did, role)
-      return updateGroupMember(id, did, role)
+      return appBlebbitAuthrGroupUpdateGroupRelationship({
+        resource: id,
+        relation: role,
+        subject: did,
+      })
     },
     onSuccess: (data) => {
       console.log("setRole.onSuccess", data)
@@ -201,7 +213,10 @@ export const GroupView = ({ id }: { id: string }) => {
   const removeMember = useMutation({
     mutationFn: async (did: string) => {
       console.log("removeMember", id, did)
-      return deleteGroupMember(id, did)
+      return appBlebbitAuthrGroupDeleteGroupRelationship({
+        resource: id,
+        subject: did,
+      })
     },
     onSuccess: (data) => {
       console.log("removeMember.onSuccess", data)

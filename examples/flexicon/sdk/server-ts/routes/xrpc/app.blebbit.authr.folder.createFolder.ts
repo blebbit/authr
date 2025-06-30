@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_FOLDER_CREATE_FOLDER_INPUT,
@@ -43,8 +43,6 @@ export async function createFolder(c: Context) {
   }
   const input: APP_BLEBBIT_AUTHR_FOLDER_CREATE_FOLDER_INPUT = iResult.data;
 
-  const parent = input?.parent || reqDid;
-
   // create body
 
   console.log("createFolder.input", input);
@@ -60,7 +58,17 @@ export async function createFolder(c: Context) {
     console.log("createFolder.cuid", cuid);
     // write resource and assign owner to creator
     perm = await authz.createRelationship("folder:" + cuid, "owner", reqSubj);
-    console.log("createFolder.perm", perm);
+    console.log("createFolder.perm.owner", perm);
+
+    // TODO, if parent, create relationship to parent
+    if (input.parent) {
+      const pperm = await authz.createRelationship(
+        "folder:" + cuid,
+        "parent",
+        "folder:" + input.parent,
+      );
+      console.log("createFolder.perm.parent", pperm);
+    }
   } catch (err) {
     console.error("createFolder.createRelationship", err);
   }
@@ -78,7 +86,13 @@ export async function createFolder(c: Context) {
     console.log("createFolder.result", result);
   } catch (err) {
     console.error("createFolder.createRecord", err);
-    // delete relationship
+    // delete all relationships
+    perm = await authz.deleteRelationship(
+      "folder:" + cuid,
+      undefined,
+      undefined,
+    );
+    console.log("createFolder.perm CLEANUP", perm);
   }
 
   try {
@@ -101,40 +115,3 @@ export async function createFolder(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: folder
-    lplural: folders
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: create
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        output:
-            encoding: application/json
-            schema:
-                properties:
-                    cuid:
-                        type: string
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        type: procedure
-description: create a folder
-id: app.blebbit.authr.folder.createFolder
-lexicon: 1
-revision: 1
-
-*/

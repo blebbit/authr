@@ -14,21 +14,35 @@ export function createObjectReference(objectType: string) {
 }
 
 export function createSubjectReference(subjectType: string) {
-  const [subjectTypeName, subjectId] = subjectType.split(":");
-  return spice.SubjectReference.create({
+  var [subjectTypeName, subjectId] = subjectType.split(":");
+  var [subjectId, optionalRelation] = subjectId.split("#")
+
+  console.log("createSubjectReference", subjectTypeName, subjectId, optionalRelation);
+  var opts: any = {
     object: spice.ObjectReference.create({
       objectType: subjectTypeName,
       objectId: subjectId,
     }),
-  });
+  }
+  if (optionalRelation) {
+    opts.optionalRelation = optionalRelation;
+  }
+  return spice.SubjectReference.create(opts);
 }
 
 export function createSubjectFilter(subjectType: string) {
-  const [subjectTypeName, subjectId] = subjectType.split(":");
-  return spice.SubjectFilter.create({
+  var [subjectTypeName, subjectId] = subjectType.split(":");
+  var [subjectId, optionalRelation] = subjectId.split("#")
+  var opts: any = {
     subjectType: subjectTypeName,
     optionalSubjectId: subjectId || undefined,
-  });
+  }
+  if (optionalRelation) {
+    opts.optionalRelation = {
+      relation: optionalRelation,
+    }
+  }
+  return spice.SubjectFilter.create(opts);
 }
 
 export function createCheckPermissionRequest(objectType: string, permission: string, subjectType: string) {
@@ -42,6 +56,7 @@ export function createCheckPermissionRequest(objectType: string, permission: str
 }
 
 export function createRelationshipFilter(objectType?: string, relation?: string, subjectType?: string) {
+  console.log("createRelationshipFilter", objectType, relation, subjectType);
   const filter: spice.RelationshipFilter = {};
   if (objectType) {
     const parts = objectType.split(":");

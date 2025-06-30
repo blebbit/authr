@@ -8,5 +8,5 @@ export const Route = createFileRoute('/groups/$id')({
 
 function RouteComponent() {
   const { id } = Route.useParams()
-  return <GroupView id={id} />
+  return <GroupView gid={id} />
 }

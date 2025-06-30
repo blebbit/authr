@@ -3,11 +3,11 @@ export async function xrpcCall({
   method,
   params,
   payload,
-  verbose = true,
+  verbose = false,
 }: {
   nsid: string,
   method: string,
-  params?: Record<string, string | string[]>,
+  params?: any,
   payload?: any
   verbose?: boolean,
 }) {
@@ -23,7 +23,7 @@ export async function xrpcCall({
       if (Array.isArray(value)) {
         value.forEach(item => usp.append(key, item))
       } else {
-        usp.append(key, value)
+        usp.append(key, value as string)
       }
     })
     path += `?${usp.toString()}`
@@ -38,8 +38,23 @@ export async function xrpcCall({
     opts["body"] = JSON.stringify(payload)
   }
 
-  const resp = await fetch(url, opts)
-  // todo, check for response status and errors
+  const resp = await fetch(url, opts as any)
+
+  if (verbose) {
+    console.log(`${nsid}.response`, resp.status, resp.statusText, resp.headers.get("content-type"))
+  }
+
+  // check for errors and format better
+  if (resp.status >= 400) {
+    console.error("Error in xrpcCall:", resp.statusText);
+    throw new Error(`Failed to call ${method} ${nsid}: ${resp.statusText}`);
+  }
+
+  if (!resp.ok) {
+    const errorText = await resp.text()
+    throw new Error(`Failed to call ${method} ${nsid}: ${resp.status} ${resp.statusText} - ${errorText}`)
+  }
+
   const output = await resp.json()
   if (verbose) {
     console.log(`${nsid}.output`, output)

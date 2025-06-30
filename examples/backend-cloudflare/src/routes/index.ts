@@ -1,6 +1,6 @@
 import { Hono, Context } from 'hono'
 
-import { addRoutes as webooksRoutes } from './webhooks'
+import { addRoutes as webhooksRoutes } from './webhooks'
 import { addRoutes as proxyRoutes } from './xrpc/proxy'
 
 import { xrpcRouter } from 'authr-example-flexicon/server-ts'
@@ -8,7 +8,7 @@ import { xrpcRouter } from 'authr-example-flexicon/server-ts'
 export function addRoutes(app: Hono) {
   app.get('/', hello)
 
-  webooksRoutes(app)
+  webhooksRoutes(app)
 
   // XRPC routes
   // 1. app routes

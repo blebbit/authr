@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_FOLDER_UPDATE_FOLDER_PARAMETERS,
@@ -9,6 +9,8 @@ import {
   APP_BLEBBIT_AUTHR_FOLDER_UPDATE_FOLDER_INPUT_SCHEMA,
   type APP_BLEBBIT_AUTHR_FOLDER_UPDATE_FOLDER_OUTPUT,
 } from "authr-example-flexicon";
+
+import { updateRecord } from "authr-example-flexicon/lib/storage";
 
 export async function updateFolder(c: Context) {
   console.log("POST /xrpc/app.blebbit.authr.folder.updateFolder");
@@ -57,11 +59,49 @@ export async function updateFolder(c: Context) {
   }
   const input: APP_BLEBBIT_AUTHR_FOLDER_UPDATE_FOLDER_INPUT = iResult.data;
 
-  const parent = input?.parent || reqDid;
+  // create body
 
-  // update body
+  console.log("updateFolder.input", params, input);
+  const authz = c.get("authzClient") as AuthzClient;
 
-  // Check permissions using Authzed
+  const resId = `folder:${params.id}`;
+  const reqSubj = "user:" + reqDid.replaceAll(":", "_");
+
+  const permCheck = (await authz.checkPermission(resId, "admin", reqSubj)) as {
+    allowed: string;
+  };
+  console.log("updateFolder.permCheck", JSON.stringify(permCheck, null, 2));
+
+  if (permCheck.allowed !== "yes") {
+    return c.json(
+      {
+        error: "Permission denied",
+      },
+      403,
+    );
+  }
+
+  var result: any;
+
+  try {
+    // write to application database
+    result = await updateRecord(c, params.id, input, {});
+    console.log("updateFolder.result", result);
+  } catch (err) {
+    console.error("updateFolder.createRecord", err);
+    // delete relationship
+  }
+
+  try {
+    // write to account's PDS
+  } catch (err) {
+    console.error("updateFolder.writeToPDS", err);
+    // we have the record and permission, we should retry in the background (with pg-boss)
+  }
+
+  return c.json({
+    ...result,
+  });
 
   return c.json(
     {
@@ -70,45 +110,3 @@ export async function updateFolder(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: folder
-    lplural: folders
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: update
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        output:
-            encoding: application/json
-            schema:
-                properties:
-                    cuid:
-                        type: string
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        parameters:
-            properties:
-                id:
-                    type: string
-            type: params
-        type: procedure
-description: update a folder
-id: app.blebbit.authr.folder.updateFolder
-lexicon: 1
-revision: 1
-
-*/

@@ -5,7 +5,11 @@
   "description": "create a folder",
   "$flexicon": {
     "lname": "folder",
-    "lplural": "folders"
+    "lplural": "folders",
+    "parented": true,
+    "parent": "folder",
+    "permissioned": true,
+    "typeAhead": ""
   },
   "defs": {
     "main": {
@@ -20,6 +24,9 @@
           "type": "object",
           "properties": {
             "name": {
+              "type": "string"
+            },
+            "parent": {
               "type": "string"
             },
             "public": {
@@ -37,6 +44,9 @@
               "type": "string"
             },
             "name": {
+              "type": "string"
+            },
+            "parent": {
               "type": "string"
             },
             "public": {

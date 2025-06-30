@@ -31,8 +31,8 @@ export type AuthzClient = {
   ) => Promise<any>,
   deleteRelationship: (
     resource: string,
-    relation: string,
-    subject: string,
+    relation?: string,
+    subject?: string,
   ) => Promise<any>,
   checkPermission: (
     resource: string,
@@ -218,8 +218,8 @@ export function getAuthzClient(config: AuthzConfig) {
 
     deleteRelationship: async (
       resource: string,
-      relation: string,
-      subject: string,
+      relation?: string,
+      subject?: string,
     ) => {
       const response = await callAuthz(config, {
         method: "DELETE",

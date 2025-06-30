@@ -89,6 +89,7 @@
   },
   "dependencies": {
     "@paralleldrive/cuid2": "^2.2.2",
-    "hono": "^4.7.11"
+    "hono": "^4.7.11",
+    "workers-qb": "^1.10.2"
   }
 }

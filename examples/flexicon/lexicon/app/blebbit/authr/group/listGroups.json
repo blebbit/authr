@@ -5,7 +5,11 @@
   "description": "get a group list",
   "$flexicon": {
     "lname": "group",
-    "lplural": "groups"
+    "lplural": "groups",
+    "parented": false,
+    "parent": "",
+    "permissioned": true,
+    "typeAhead": "name"
   },
   "defs": {
     "main": {
@@ -17,11 +21,14 @@
       "parameters": {
         "type": "params",
         "properties": {
+          "account": {
+            "type": "string"
+          },
           "cursor": {
             "type": "string"
           },
           "limit": {
-            "type": "integer"
+            "type": "string"
           }
         }
       },

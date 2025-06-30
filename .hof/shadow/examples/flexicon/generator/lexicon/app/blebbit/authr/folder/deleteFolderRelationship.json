@@ -5,7 +5,11 @@
   "description": "delete a relationship for folder",
   "$flexicon": {
     "lname": "folder",
-    "lplural": "folders"
+    "lplural": "folders",
+    "parented": true,
+    "parent": "folder",
+    "permissioned": true,
+    "typeAhead": ""
   },
   "defs": {
     "main": {

@@ -5,7 +5,11 @@
   "description": "get a folder by id",
   "$flexicon": {
     "lname": "folder",
-    "lplural": "folders"
+    "lplural": "folders",
+    "parented": true,
+    "parent": "folder",
+    "permissioned": true,
+    "typeAhead": ""
   },
   "defs": {
     "main": {
@@ -18,6 +22,9 @@
         "type": "params",
         "properties": {
           "id": {
+            "type": "string"
+          },
+          "account": {
             "type": "string"
           }
         },

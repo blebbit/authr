@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_PAGE_CREATE_PAGE_INPUT,
@@ -43,8 +43,6 @@ export async function createPage(c: Context) {
   }
   const input: APP_BLEBBIT_AUTHR_PAGE_CREATE_PAGE_INPUT = iResult.data;
 
-  const parent = input?.parent || reqDid;
-
   // create body
 
   console.log("createPage.input", input);
@@ -60,7 +58,17 @@ export async function createPage(c: Context) {
     console.log("createPage.cuid", cuid);
     // write resource and assign owner to creator
     perm = await authz.createRelationship("page:" + cuid, "owner", reqSubj);
-    console.log("createPage.perm", perm);
+    console.log("createPage.perm.owner", perm);
+
+    // TODO, if parent, create relationship to parent
+    if (input.parent) {
+      const pperm = await authz.createRelationship(
+        "page:" + cuid,
+        "parent",
+        "folder:" + input.parent,
+      );
+      console.log("createPage.perm.parent", pperm);
+    }
   } catch (err) {
     console.error("createPage.createRelationship", err);
   }
@@ -78,7 +86,9 @@ export async function createPage(c: Context) {
     console.log("createPage.result", result);
   } catch (err) {
     console.error("createPage.createRecord", err);
-    // delete relationship
+    // delete all relationships
+    perm = await authz.deleteRelationship("page:" + cuid, undefined, undefined);
+    console.log("createPage.perm CLEANUP", perm);
   }
 
   try {
@@ -101,42 +111,3 @@ export async function createPage(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: page
-    lplural: pages
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: create
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        output:
-            encoding: application/json
-            schema:
-                properties:
-                    content:
-                        type: string
-                    cuid:
-                        type: string
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        type: procedure
-description: create a page
-id: app.blebbit.authr.page.createPage
-lexicon: 1
-revision: 1
-
-*/

@@ -1,18 +1,16 @@
 definition user {}
 
 definition group {
-  // recursive groups
-  relation parent: group
-
   // role assignments
   relation owner: user | group#member
   relation editor: user | group#member
   relation reader: user | group#member
 
+  // pseudo member role as a permission
   permission member = owner + editor + reader
 
   // permissions over the group
-  permission admin = owner + parent->admin
-  permission write = editor + admin + parent->write
-  permission read = reader + write + parent->read
+  permission admin = owner
+  permission write = editor + admin
+  permission read = reader + write
 }

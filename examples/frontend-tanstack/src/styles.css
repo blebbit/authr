@@ -1,5 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
+@plugin "@tailwindcss/typography";
 @import "@blebbit/authr-react-common/style.css";
 @import "@blebbit/authr-react-tanstack/style.css";
 

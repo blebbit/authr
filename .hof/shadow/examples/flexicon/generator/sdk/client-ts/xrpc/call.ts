@@ -1,20 +1,18 @@
 export async function xrpcCall({
-  name,
   nsid,
   method,
-  payload,
   params,
-  verbose = true,
+  payload,
+  verbose = false,
 }: {
-  name: string,
   nsid: string,
   method: string,
+  params?: any,
   payload?: any
-  params?: Record<string, string | string[]>,
   verbose?: boolean,
 }) {
   if (verbose) {
-    console.log(`${name}.input`, nsid, method, payload)
+    console.log(`${nsid}.input`, params, payload)
   }
 
   var path = `/xrpc/${nsid}`
@@ -41,9 +39,25 @@ export async function xrpcCall({
   }
 
   const resp = await fetch(url, opts)
+
+  if (verbose) {
+    console.log(`${nsid}.response`, resp.status, resp.statusText, resp.headers.get("content-type"))
+  }
+
+  // check for errors and format better
+  if (resp.status >= 400) {
+    console.error("Error in xrpcCall:", resp.statusText);
+    throw new Error(`Failed to call ${method} ${nsid}: ${resp.statusText}`);
+  }
+
+  if (!resp.ok) {
+    const errorText = await resp.text()
+    throw new Error(`Failed to call ${method} ${nsid}: ${resp.status} ${resp.statusText} - ${errorText}`)
+  }
+
   const output = await resp.json()
   if (verbose) {
-    console.log("sdk.createGroupMember.resp", output)
+    console.log(`${nsid}.output`, output)
   }
   return output
 }
