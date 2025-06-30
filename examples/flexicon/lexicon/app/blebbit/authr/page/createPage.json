@@ -5,7 +5,11 @@
   "description": "create a page",
   "$flexicon": {
     "lname": "page",
-    "lplural": "pages"
+    "lplural": "pages",
+    "parented": true,
+    "parent": "folder",
+    "permissioned": true,
+    "typeAhead": ""
   },
   "defs": {
     "main": {
@@ -22,8 +26,14 @@
             "name": {
               "type": "string"
             },
+            "parent": {
+              "type": "string"
+            },
             "public": {
               "type": "boolean"
+            },
+            "content": {
+              "type": "string"
             }
           }
         }
@@ -37,6 +47,9 @@
               "type": "string"
             },
             "name": {
+              "type": "string"
+            },
+            "parent": {
               "type": "string"
             },
             "public": {

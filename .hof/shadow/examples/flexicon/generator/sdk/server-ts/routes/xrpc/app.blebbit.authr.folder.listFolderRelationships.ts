@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_FOLDER_LIST_FOLDER_RELATIONSHIPS_PARAMETERS,
@@ -46,8 +46,6 @@ export async function listFolderRelationships(c: Context) {
   // else case in template when no input schema is defined
   const input = undefined;
 
-  const parent = input?.parent || reqDid;
-
   // rel-list body
 
   return c.json(
@@ -57,45 +55,3 @@ export async function listFolderRelationships(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: folder
-    lplural: folders
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: rel-list
-        output:
-            encoding: application/json
-            schema:
-                properties:
-                    folders:
-                        items:
-                            properties:
-                                relation:
-                                    type: string
-                                resource:
-                                    type: string
-                                subject:
-                                    type: string
-                            type: object
-                        type: array
-                type: object
-        parameters:
-            properties:
-                cursor:
-                    type: string
-                id:
-                    type: string
-                limit:
-                    type: integer
-            type: params
-        type: query
-description: get a list of relationships for a folder
-id: app.blebbit.authr.folder.listFolderRelationships
-lexicon: 1
-revision: 1
-
-*/

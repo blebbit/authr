@@ -10,6 +10,7 @@ export const Sharing = ({
       <AcctSearch
         addMember={(subject: string) => {
           console.log("Adding member with subject:", subject);
+          addMember?.(subject);
         }}
       />
     </div>

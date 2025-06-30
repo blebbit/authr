@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_FOLDER_DELETE_FOLDER_RELATIONSHIP_INPUT,
@@ -42,16 +42,19 @@ export async function deleteFolderRelationship(c: Context) {
   const input: APP_BLEBBIT_AUTHR_FOLDER_DELETE_FOLDER_RELATIONSHIP_INPUT =
     iResult.data;
 
-  const parent = input?.parent || reqDid;
-
   // rel-delete body
 
   // unpack the payload
-  console.log("addGroupMember.input", input);
+  console.log("deleteFolderRelationship.input", input);
 
   const reqSubj = "user:" + reqDid.replaceAll(":", "_");
   const resource = `folder:${input.resource}`;
-  const subject = `user:${input.subject.replaceAll(":", "_")}`;
+  var subject = "";
+  if (input.subject.startsWith("did:")) {
+    subject = `user:${input.subject.replaceAll(":", "_")}`;
+  } else {
+    subject = `group:${input.subject}#member`;
+  }
 
   // look for the folder in the database
   const dbRet = await c.env.DB.prepare(
@@ -94,8 +97,14 @@ export async function deleteFolderRelationship(c: Context) {
     );
   }
 
-  // create the relationship
+  // delete the relationship
   try {
+    console.log(
+      "deleteFolderRelationship.permPayload",
+      resource,
+      input.relation,
+      subject,
+    );
     // write resource and assign owner to creator
     const perm = await authz.deleteRelationship(
       resource,
@@ -108,10 +117,10 @@ export async function deleteFolderRelationship(c: Context) {
       perm,
     });
   } catch (err) {
-    console.error("deleteFolderRelationship.createRelationship", err);
+    console.error("deleteFolderRelationship.deleteRelationship", err);
     return c.json(
       {
-        error: "Failed to create relationship",
+        error: "Failed to delete relationship",
       },
       500,
     );
@@ -124,34 +133,3 @@ export async function deleteFolderRelationship(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: folder
-    lplural: folders
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: rel-delete
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    relation:
-                        type: string
-                    resource:
-                        type: string
-                    subject:
-                        type: string
-                required:
-                    - subject
-                    - resource
-                type: object
-        type: procedure
-description: delete a relationship for folder
-id: app.blebbit.authr.folder.deleteFolderRelationship
-lexicon: 1
-revision: 1
-
-*/

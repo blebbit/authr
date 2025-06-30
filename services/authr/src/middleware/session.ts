@@ -24,7 +24,7 @@ export default async (c: Context, next: Next) => {
     authrSession = await getSession(c);
   } catch (error) {
     if (error.claim === 'exp' && error.code === 'ERR_JWT_EXPIRED') {
-      console.error("Authr cookie expired...:", error)
+      // console.error("Authr cookie expired...:", error)
 
       authrSession = await addSession(c, {
         did: error.payload.did,
@@ -37,14 +37,14 @@ export default async (c: Context, next: Next) => {
     }
   }
 
-  console.log("sessionHandler:", c.req.path, authrSession?.did)
+  // console.log("sessionHandler:", c.req.path, authrSession?.did)
 
   // lookup in database or cache (?)
   if (authrSession) {
 
     // check for expired session
     if (new Date(authrSession.exp) > new Date()) {
-      console.log("sessionHandler.sessionExpired:", authrSession.exp)
+      // console.log("sessionHandler.sessionExpired:", authrSession.exp)
       throw new HTTPException(401, { message: 'Session expired' })
     }
 

@@ -5,7 +5,11 @@
   "description": "create a relationship for page",
   "$flexicon": {
     "lname": "page",
-    "lplural": "pages"
+    "lplural": "pages",
+    "parented": true,
+    "parent": "folder",
+    "permissioned": true,
+    "typeAhead": ""
   },
   "defs": {
     "main": {

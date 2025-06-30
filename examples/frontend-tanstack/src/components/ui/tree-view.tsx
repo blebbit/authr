@@ -19,6 +19,8 @@ const dragOverVariants = cva(
 interface TreeDataItem {
     id: string
     name: string
+    nsid?: string
+    parent?: string
     icon?: any
     selectedIcon?: any
     openIcon?: any

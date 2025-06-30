@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_PAGE_LIST_PAGES_PARAMETERS,
@@ -43,37 +43,34 @@ export async function listPages(c: Context) {
   // else case in template when no input schema is defined
   const input = undefined;
 
-  const parent = input?.parent || reqDid;
-
   // list body
+  console.log("listPages.list params", params);
+
+  const account = params.account || undefined;
   const limit = params.limit || 10;
-  const cursor = params.cursor || 0;
-  console.log("listPages.limit", limit);
-  console.log("listPages.cursor", cursor);
-  console.log("NSID: app.blebbit.authr.page.listPages");
+  const cursor = params.cursor;
+  const parent = params.parent || "";
 
   const authz = c.get("authzClient") as AuthzClient;
-  // Lookup permissions using Authzed
-  // we just look up them all for the current user for now
-  // could probably use in an "IN" clause for SQL...
-  // or we could use a spicedb bulk lookup
-
   const reqSubj = "user:" + reqDid.replaceAll(":", "_");
-  console.log("listPages.reqSubj", reqSubj);
   const reqPerms = await authz.getRelationship(`page`, undefined, reqSubj);
   console.log("listPages.reqPerms", reqPerms);
 
-  // need to account for cursor and limit still
-  const dbRet = await c.env.DB.prepare(
-    "SELECT * FROM records WHERE nsid = ? LIMIT ?",
-  )
-    .bind("app.blebbit.authr.page.record", limit)
-    .all();
-
-  var results = dbRet.results as any[];
-  console.log("listPages.results", results);
-
+  // results we build up
+  var results: any[] = [];
+  // if auth'd, filter by permissions, otherwise just return public records
   if (reqDid) {
+    // need to account for cursor and limit still
+    // need to loop until we reach limit or end of results (after filtering for permisssions)
+    const dbRet = await c.env.DB.prepare(
+      "SELECT * FROM records WHERE nsid = ? AND parent = ? LIMIT ?",
+    )
+      .bind("app.blebbit.authr.page.record", parent, limit)
+      .all();
+
+    results = dbRet.results as any[];
+    console.log("listPages.results", results);
+
     var objs = results.map((page) => {
       return "page:" + page.id;
     });
@@ -90,6 +87,15 @@ export async function listPages(c: Context) {
       // TODO, ensure we have the same id for each item
       return el.public || perm?.response?.item?.permissionship === 2;
     });
+  } else {
+    // need to account for cursor and limit still
+    const dbRet = await c.env.DB.prepare(
+      "SELECT * FROM records WHERE nsid = ? AND parent = ? AND public = 1 LIMIT ?",
+    )
+      .bind("app.blebbit.authr.page.record", parent, cursor, limit)
+      .all();
+
+    results = dbRet.results as any[];
   }
 
   return c.json({
@@ -105,45 +111,3 @@ export async function listPages(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: page
-    lplural: pages
-defs:
-    main:
-        $authzed: read
-        $flexicon:
-            action: list
-        output:
-            encoding: application/json
-            schema:
-                properties:
-                    pages:
-                        items:
-                            properties:
-                                content:
-                                    type: string
-                                cuid:
-                                    type: string
-                                name:
-                                    type: string
-                                public:
-                                    type: boolean
-                            type: object
-                        type: array
-                type: object
-        parameters:
-            properties:
-                cursor:
-                    type: string
-                limit:
-                    type: integer
-            type: params
-        type: query
-description: get a page list
-id: app.blebbit.authr.page.listPages
-lexicon: 1
-revision: 1
-
-*/

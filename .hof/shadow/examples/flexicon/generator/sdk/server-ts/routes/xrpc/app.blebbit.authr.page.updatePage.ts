@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_PAGE_UPDATE_PAGE_PARAMETERS,
@@ -9,6 +9,8 @@ import {
   APP_BLEBBIT_AUTHR_PAGE_UPDATE_PAGE_INPUT_SCHEMA,
   type APP_BLEBBIT_AUTHR_PAGE_UPDATE_PAGE_OUTPUT,
 } from "authr-example-flexicon";
+
+import { updateRecord } from "authr-example-flexicon/lib/storage";
 
 export async function updatePage(c: Context) {
   console.log("POST /xrpc/app.blebbit.authr.page.updatePage");
@@ -56,11 +58,49 @@ export async function updatePage(c: Context) {
   }
   const input: APP_BLEBBIT_AUTHR_PAGE_UPDATE_PAGE_INPUT = iResult.data;
 
-  const parent = input?.parent || reqDid;
+  // create body
 
-  // update body
+  console.log("updatePage.input", params, input);
+  const authz = c.get("authzClient") as AuthzClient;
 
-  // Check permissions using Authzed
+  const resId = `page:${params.id}`;
+  const reqSubj = "user:" + reqDid.replaceAll(":", "_");
+
+  const permCheck = (await authz.checkPermission(resId, "admin", reqSubj)) as {
+    allowed: string;
+  };
+  console.log("updatePage.permCheck", JSON.stringify(permCheck, null, 2));
+
+  if (permCheck.allowed !== "yes") {
+    return c.json(
+      {
+        error: "Permission denied",
+      },
+      403,
+    );
+  }
+
+  var result: any;
+
+  try {
+    // write to application database
+    result = await updateRecord(c, params.id, input, {});
+    console.log("updatePage.result", result);
+  } catch (err) {
+    console.error("updatePage.createRecord", err);
+    // delete relationship
+  }
+
+  try {
+    // write to account's PDS
+  } catch (err) {
+    console.error("updatePage.writeToPDS", err);
+    // we have the record and permission, we should retry in the background (with pg-boss)
+  }
+
+  return c.json({
+    ...result,
+  });
 
   return c.json(
     {
@@ -69,47 +109,3 @@ export async function updatePage(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: page
-    lplural: pages
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: update
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        output:
-            encoding: application/json
-            schema:
-                properties:
-                    content:
-                        type: string
-                    cuid:
-                        type: string
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        parameters:
-            properties:
-                id:
-                    type: string
-            type: params
-        type: procedure
-description: update a page
-id: app.blebbit.authr.page.updatePage
-lexicon: 1
-revision: 1
-
-*/

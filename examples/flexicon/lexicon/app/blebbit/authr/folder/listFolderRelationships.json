@@ -5,7 +5,11 @@
   "description": "get a list of relationships for a folder",
   "$flexicon": {
     "lname": "folder",
-    "lplural": "folders"
+    "lplural": "folders",
+    "parented": true,
+    "parent": "folder",
+    "permissioned": true,
+    "typeAhead": ""
   },
   "defs": {
     "main": {

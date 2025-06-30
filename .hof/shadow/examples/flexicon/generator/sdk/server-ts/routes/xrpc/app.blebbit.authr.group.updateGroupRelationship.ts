@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_GROUP_UPDATE_GROUP_RELATIONSHIP_INPUT,
@@ -42,16 +42,19 @@ export async function updateGroupRelationship(c: Context) {
   const input: APP_BLEBBIT_AUTHR_GROUP_UPDATE_GROUP_RELATIONSHIP_INPUT =
     iResult.data;
 
-  const parent = input?.parent || reqDid;
-
   // rel-update body
 
   // unpack the payload
-  console.log("addGroupMember.input", input);
+  console.log("updateGroupRelationship.input", input);
 
   const reqSubj = "user:" + reqDid.replaceAll(":", "_");
   const resource = `group:${input.resource}`;
-  const subject = `user:${input.subject.replaceAll(":", "_")}`;
+  var subject = "";
+  if (input.subject.startsWith("did:")) {
+    subject = `user:${input.subject.replaceAll(":", "_")}`;
+  } else {
+    subject = `group:${input.subject}#member`;
+  }
 
   // look for the group in the database
   const dbRet = await c.env.DB.prepare(
@@ -88,7 +91,7 @@ export async function updateGroupRelationship(c: Context) {
     return c.json(
       {
         error:
-          "You do not have required permission (admin) to modify relationships",
+          "You do not have required permission (admin) to call updateGroupRelationship",
       },
       403,
     );
@@ -96,6 +99,12 @@ export async function updateGroupRelationship(c: Context) {
 
   // create the relationship
   try {
+    console.log(
+      "updateGroupRelationship.permPayload",
+      resource,
+      input.relation,
+      subject,
+    );
     // write resource and assign owner to creator
     const perm = await authz.updateRelationship(
       resource,
@@ -108,10 +117,10 @@ export async function updateGroupRelationship(c: Context) {
       perm,
     });
   } catch (err) {
-    console.error("updateGroupRelationship.createRelationship", err);
+    console.error("updateGroupRelationship.error", err);
     return c.json(
       {
-        error: "Failed to create relationship",
+        error: "Failed to update relationship",
       },
       500,
     );
@@ -124,35 +133,3 @@ export async function updateGroupRelationship(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: group
-    lplural: groups
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: rel-update
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    relation:
-                        type: string
-                    resource:
-                        type: string
-                    subject:
-                        type: string
-                required:
-                    - subject
-                    - relation
-                    - resource
-                type: object
-        type: procedure
-description: update a relationship for group
-id: app.blebbit.authr.group.updateGroupRelationship
-lexicon: 1
-revision: 1
-
-*/

@@ -4,76 +4,82 @@ import (
   "github.com/blebbit/flexicon/codegen/schema"
 )
 
-groupAuthzed: schema.#Lexicon & {
-  id: "app.blebbit.authr.group.authzed"
-  revision: 1
-  description: "Relations and permissions available on groups for the Authr Example"
+lexicon: {
 
-  $authzed: {
-    relations: {
-      parent: ["group"]
-      owner: ["user", "group#member"]
-      editor: ["user", "group#member"]
-      reader: ["user", "group#member"]
-    }
-    permissions: {
-      member: "owner + editor + reader"
-      // permissions over the group
-      admin: "owner + parent->admin"
-      write: "editor + admin + parent->write"
-      read: "reader + write + parent->read"
-    }
-  }
+  groupAuthzed: schema.#Lexicon & {
+    id: "app.blebbit.authr.group.authzed"
+    revision: 1
+    description: "Relations and permissions available on groups for the Authr Example"
 
-  defs: {}
-}
-
-groupDefs: schema.#Lexicon & {
-
-  id: "app.blebbit.authr.group.defs"
-  revision: 1
-  description: "Common defs for the Authr Example"
-
-  defs: {
-    groupView: schema.#Object & {
-      properties: {
-        cuid: schema.#String
-        name: schema.#String
-        display: schema.#String
-        description: schema.#String
-        public: schema.#Boolean
+    $authzed: {
+      relations: {
+        owner: ["user", "group#member"]
+        editor: ["user", "group#member"]
+        reader: ["user", "group#member"]
+      }
+      permissions: {
+        // pseudo member role as a permission
+        member: "owner + editor + reader"
+        // permissions over the group
+        admin: "owner + parent->admin"
+        write: "editor + admin + parent->write"
+        read: "reader + write + parent->read"
       }
     }
-    groupForm: schema.#Object & {
-      properties: {
-        name: schema.#String
-        display: schema.#String
-        description: schema.#String
-        public: schema.#Boolean
+
+    defs: {}
+  }
+
+  groupDefs: schema.#Lexicon & {
+
+    id: "app.blebbit.authr.group.defs"
+    revision: 1
+    description: "Common defs for the Authr Example"
+
+    defs: {
+      groupView: schema.#Object & {
+        properties: {
+          cuid: schema.#String
+          name: schema.#String
+          display: schema.#String
+          description: schema.#String
+          public: schema.#Boolean
+        }
       }
-      required: ["name"]
+      groupForm: schema.#Object & {
+        properties: {
+          name: schema.#String
+          display: schema.#String
+          description: schema.#String
+          public: schema.#Boolean
+        }
+        required: ["name"]
+      }
     }
   }
-}
 
-groupRecord: schema.#Lexicon & {
-  id: "app.blebbit.authr.group.record"
-  revision: 1
-  description: "Lexicon for groups on Authr Example"
+  groupRecord: schema.#Lexicon & {
+    id: "app.blebbit.authr.group.record"
+    revision: 1
+    description: "Lexicon for groups on Authr Example"
 
-  defs: {
-    main: schema.#Record & {
-      key: "tid"
-      record: groupDefs.defs.groupView
+    defs: {
+      main: schema.#Record & {
+        key: "tid"
+        record: groupDefs.defs.groupView
+      }
     }
   }
+
+  (#CRUD & {
+    #params: {
+      name: "group"
+
+      typeAhead: "name"
+
+      form: groupDefs.defs.groupForm
+      view: groupDefs.defs.groupView
+    }
+  }).lexicon
+
 }
-
-(#CRUD & {
-  #params: {
-    name: "group"
-
-    form: groupDefs.defs.groupForm
-    view: groupDefs.defs.groupView
-  }
-}).lexicon

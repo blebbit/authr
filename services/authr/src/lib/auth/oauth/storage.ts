@@ -59,7 +59,7 @@ export class SessionStore implements NodeSavedSessionStore {
   }
 
   async set(key: string, val: NodeSavedSession) {
-    console.log("SessionStore.set", key, val)
+    // console.log("SessionStore.set", key, val)
 
     const claims = jose.decodeJwt(val.tokenSet.access_token)
     // console.log("SessionStore.set.claims:", claims);

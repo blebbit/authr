@@ -17,7 +17,7 @@ import config from '@/config';
 
 export const hasAuthzApikey = async (c: Context) => {
   const apikey = c.req.header('x-authr-apikey');
-  console.log("hasAuthzApikey.apikey", apikey, config.spicedb.adminApikey);
+  // console.log("hasAuthzApikey.apikey", apikey, config.spicedb.adminApikey);
 
   if (!apikey || apikey !== config.spicedb.adminApikey) {
     return false
@@ -83,9 +83,9 @@ export const handleLookupResources = async (c: Context) => {
   }
 
   const data: any = await c.req.json()
-  console.log("lookupResources.data", data)
+  // console.log("lookupResources.data", data)
   const r: any = await lookupResources(data.resource, data.permission, data.subject)
-  console.log("lookupResources.r", r)
+  // console.log("lookupResources.r", r)
 
   return c.json(r)
 }
@@ -96,9 +96,9 @@ export const handleLookupSubjects = async (c: Context) => {
     return c.json({ message: "Unauthorized" }, { status: 401 });
   }
   const data: any = await c.req.json()
-  console.log("lookupSubjects.data", data)
+  // console.log("lookupSubjects.data", data)
   const r: any = await lookupSubjects(data.resource, data.permission, data.subject)
-  console.log("lookupSubjects.r", r)
+  // console.log("lookupSubjects.r", r)
   return c.json(r)
 }
 
@@ -110,9 +110,9 @@ export const handleGetRelationship = async (c: Context) => {
   }
 
   const data: any = await c.req.json()
-  console.log("getRelationship.data", data)
+  // console.log("getRelationship.data", data)
   const r: any = await getRelationship(data.resource, data.relation, data.subject)
-  console.log("getRelationship.r", r)
+  // console.log("getRelationship.r", r)
 
   return c.json(r)
 }
@@ -125,9 +125,9 @@ export const handleCreateRelationship = async (c: Context) => {
   }
 
   const data: any = await c.req.json()
-  console.log("createRelationship.data", data)
+  // console.log("createRelationship.data", data)
   const r: any = await createRelationship(data.resource, data.relation, data.subject)
-  console.log("createRelationship.r", r)
+  // console.log("createRelationship.r", r)
 
   return c.json(r)
 }
@@ -140,9 +140,9 @@ export const handleUpdateRelationship = async (c: Context) => {
   }
 
   const data: any = await c.req.json()
-  console.log("createRelationship.data", data)
+  // console.log("createRelationship.data", data)
   const r: any = await updateRelationship(data.resource, data.relation, data.subject)
-  console.log("createRelationship.r", r)
+  // console.log("createRelationship.r", r)
 
   return c.json(r)
 }
@@ -155,9 +155,9 @@ export const handleDeleteRelationship = async (c: Context) => {
   }
 
   const data: any = await c.req.json()
-  console.log("createRelationship.data", data)
+  // console.log("createRelationship.data", data)
   const r: any = await deleteRelationship(data.resource, data.relation, data.subject)
-  console.log("createRelationship.r", r)
+  // console.log("createRelationship.r", r)
 
   return c.json(r)
 }
@@ -170,9 +170,9 @@ export const handleCheckPermission = async (c: Context) => {
   }
 
   const data: any = await c.req.json()
-  console.log("checkPermission.data", data)
+  // console.log("checkPermission.data", data)
   const r: any = await checkPermission(data.resource, data.permission, data.subject)
-  console.log("checkPermission.r", r)
+  // console.log("checkPermission.r", r)
 
   return c.json(r)
 }
@@ -185,9 +185,9 @@ export const handleCheckBulkPermissions = async (c: Context) => {
   }
 
   const data: any = await c.req.json()
-  console.log("checkBulkPermissions.data", data)
+  // console.log("checkBulkPermissions.data", data)
   const r: any = await checkBulkPermission(data.resources, data.permission, data.subject)
-  console.log("checkBulkPermissions.r", r)
+  // console.log("checkBulkPermissions.r", r)
 
   return c.json(r)
 }

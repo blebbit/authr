@@ -5,7 +5,11 @@
   "description": "update a group",
   "$flexicon": {
     "lname": "group",
-    "lplural": "groups"
+    "lplural": "groups",
+    "parented": false,
+    "parent": "",
+    "permissioned": true,
+    "typeAhead": "name"
   },
   "defs": {
     "main": {
@@ -19,8 +23,14 @@
         "properties": {
           "id": {
             "type": "string"
+          },
+          "replace": {
+            "type": "boolean"
           }
-        }
+        },
+        "required": [
+          "id"
+        ]
       },
       "input": {
         "encoding": "application/json",

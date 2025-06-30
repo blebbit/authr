@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_INPUT,
@@ -43,8 +43,6 @@ export async function createGroup(c: Context) {
   }
   const input: APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_INPUT = iResult.data;
 
-  const parent = input?.parent || reqDid;
-
   // create body
 
   console.log("createGroup.input", input);
@@ -60,7 +58,17 @@ export async function createGroup(c: Context) {
     console.log("createGroup.cuid", cuid);
     // write resource and assign owner to creator
     perm = await authz.createRelationship("group:" + cuid, "owner", reqSubj);
-    console.log("createGroup.perm", perm);
+    console.log("createGroup.perm.owner", perm);
+
+    // TODO, if parent, create relationship to parent
+    if (input.parent) {
+      const pperm = await authz.createRelationship(
+        "group:" + cuid,
+        "parent",
+        ":" + input.parent,
+      );
+      console.log("createGroup.perm.parent", pperm);
+    }
   } catch (err) {
     console.error("createGroup.createRelationship", err);
   }
@@ -78,7 +86,13 @@ export async function createGroup(c: Context) {
     console.log("createGroup.result", result);
   } catch (err) {
     console.error("createGroup.createRecord", err);
-    // delete relationship
+    // delete all relationships
+    perm = await authz.deleteRelationship(
+      "group:" + cuid,
+      undefined,
+      undefined,
+    );
+    console.log("createGroup.perm CLEANUP", perm);
   }
 
   try {
@@ -101,50 +115,3 @@ export async function createGroup(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: group
-    lplural: groups
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: create
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    description:
-                        type: string
-                    display:
-                        type: string
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                required:
-                    - name
-                type: object
-        output:
-            encoding: application/json
-            schema:
-                properties:
-                    cuid:
-                        type: string
-                    description:
-                        type: string
-                    display:
-                        type: string
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        type: procedure
-description: create a group
-id: app.blebbit.authr.group.createGroup
-lexicon: 1
-revision: 1
-
-*/

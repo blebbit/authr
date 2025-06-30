@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_RELATIONSHIP_INPUT,
@@ -42,8 +42,6 @@ export async function createGroupRelationship(c: Context) {
   const input: APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_RELATIONSHIP_INPUT =
     iResult.data;
 
-  const parent = input?.parent || reqDid;
-
   // rel-create body
 
   // unpack the payload
@@ -51,7 +49,12 @@ export async function createGroupRelationship(c: Context) {
 
   const reqSubj = "user:" + reqDid.replaceAll(":", "_");
   const resource = `group:${input.resource}`;
-  const subject = `user:${input.subject.replaceAll(":", "_")}`;
+  var subject = "";
+  if (input.subject.startsWith("did:")) {
+    subject = `user:${input.subject.replaceAll(":", "_")}`;
+  } else {
+    subject = `group:${input.subject}#member`;
+  }
 
   // look for the group in the database
   const dbRet = await c.env.DB.prepare(
@@ -107,6 +110,12 @@ export async function createGroupRelationship(c: Context) {
 
   // create the relationship
   try {
+    console.log(
+      "createGroupRelationship.permPayload",
+      resource,
+      input.relation,
+      subject,
+    );
     // write resource and assign owner to creator
     const perm = await authz.createRelationship(
       resource,
@@ -135,35 +144,3 @@ export async function createGroupRelationship(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: group
-    lplural: groups
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: rel-create
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    relation:
-                        type: string
-                    resource:
-                        type: string
-                    subject:
-                        type: string
-                required:
-                    - subject
-                    - relation
-                    - resource
-                type: object
-        type: procedure
-description: create a relationship for group
-id: app.blebbit.authr.group.createGroupRelationship
-lexicon: 1
-revision: 1
-
-*/

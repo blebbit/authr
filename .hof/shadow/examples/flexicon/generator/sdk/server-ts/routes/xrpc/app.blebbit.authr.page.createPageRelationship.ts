@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_PAGE_CREATE_PAGE_RELATIONSHIP_INPUT,
@@ -42,16 +42,19 @@ export async function createPageRelationship(c: Context) {
   const input: APP_BLEBBIT_AUTHR_PAGE_CREATE_PAGE_RELATIONSHIP_INPUT =
     iResult.data;
 
-  const parent = input?.parent || reqDid;
-
   // rel-create body
 
   // unpack the payload
-  console.log("addGroupMember.input", input);
+  console.log("createPageRelationship.input", input);
 
   const reqSubj = "user:" + reqDid.replaceAll(":", "_");
   const resource = `page:${input.resource}`;
-  const subject = `user:${input.subject.replaceAll(":", "_")}`;
+  var subject = "";
+  if (input.subject.startsWith("did:")) {
+    subject = `user:${input.subject.replaceAll(":", "_")}`;
+  } else {
+    subject = `group:${input.subject}#member`;
+  }
 
   // look for the page in the database
   const dbRet = await c.env.DB.prepare(
@@ -96,6 +99,12 @@ export async function createPageRelationship(c: Context) {
 
   // create the relationship
   try {
+    console.log(
+      "createPageRelationship.permPayload",
+      resource,
+      input.relation,
+      subject,
+    );
     // write resource and assign owner to creator
     const perm = await authz.createRelationship(
       resource,
@@ -124,35 +133,3 @@ export async function createPageRelationship(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: page
-    lplural: pages
-defs:
-    main:
-        $authzed: admin
-        $flexicon:
-            action: rel-create
-        input:
-            encoding: application/json
-            schema:
-                properties:
-                    relation:
-                        type: string
-                    resource:
-                        type: string
-                    subject:
-                        type: string
-                required:
-                    - subject
-                    - relation
-                    - resource
-                type: object
-        type: procedure
-description: create a relationship for page
-id: app.blebbit.authr.page.createPageRelationship
-lexicon: 1
-revision: 1
-
-*/

@@ -5,7 +5,11 @@
   "description": "get a list of relationships for a group",
   "$flexicon": {
     "lname": "group",
-    "lplural": "groups"
+    "lplural": "groups",
+    "parented": false,
+    "parent": "",
+    "permissioned": true,
+    "typeAhead": "name"
   },
   "defs": {
     "main": {

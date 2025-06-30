@@ -1,6 +1,6 @@
 import { type Context } from "hono";
 
-import { type AuthzClient } from "authr-example-flexicon";
+import { type AuthzClient } from "authr-example-flexicon/lib/authz";
 
 import {
   type APP_BLEBBIT_AUTHR_FOLDER_GET_FOLDER_PARAMETERS,
@@ -43,17 +43,15 @@ export async function getFolder(c: Context) {
   // else case in template when no input schema is defined
   const input = undefined;
 
-  const parent = input?.parent || reqDid;
-
   // get body
   const id = params.id;
   console.log("getFolder.id", id);
   const reqSubj = "user:" + reqDid.replaceAll(":", "_");
-  const subjId = `folder:${id}`;
+  const resId = `folder:${id}`;
 
   const authz = c.get("authzClient") as AuthzClient;
   // Check permissions using Authzed
-  const reqPerm = await authz.getRelationship(subjId, undefined, undefined);
+  const reqPerm = await authz.getRelationship(resId, undefined, undefined);
   console.log("getFolder.reqPerm", reqPerm);
 
   const dbRet = await c.env.DB.prepare(
@@ -68,11 +66,9 @@ export async function getFolder(c: Context) {
   var result = undefined;
 
   if (reqDid && results.length > 0) {
-    const permCheck = (await authz.checkPermission(
-      subjId /*should be resourceId*/,
-      "read",
-      reqSubj,
-    )) as { allowed: string };
+    const permCheck = (await authz.checkPermission(resId, "read", reqSubj)) as {
+      allowed: string;
+    };
     console.log("getFolder.permCheck", JSON.stringify(permCheck, null, 2));
 
     if (results[0].public || permCheck?.allowed === "yes") {
@@ -81,7 +77,7 @@ export async function getFolder(c: Context) {
   }
 
   // also condition on results and permissions
-  const folderSubjects = await authz.lookupSubjects(subjId, "read", "user");
+  const folderSubjects = await authz.lookupSubjects(resId, "read", "user");
 
   return c.json({
     folder: result,
@@ -97,38 +93,3 @@ export async function getFolder(c: Context) {
     501,
   );
 }
-
-/*
-$flexicon:
-    lname: folder
-    lplural: folders
-defs:
-    main:
-        $authzed: read
-        $flexicon:
-            action: get
-        output:
-            encoding: application/json
-            schema:
-                properties:
-                    cuid:
-                        type: string
-                    name:
-                        type: string
-                    public:
-                        type: boolean
-                type: object
-        parameters:
-            properties:
-                id:
-                    type: string
-            required:
-                - id
-            type: params
-        type: query
-description: get a folder by id
-id: app.blebbit.authr.folder.getFolder
-lexicon: 1
-revision: 1
-
-*/

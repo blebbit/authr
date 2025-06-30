@@ -1,0 +1,71 @@
+{
+  "lexicon": 1,
+  "id": "app.blebbit.authr.group.typeAheadGroups",
+  "revision": 1,
+  "description": "get matching group by name prefix",
+  "$flexicon": {
+    "lname": "group",
+    "lplural": "groups",
+    "parented": false,
+    "parent": "",
+    "permissioned": true,
+    "typeAhead": "name"
+  },
+  "defs": {
+    "main": {
+      "$authzed": "read",
+      "$flexicon": {
+        "action": "type-ahead"
+      },
+      "type": "query",
+      "parameters": {
+        "type": "params",
+        "properties": {
+          "prefix": {
+            "type": "string"
+          },
+          "account": {
+            "type": "string"
+          },
+          "cursor": {
+            "type": "string"
+          },
+          "limit": {
+            "type": "string"
+          }
+        }
+      },
+      "output": {
+        "encoding": "application/json",
+        "schema": {
+          "type": "object",
+          "properties": {
+            "groups": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "properties": {
+                  "cuid": {
+                    "type": "string"
+                  },
+                  "name": {
+                    "type": "string"
+                  },
+                  "display": {
+                    "type": "string"
+                  },
+                  "description": {
+                    "type": "string"
+                  },
+                  "public": {
+                    "type": "boolean"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

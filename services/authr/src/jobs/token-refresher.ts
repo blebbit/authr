@@ -29,7 +29,7 @@ export async function tokenRefresher() {
     // create refresh work queue and handler
     await boss.createQueue(AtprotoOauthRefreshQueue)
     await boss.work(AtprotoOauthRefreshQueue, { pollingIntervalSeconds: 10, batchSize: 100 }, async (jobs) => {
-      console.log('AtprotoOauthRefreshQueue jobs:', jobs)
+      // console.log('AtprotoOauthRefreshQueue jobs:', jobs)
 
       const client = await getClient()
       for (const job of jobs) {
@@ -48,13 +48,13 @@ export async function tokenRefresher() {
       // removeOnFail: false,
     })
     await boss.work(AtprotoOauthRefreshCron, { pollingIntervalSeconds: 10 }, async (job) => {
-      console.log('CRON', job.map((j) => j.id))
+      // console.log('CRON', job.map((j) => j.id))
       // lookup aging tokens
 
       const sessions = await db
         .selectFrom("oauth_session")
-        .select(["key", "refresh_expires_at"])
-        .where("refresh_expires_at", "<", new Date(Date.now() + 1000 * 60 * 10)) // expires in less than 10 minutes
+        .select(["key", "access_expires_at"])
+        .where("access_expires_at", "<", new Date(Date.now() + 1000 * 60 * 10)) // expires in less than 10 minutes
         .execute()
 
       // console.log('AtprotoOauthRefreshCron sessions:', sessions)

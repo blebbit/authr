@@ -2,28 +2,9 @@ import { useAuthr } from "@blebbit/authr-react-tanstack";
 import { Link } from "@tanstack/react-router"
 import { useQuery, useQueries, useMutation, useQueryClient } from "@tanstack/react-query"
 
-import { type ColumnDef } from "@tanstack/react-table"
 import { AcctSearch } from "@/components/widgets/acct-search";
-import { DataTable } from "@/components/widgets/data-table"
 
-import { 
-  ArrowLeft,
-  ArrowUpDown,
-  MoreHorizontal,
-} from "lucide-react"
-import { Button } from "@/components/ui/button"
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-  DropdownMenuPortal,
-  DropdownMenuSub,
-  DropdownMenuSubContent,
-  DropdownMenuSubTrigger,
-} from "@/components/ui/dropdown-menu"
+import { ArrowLeft } from "lucide-react"
 
 import {
   APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_DOC
@@ -35,122 +16,24 @@ import {
   appBlebbitAuthrGroupUpdateGroupRelationship,
   appBlebbitAuthrGroupDeleteGroupRelationship,
 } from 'authr-example-flexicon/client-ts'
+import { PermissionTable } from "../widgets/perm-table";
 
-type GroupRow = {
-  did: string
-  handle: string
-  role: "owner" | "member"
-  extra?: any
-}
+const groupRoles = [
+  "owner",
+  "editor",
+  "reader",
+]
 
-export const columns: ColumnDef<GroupRow>[] = [{
-  accessorKey: "role",
-  header: ({ column }) => {
-    return (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Role 
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    )
-  },
-},{
-  accessorKey: "handle",
-  header: ({ column }) => {
-    return (
-      <Button
-        variant="ghost"
-        onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
-      >
-        Handle 
-        <ArrowUpDown className="ml-2 h-4 w-4" />
-      </Button>
-    )
-  },
-  cell: ({ row }) => {
-    const handle: string = row.getValue("handle")
-    const url = `https://blebbit.app/at/${handle}`
-
-    return (
-      <Link
-        to={url}
-        className="text-blue-500 hover:underline"
-      >
-        {handle}
-      </Link>
-    )
-  }
-},{
-  accessorKey: "did",
-  header: "DID",
-},{
-  id: "actions",
-  cell: ({ row, table }) => {
-    const meta = table.options.meta as any
-    const acctInfo = row.original
-
-    const roles = ["owner", "editor", "reader"]
-
-    return (
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="ghost" className="h-8 w-8 p-0">
-            <span className="sr-only">menu</span>
-            <MoreHorizontal className="h-4 w-4" />
-          </Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent align="end">
-
-          { meta.isOwner && (
-            <>
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuSub>
-                <DropdownMenuSubTrigger>Set Role</DropdownMenuSubTrigger>
-                <DropdownMenuPortal>
-                  <DropdownMenuSubContent>
-                    {roles.map(role => (
-                      <DropdownMenuItem
-                        key={role}
-                        onSelect={() => meta.setRole({ did: acctInfo.did, role })}
-                      >
-                        {role.charAt(0).toUpperCase() + role.slice(1)}
-                      </DropdownMenuItem>
-                    ))}
-                  </DropdownMenuSubContent>
-                </DropdownMenuPortal>
-              </DropdownMenuSub>
-              <DropdownMenuItem
-                onClick={() => meta.removeMember(acctInfo.did)}
-              >
-                Remove
-              </DropdownMenuItem>
-              <DropdownMenuSeparator />
-            </>
-          )}
-
-          <DropdownMenuItem className="p-0">
-            <Link to={`https://blebbit.app/at/${acctInfo.did}`}
-              className="py-1.5 w-full text-center"
-            >View on Blebbit</Link>
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
-    )
-  },
-}]
-
-export const GroupView = ({ id }: { id: string }) => {
+export const GroupView = ({ gid }: { gid: string }) => {
   const queryClient = useQueryClient();
   const authr = useAuthr();
   const session = authr.session
 
   const authrGroup: any = useQuery({
-    queryKey: [APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_DOC.id, id],
+    queryKey: [APP_BLEBBIT_AUTHR_GROUP_CREATE_GROUP_DOC.id, gid],
     queryFn: async () => {
       return appBlebbitAuthrGroupGetGroup({
-        id,
+        id: gid,
       })
     },
     // enabled: !!(session?.did)
@@ -159,68 +42,83 @@ export const GroupView = ({ id }: { id: string }) => {
   const acctInfos: any[] = useQueries({
     queries: (authrGroup.data?.groupRelations || []).map((relation: any) => {
       const did = relation.relationship.subject.object.objectId.replaceAll("_", ":")
-      return ({
-        queryKey: [did, 'info'],
-        queryFn: async () => {
-          const r = await fetch(`https://plc.blebbit.dev/info/${did}`)
+      if (did.startsWith("did:")) {
+        return ({
+          queryKey: [did, 'info'],
+          queryFn: async () => {
+            const r = await fetch(`https://plc.blebbit.dev/info/${did}`)
 
-          return r.json()
-        },
-        staleTime: 5 * 60 * 1000,
-        // enabled: !!(relation.relationship.subject.object.objectId)
-      })
+            return r.json()
+          },
+          staleTime: 5 * 60 * 1000,
+          // enabled: !!(relation.relationship.subject.object.objectId)
+        })
+      } else {
+        return ({
+          queryKey: ["group", 'info'],
+          queryFn: async () => {
+            const g = await appBlebbitAuthrGroupGetGroup({
+              id: did,
+            })
+            console.log("groupInfo queryFn", did, g)
+            return g
+          },
+          staleTime: 5 * 60 * 1000,
+          // enabled: !!(relation.relationship.subject.object.objectId)
+        })
+      }
     })
   })
 
-  const addMember = useMutation({
-    mutationFn: async (did: string) => {
-      console.log("addMember", id, did)
+  const createRelation = useMutation({
+    mutationFn: async ({id, relation}: {id: string, relation: string}) => {
+      console.log("createRelation", gid, id, relation)
       return appBlebbitAuthrGroupCreateGroupRelationship({
-        resource: id,
-        relation: "reader",
-        subject: did,
+        resource: gid,
+        relation,
+        subject: id,
       })
     },
     onSuccess: (data) => {
-      console.log("addMember.onSuccess", data)
+      console.log("createRelation.onSuccess", data)
       setTimeout(() => {
-        console.log("addMember.onSuccess.invalidateQueries", id)
-        queryClient.invalidateQueries({ queryKey:['authrGroups', id]})
+        console.log("createRelation.onSuccess.invalidateQueries", gid)
+        queryClient.invalidateQueries({ queryKey:['authrGroups', gid]})
       }, 3000)
     }
   })
 
-  const setRole = useMutation({
-    mutationFn: async ({did, role}: {did: string, role: string}) => {
-      console.log("setRole", id, did, role)
+  const updateRelation = useMutation({
+    mutationFn: async ({id, relation}: {id: string, relation: string}) => {
+      console.log("updateRelation", gid, id, relation)
       return appBlebbitAuthrGroupUpdateGroupRelationship({
-        resource: id,
-        relation: role,
-        subject: did,
+        resource: gid,
+        relation,
+        subject: id,
       })
     },
     onSuccess: (data) => {
-      console.log("setRole.onSuccess", data)
+      console.log("updateRelation.onSuccess", data)
       setTimeout(() => {
-        console.log("setRole.onSuccess.invalidateQueries", id)
-        queryClient.invalidateQueries({ queryKey:['authrGroups', id]})
+        console.log("updateRelation.onSuccess.invalidateQueries", gid)
+        queryClient.invalidateQueries({ queryKey:['authrGroups', gid]})
       }, 2000)
     }
   })
 
-  const removeMember = useMutation({
-    mutationFn: async (did: string) => {
-      console.log("removeMember", id, did)
+  const deleteRelation = useMutation({
+    mutationFn: async ({id}: {id: string}) => {
+      console.log("deleteRelation", gid, id)
       return appBlebbitAuthrGroupDeleteGroupRelationship({
-        resource: id,
-        subject: did,
+        resource: gid,
+        subject: id,
       })
     },
     onSuccess: (data) => {
-      console.log("removeMember.onSuccess", data)
+      console.log("deleteRelation.onSuccess", data)
       setTimeout(() => {
-        console.log("removeMember.onSuccess.invalidateQueries", id)
-        queryClient.invalidateQueries({ queryKey:['authrGroups', id]})
+        console.log("deleteRelation.onSuccess.invalidateQueries", gid)
+        queryClient.invalidateQueries({ queryKey:['authrGroups', gid]})
       }, 3000)
     }
   })
@@ -235,11 +133,13 @@ export const GroupView = ({ id }: { id: string }) => {
     )
   }
 
-  // console.log("authrGroup", authrGroup)
-  // console.log("authrGroup.data", authrGroup.data)
+  console.log("authrGroup", authrGroup)
+  console.log("authrGroup.data", authrGroup.data)
+  console.log("authrGroup.accInfos", acctInfos)
 
   const data = authrGroup.data as any
   const group = data?.group || null
+  const relations = data?.groupRelations || []
   console.log("authrGroup.group", group)
   const value = JSON.parse(group?.value || '{}')
   console.log("authrGroup.value", value)
@@ -251,46 +151,6 @@ export const GroupView = ({ id }: { id: string }) => {
       </div>
     )
   }
-
-  var relations: GroupRow[] = []
-  if (data?.groupRelations && data?.groupRelations.length > 0) {
-    relations = data.groupRelations.map( (relation: any) => {
-      const did = relation.relationship.subject.object.objectId.replaceAll("_", ":")
-      const info = acctInfos.find(info => info.data?.did === did)
-
-      return {
-        did,
-        handle: info.data?.handle,
-        role: relation.relationship.relation,
-        extra: {
-          relation,
-          info,
-        }
-      }
-    })
-  }
-
-  console.log("relations", relations)
-
-  const meta = {
-    setRole: setRole.mutate,
-    addMember: addMember.mutate,
-    removeMember: removeMember.mutate,
-    slug: "love",
-    isOwner: data?.groupRelations.some((relation: any) =>
-      relation.relationship.subject.object.objectId.replaceAll("_", ":") === session?.did &&
-      relation.relationship.relation === "owner"
-    ),
-    group,
-    groupId: group?.id,
-  }
-
-  const filters = [{
-    name: "Handle",
-    key: "handle",
-    placeholder: "Filter by handle",
-  }]
-
 
   return (
     <div className="flex flex-col gap-4 p-4">
@@ -310,13 +170,18 @@ export const GroupView = ({ id }: { id: string }) => {
 
         <div className="flex flex-grow gap-2 justify-end">
           <AcctSearch 
-            addMember={addMember.mutate}
+            addMember={createRelation.mutate}
           />
         </div>
       </div>
-      <div className="container mx-auto">
-        <DataTable columns={columns} data={relations} meta={meta} filters={filters}/>
-      </div>
+      <PermissionTable
+        roles={groupRoles}
+        relations={relations}
+        memberInfos={acctInfos}
+        createRelation={createRelation.mutate}
+        updateRelation={updateRelation.mutate}
+        deleteRelation={deleteRelation.mutate}
+      />
     </div>
   )
 }

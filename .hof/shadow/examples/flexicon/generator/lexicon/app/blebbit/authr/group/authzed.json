@@ -5,9 +5,6 @@
   "description": "Relations and permissions available on groups for the Authr Example",
   "$authzed": {
     "relations": {
-      "parent": [
-        "group"
-      ],
       "owner": [
         "user",
         "group#member"

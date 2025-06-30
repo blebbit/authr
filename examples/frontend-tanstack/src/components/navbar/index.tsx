@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { use } from 'react';
 import { useNavigate, Link } from '@tanstack/react-router';
 
 import { AuthrButton, DropdownMenuItem } from '@blebbit/authr-react-tanstack';
+import { useAuthr } from '@blebbit/authr-react-tanstack';
 
 const Navbar = () => {
+  const authr = useAuthr();
   const navigate = useNavigate();
 
   return (
@@ -18,6 +20,9 @@ const Navbar = () => {
         </div>
       </div>
       <AuthrButton>
+        <DropdownMenuItem onSelect={() => navigate({ to: `/profile/${authr.session.handle}` })}>
+          Profile
+        </DropdownMenuItem>
         <DropdownMenuItem onSelect={() => navigate({ to: "/groups" })}>
           Groups
         </DropdownMenuItem>

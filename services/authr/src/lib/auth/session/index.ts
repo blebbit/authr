@@ -78,7 +78,7 @@ export async function getSession(c: Context): Promise<Session | null> {
   const cookie = getCookie(c, config.cookie.name);
 
   if (!cookie) {
-    console.log(`Cookie '${config.cookie.name}' not found.`);
+    // console.log(`Cookie '${config.cookie.name}' not found.`);
     return null;
   }
 
