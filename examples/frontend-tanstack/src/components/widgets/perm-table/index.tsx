@@ -120,6 +120,9 @@ export const PermissionTable = ({
     })
   }
 
+  // filter rows by role
+  rows = rows.filter(row => row.role !== "parent")
+
   // console.log("rows", rows)
 
   const meta = {

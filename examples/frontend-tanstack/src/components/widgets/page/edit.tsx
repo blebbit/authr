@@ -1,8 +1,14 @@
-import { useEffect } from 'react'
 import {
   type AnyFieldApi,
   useForm,
 } from '@tanstack/react-form'
+import "@uiw/react-md-editor/markdown-editor.css";
+import "@uiw/react-markdown-preview/markdown.css";
+import MDEditor from '@uiw/react-md-editor';
+import rehypeSanitize from "rehype-sanitize";
+
+
+import * as commands from "@uiw/react-md-editor/commands"
 
 import { cn } from '@/lib/utils'
 
@@ -61,14 +67,23 @@ export const PageEdit = ({
                       <FieldInfo field={field}/>
                     </span>
                   </div>
-                  <textarea
-                    className="border p-2 rounded h-128"
-                    id={field.name}
-                    name={field.name}
-                    value={field.state.value}
-                    onBlur={field.handleBlur}
-                    onChange={(e) => field.handleChange(e.target.value)}
-                  />
+                    <div className="container">
+                      <MDEditor
+                        id={field.name}
+                        name={field.name}
+
+                        className="border p-2 rounded h-full"
+                        value={field.state.value}
+                        onBlur={field.handleBlur}
+                        onChange={(val) => {
+                          // console.log('onChange', val)
+                          field.handleChange(val)
+                        }}
+                        previewOptions={{
+                          rehypePlugins: [[rehypeSanitize]],
+                        }}
+                      />
+                    </div>
                 </>
               )
             }}

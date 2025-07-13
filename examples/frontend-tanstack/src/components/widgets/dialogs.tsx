@@ -323,7 +323,7 @@ export const Dialogs = ({
 
         return (
           <>
-            <Sharing addMember={(subject: string) => createFolderRelation.mutate({ id: subject, relation: "reader" })} />
+            <Sharing addMember={createFolderRelation.mutate} />
             <PermissionTable
               roles={roles}
               relations={openDialogItem?.relations}
@@ -431,7 +431,7 @@ export const Dialogs = ({
       content: () => {
         return (
           <>
-            <Sharing addMember={(subject: string) => createFolderRelation.mutate({ id: subject, relation: "reader" })} />
+            <Sharing addMember={createFolderRelation.mutate} />
             <PermissionTable
               roles={roles}
               relations={openDialogItem?.relations}

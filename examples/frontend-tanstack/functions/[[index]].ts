@@ -35,7 +35,7 @@ let securityHeaders = {
 }
 
 let sanitiseHeaders = {
-	"Server" : "My New Server Header!!!",
+	"Server" : "Authr Example Frontend",
 }
 
 let removeHeaders = [

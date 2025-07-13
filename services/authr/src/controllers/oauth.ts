@@ -45,15 +45,17 @@ export const login = async (c: Context) => {
   // const ac = new AbortController()
   // req.on('close', () => ac.abort())
 
-  // Authorize
+  // get did from handle now that we have a step.1 authorized user
+  const info = await lookupInfo(handle)
+
+  // get AT SDK with OAuth client
   const at = await getClient()
+
+  // Authorize
   const url = await at.authorize(handle, {
     // signal: ac.signal,
     scope: config.oauth.bskyScopes,
   })
-
-  // get did from handle now that we have a step.1 authorized user
-  const info = await lookupInfo(handle)
 
   // upsert user, set redirect
   const userinfo = await db.selectFrom("oauth_userinfo")

@@ -1,9 +1,11 @@
 version: "3"
 
 volumes:
-  spice_pgdata:
   authr_pgdata:
+  spice_pgdata:
   pgboss_pgdata:
+  pds_data:
+  pds_blobs:
 
 services:
   spicedb:
@@ -78,3 +80,13 @@ services:
     ports:
     - "5434:5432"
  
+  pds:
+    image: "blebbit/pds:latest"
+    # restart: always
+    env_file:
+      - ./pds.env
+    volumes:
+      - pds_data:/app/data
+      - pds_blobs:/app/blobs
+    ports:
+    - "3002:3000"
